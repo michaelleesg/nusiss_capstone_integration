@@ -1,10 +1,13 @@
-# ingest.py
 import os, time, uuid, argparse
 import httpx, numpy as np
 from tqdm import tqdm
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # ---- Env / CLI ----
 NER_BIO_SOURCE = os.getenv("NER_BIO_SOURCE", "/data/ner_training.txt")
@@ -13,6 +16,7 @@ MODEL_NAME = os.getenv("MODEL_NAME", "all-MiniLM-L6-v2")
 QDRANT_URL = os.getenv("QDRANT_URL", "http://qdrant:6333")
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "1000"))
 EMBEDDING_BACKUP_PATH = os.getenv("EMBEDDING_BACKUP_PATH", "/data/embedding_backup.npy")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--skip-recreate", action="store_true", help="Skip collection deletion/recreation")
