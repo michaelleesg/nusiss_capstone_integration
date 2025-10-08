@@ -1,6 +1,10 @@
 from transformers import AutoTokenizer, AutoModelForTokenClassification, DataCollatorForTokenClassification, TrainingArguments, Trainer
 from datasets import Dataset
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Read file directly instead of load_dataset
 data_path = "ner_training.txt"
