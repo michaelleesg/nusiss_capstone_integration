@@ -1,0 +1,38 @@
+{
+  "from": "NERAgent",
+  "to": "ThreatScoringAgent",
+  "doc_id": "doc001",
+  "timestamp": "2025-10-02T09:00:01Z",
+  "payload": {
+    "entities": [
+      {
+        "start": 0,
+        "end": 14,
+        "label": "CVE",
+        "method": "regex",
+        "confidence": 1.0
+      },
+      {
+        "start": 71,
+        "end": 78,
+        "label": "IP",
+        "method": "regex",
+        "confidence": 1.0
+      },
+      {
+        "start": 100,
+        "end": 115,
+        "label": "DOMAIN",
+        "method": "regex",
+        "confidence": 1.0
+      },
+      {
+        "start": 40,
+        "end": 45,
+        "label": "THREAT_ACTOR",
+        "method": "dict",
+        "confidence": 0.9
+      }
+    ]
+  }
+}

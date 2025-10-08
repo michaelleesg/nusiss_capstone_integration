@@ -1,0 +1,26 @@
+[
+  {
+    "input": "CVE-9999-XXXX is fake",
+    "expected": "INVALID",
+    "actual": "INVALID",
+    "result": "PASS"
+  },
+  {
+    "input": "CVE-2025-12345 patched",
+    "expected": "VALID",
+    "actual": "VALID",
+    "result": "PASS"
+  },
+  {
+    "input": "domain bad..com is malformed",
+    "expected": "INVALID",
+    "actual": "INVALID",
+    "result": "PASS"
+  },
+  {
+    "input": "abc-malware[.]com",
+    "expected": "VALID",
+    "actual": "VALID",
+    "result": "PASS"
+  }
+]

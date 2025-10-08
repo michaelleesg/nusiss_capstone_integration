@@ -1,0 +1,32 @@
+
+# 2025-10-08 17:57:04.901959
++y
+
+# 2025-10-08 17:57:12.058283
++n
+
+# 2025-10-08 17:57:20.141389
++mkdir -p ~/.secrets
++printf 'OPENAI_API_KEY=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\n' > ~/.secrets/openai.env
++echo 'set -a; [ -f ~/.secrets/openai.env ] && . ~/.secrets/openai.env; set +a' >> ~/.bashrc
++source ~/.bashrc
+
+# 2025-10-08 17:57:53.432970
++y
+
+# 2025-10-08 17:58:47.720849
++n
+
+# 2025-10-08 18:42:17.099900
++/add 3_search_api_rich.py 2_ingest_vector_wsl.py 2_ingest_vector.py ingest_wrapper.py Dockerfile docker-compose.yml how_to_run.txt
++
++Refactor Agent B (HEVA):
++- ensure /health and /version
++- add pytest + ruff (with a simple /health test)
++- multi-stage Dockerfile (slim), envs: QDRANT_URL, QDRANT_COLLECTION
++- GitHub Actions (py311) to run ruff + pytest
++Propose unified diffs only; don’t apply without my OK.
++
+
+# 2025-10-08 18:42:22.645813
++y

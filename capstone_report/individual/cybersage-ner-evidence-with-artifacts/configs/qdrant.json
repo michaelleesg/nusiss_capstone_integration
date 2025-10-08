@@ -1,0 +1,6 @@
+{
+  "collection": "ner_vectors",
+  "vectors": {"size": 384, "distance": "Cosine"},
+  "hnsw_config": {"m": 32, "ef_construct": 128},
+  "optimizers_config": {"default_segment_number": 2}
+}

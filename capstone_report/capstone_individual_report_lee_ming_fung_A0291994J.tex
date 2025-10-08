@@ -1,0 +1,206 @@
+documentclass[11pt,conference]{IEEEtran}
+
+% Encoding & fonts
+usepackage[utf8]{inputenc}
+usepackage[T1]{fontenc}
+usepackage[varqu]{zi4} % Inconsolata (tt), safer than manual shape hacks
+
+% Core packages
+usepackage{graphicx}
+usepackage{amsmath}
+usepackage{amsfonts}
+usepackage{booktabs}
+usepackage{listings}
+usepackage{xcolor}
+usepackage{cite} % IEEE numeric citations sortedcompressed
+
+% Captions (IEEE-friendly)
+usepackage[font=footnotesize,labelfont=bf]{caption}
+captionsetup{skip=6pt}
+captionsetup[lstlisting]{skip=0.8em}
+
+% Optional compact headings (scope only to subsection)
+usepackage[compact,explicit]{titlesec}
+titlespacing{subsection}{0pt}{1.0ex plus 0.2ex minus .2ex}{0.6ex plus .1ex}
+titleformat{subsection}[runin]{bfseries}{thesubsection}{0.5em}{}[]
+
+% Hyperref MUST be last
+usepackage[hidelinks]{hyperref}
+
+% -------- Listings defaults --------
+lstset{
+	basicstyle=ttfamilyfootnotesize,
+	breaklines=true,
+	frame=single,
+	columns=fullflexible,
+	keepspaces=true,
+	showstringspaces=false
+}
+% JSON language (minimal, ASCII-safe)
+lstdefinelanguage{json}{
+	basicstyle=ttfamilyfootnotesize,
+	showstringspaces=false,
+	breaklines=true,
+	frame=single,
+	morestring=[b],
+	morecomment=[l]{},
+	morecomment=[s]{}{},
+}
+
+% ---------- Title ----------
+title{Individual Progress Report CyberSage}
+author{
+	Michael Lee Ming Fung (A0291994J)
+	National University of Singapore (NUS-ISS)
+}
+date{}
+
+begin{document}
+maketitle
+
+begin{abstract}
+This report summarizes my individual contributions to the CyberSage project, a multi-agent AI system for cyber threat intelligence. I describe the scope of work undertaken, key design decisions, implementation artifacts, and evaluation results relevant to my assigned components. I also reflect on limitations and propose next steps. A one-page reproducibility appendix is included to enable an end-to-end slice (HEVA storage, retrieval, and Agent~C triage artifact emission) that mirrors the project’s management and technical report outputs.
+end{abstract}
+
+section{Introduction}
+Briefly restate the overall project problem and the CyberSage approach (A~textrightarrow~B~textrightarrow~C~textrightarrow~D). Clarify your role and the components you owned or co-owned.
+
+section{Objectives}
+List the specific objectives you targeted (e.g., data contracts, retrieval quality, triage scoring, reporting).
+
+section{Design and Implementation}
+Describe the design choices you made and why. Include schemas, interfaces, and any toolslibraries used (e.g., Qdrant, FastAPI, spaCy, SentenceTransformer).
+
+section{Experiments and Results}
+Summarize your experiments, datasets, and results (tablesfigures if applicable). State limitations and error modes candidly.
+
+section{Discussion}
+Interpret results, lessons learned, and trade-offs. Note how your work integrated with other agents and where future improvements should focus.
+
+section{Conclusion}
+Concise wrap-up of contributions and impact on the overall system.
+
+% -------- Optional references (reuse team .bib if desired) --------
+% bibliographystyle{ieeetr}
+% bibliography{CyberSage}
+
+% ===================== APPENDIX =====================
+section{Appendix Reproducibility (One Page)}
+label{apprepro}
+
+textbf{Goal.} Reproduce an end-to-end slice (i) stand up HEVA store; (ii) load minimal evidence for the Veeam incident; (iii) emit an Agent~C triage artifact that matches the Agent~C emph{management} and emph{technical} reportsfootnote{See texttt{management_report_20251004_030351.txt} and texttt{technical_report_20251004_030351.txt}.} (Medium 5.010, 4-round debate, moderate consensus).
+
+subsection{Environment}
+begin{lstlisting}[language=bash]
+python -m venv .venv && source .venvbinactivate
+pip install qdrant-client sentence-transformers fastapi uvicorn
+# If behind a firewall, pre-download sentence-transformersall-MiniLM-L6-v2
+end{lstlisting}
+
+subsection{Start Vector DB (Qdrant)}
+begin{lstlisting}[language=bash]
+docker run -d --name qdrant --restart unless-stopped 
+-p 63336333 -v qdrant-volqdrantstorage qdrantqdrantlatest
+end{lstlisting}
+
+subsection{Create Collection (384-dim, cosine)}
+begin{lstlisting}[language=python]
+# create_collection.py
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import Distance, VectorParams
+QdrantClient(host=localhost, port=6333).recreate_collection(
+collection_name=ner_vectors,
+vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+)
+print(OK)
+end{lstlisting}
+
+subsection{Populate HEVA Evidence (from incident JSON)}
+begin{lstlisting}[language=python]
+# upsert_veeam_evidence.py
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import PointStruct
+from sentence_transformers import SentenceTransformer
+import json, uuid, pathlib
+
+p = pathlib.Path(vulnerability_analysis_results_20251004_030351.json)
+J = json.loads(p.read_text(encoding=utf-8))
+sel = J[selected_incident][assessment]  # title, summary, cve_vulns
+
+sentences = [
+f'{sel[title]} {sel[summary]}',
+CVE-2025-23121 allows authenticated RCE on domain-joined VBR servers.,
+Patch available in VBR 12.3.2.3617; active exploitation reported.
+]
+
+model = SentenceTransformer(sentence-transformersall-MiniLM-L6-v2)
+vecs = model.encode(sentences, normalize_embeddings=True)
+
+qc = QdrantClient(host=localhost, port=6333)
+points = [PointStruct(id=str(uuid.uuid4()), vector=v.tolist(),
+payload={text t, tags[DEMO,CVE]}) for t, v in zip(sentences, vecs)]
+qc.upsert(collection_name=ner_vectors, points=points)
+print(fOK upserted {len(points)})
+end{lstlisting}
+
+subsection{Verify Retrieval (direct search)}
+begin{lstlisting}[language=python]
+# demo_search_qdrant.py
+from qdrant_client import QdrantClient
+from sentence_transformers import SentenceTransformer
+
+q = Evidence of exploitation for CVE-2025-23121
+model = SentenceTransformer(sentence-transformersall-MiniLM-L6-v2)
+qvec = model.encode([q], normalize_embeddings=True)[0]
+
+qc = QdrantClient(host=localhost, port=6333)
+hits = qc.search(collection_name=ner_vectors, query_vector=qvec, limit=5)
+for h in hits
+print(round(h.score,3), h.payload.get(text))
+end{lstlisting}
+
+subsection{Emit a Triage Artifact (values match Agent~C reports)}
+begin{lstlisting}[language=python]
+# emit_triage_artifact.py
+import uuid, json, time
+artifact = {
+	id str(uuid.uuid4()),
+	created_at time.strftime(%Y-%m-%dT%H%M%SZ, time.gmtime()),
+	source {
+		doc_id doc-2025-10-04-veeam,
+		url httpswww.bleepingcomputer.comnewssecuritynew-veeam-rce-flaw-lets-domain-users-hack-backup-servers,
+		title New Veeam RCE flaw lets domain users hack backup servers,
+		source_type html,
+		cve_vulns [CVE-2024-40711,CVE-2025-23120,CVE-2025-23121]
+	},
+	scores {
+		overall_10 5.0, overall 0.50,
+		components {
+			exploitation_probability {score 0.60, weight 0.25},
+			technical_severity      {score 0.40, weight 0.25},
+			business_analysis       {score 0.50, weight 0.25},
+			novelty_detection       {score 0.50, weight 0.25}
+		}
+	},
+	priority P2,
+	consensus {achieved True, strength Moderate,
+		rounds_conducted 4, score_range 0.20, threshold 0.25},
+	evidence [{
+		text CVE-2025-23121 RCE on VBR; active exploitation; patch 12.3.2.3617.,
+		score 0.90
+	}]
+}
+print(json.dumps(artifact, indent=2))
+end{lstlisting}
+
+subsection{Run sequence}
+begin{lstlisting}[language=bash]
+python create_collection.py
+python upsert_veeam_evidence.py
+python demo_search_qdrant.py
+python emit_triage_artifact.py  triage_artifact.json
+end{lstlisting}
+
+noindenttextbf{Expected.} Search returns the inserted sentences with high cosine scores. The emitted artifact shows Medium (5.010) with four equal-weight components and Moderate consensus over 4 rounds—matching the Agent~C management and technical reports. The artifact is the contract consumed by Agent~D.
+
+end{document}
