@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import SearchRequest
+from qdrant_client.http.models import Filter, FieldCondition, MatchValue, Range
 from fastapi.responses import JSONResponse
 import logging
 import httpx
@@ -79,23 +79,30 @@ def search(
     before: Optional[str] = Query(None, description="Filter by published date before"),
     has_ioc: Optional[bool] = Query(None, description="Filter by presence of IOCs")
 ):
-    # Build Qdrant filter
-    filter_conditions = {}
-    if tags:
-        filter_conditions["tags"] = {"$all": tags.split(",")}
+    # Build Qdrant Filter (must = AND of simple conditions)
+    must = []
+    tag_list = [t for t in (tags.split(",") if tags else []) if t]
+    for t in tag_list:
+        must.append(FieldCondition(key="tags", match=MatchValue(value=t)))
     if source_type:
-        filter_conditions["source_type"] = source_type
+        must.append(FieldCondition(key="source_type", match=MatchValue(value=source_type)))
     if doc_id:
-        filter_conditions["doc_id"] = doc_id
-    if after:
-        filter_conditions["published_at"] = {"$gte": after}
-    if before:
-        filter_conditions["published_at"] = {"$lte": before}
-    if has_ioc:
-        filter_conditions["ioc.cves"] = {"$exists": True, "$ne": []}
-        filter_conditions["ioc.ips"] = {"$exists": True, "$ne": []}
-        filter_conditions["ioc.domains"] = {"$exists": True, "$ne": []}
-        filter_conditions["ioc.hashes"] = {"$exists": True, "$ne": []}
+        must.append(FieldCondition(key="doc_id", match=MatchValue(value=doc_id)))
+    # Date filtering expects numeric; use published_at_ts in payload
+    def to_ts(s: Optional[str]) -> Optional[int]:
+        if not s:
+            return None
+        try:
+            from datetime import datetime
+            return int(datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp())
+        except Exception:
+            return None
+    gte = to_ts(after)
+    lte = to_ts(before)
+    if gte is not None or lte is not None:
+        rng = Range(gte=gte, lte=lte)
+        must.append(FieldCondition(key="published_at_ts", range=rng))
+    qfilter = Filter(must=must) if must else None
 
     # Perform vector search
     vector = model.encode(query).tolist()
@@ -103,13 +110,28 @@ def search(
         collection_name=COLLECTION_NAME,
         query_vector=vector,
         limit=limit,
-        filter=filter_conditions
+        query_filter=qfilter
     )
 
-    results = []
+    def ioc_present(p: dict) -> bool:
+        if not p:
+            return False
+        i = p.get("ioc", {})
+        return any(i.get(k) for k in ("cves", "ips", "domains", "hashes"))
+
+    results: List[SearchResult] = []
     for hit in search_result:
-        if hit.score >= min_score:
-            results.append(SearchResult(score=hit.score, payload=hit.payload, id=hit.id))
+        if hit.score < (min_score or 0):
+            continue
+        if has_ioc and not ioc_present(hit.payload or {}):
+            continue
+        results.append(
+            SearchResult(
+                score=round(float(hit.score), 4),
+                payload=hit.payload or {},
+                id=str(hit.id),
+            )
+        )
 
     return SearchResponse(query=query, results=results)
 
