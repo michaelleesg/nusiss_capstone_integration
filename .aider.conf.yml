@@ -1,5 +1,6 @@
 model: openai/gpt-4o-mini
 edit-format: diff
+<<<<<<< HEAD
 auto-lint: true
 lint-cmd:
   - "python: ruff check --fix"
@@ -9,3 +10,5 @@ lint-cmd:
   - "markdown: prettier --write"
   - "yaml: yamllint"
 
+=======
+>>>>>>> 642c5a1 (chore: clean baseline with .gitignore)
