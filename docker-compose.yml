@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 services:
   qdrant:
     image: qdrant/qdrant:latest
@@ -7,11 +8,18 @@ services:
       - qdrant_storage:/qdrant/storage
 
   api:
+=======
+version: '3.8'
+
+services:
+  app:
+>>>>>>> d62ee72 (feat: refactor and scaffold Agent B (HEVA) with FastAPI and Qdrant integration)
     build:
       context: .
       dockerfile: Dockerfile
     container_name: cyberner-api
     environment:
+<<<<<<< HEAD
       - QDRANT_URL=http://qdrant:6333
       - QDRANT_COLLECTION=heva_docs
     ports: ["8000:8000"]
@@ -34,3 +42,11 @@ services:
 
 volumes:
   qdrant_storage:
+=======
+      QDRANT_URL: http://localhost:6333
+      QDRANT_COLLECTION: heva_docs
+      VECTORS_SIZE: 384
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+>>>>>>> d62ee72 (feat: refactor and scaffold Agent B (HEVA) with FastAPI and Qdrant integration)

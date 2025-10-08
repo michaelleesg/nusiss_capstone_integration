@@ -1,0 +1,37 @@
+# How to Run the Application
+
+## Local Setup
+1. Clone the repository.
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Run the application:
+   ```bash
+   uvicorn 3_search_api_rich:app --host 0.0.0.0 --port 8000
+   ```
+
+## Docker Setup
+1. Build the Docker image:
+   ```bash
+   docker build -t cyberner-api .
+   ```
+2. Run the Docker container:
+   ```bash
+   docker run -d -p 8000:8000 --env-file .env.example cyberner-api
+   ```
+
+## Docker Compose Setup
+1. Run the application using Docker Compose:
+   ```bash
+   docker-compose up --build
+   ```
+
+## Testing the Endpoints
+- Health Check: `curl http://localhost:8000/health`
+- Version Check: `curl http://localhost:8000/version`

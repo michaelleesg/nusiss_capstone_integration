@@ -93,3 +93,5 @@ legacy/
 Makefile.bak.*
 *.tmp
 *.tex
+app/indexer.py.bak*
+tests/*.bak*

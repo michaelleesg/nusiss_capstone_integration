@@ -7,7 +7,10 @@ QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "heva_docs")
 VECTORS_SIZE = int(os.getenv("VECTORS_SIZE", 384))
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d62ee72 (feat: refactor and scaffold Agent B (HEVA) with FastAPI and Qdrant integration)
 class QdrantWrapper:
     def __init__(self):
         self.client = QdrantClient(url=QDRANT_URL)
