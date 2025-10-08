@@ -8,12 +8,13 @@ from fastapi.responses import JSONResponse
 import logging
 import httpx
 import time
+import os
+from api.qdrant_client import QdrantWrapper
 
 # === Config ===
-QDRANT_HOST = "localhost"
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_PORT = 6333
-QDRANT_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
-COLLECTION_NAME = "ner_vectors"
+COLLECTION_NAME = os.getenv("QDRANT_COLLECTION", "heva_docs")
 MODEL_NAME = "all-MiniLM-L6-v2"
 TOP_K = 5
 
@@ -21,30 +22,32 @@ TOP_K = 5
 app = FastAPI(title="CyberNER Vector Search API")
 logger = logging.getLogger("uvicorn.error")
 
+# Health check endpoint
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+# Version endpoint
+@app.get("/version")
+def version():
+    return {"name": "agent-b-heva", "version": "0.1.0"}
+
 logger.info("🔍 Loading model...")
 model = SentenceTransformer(MODEL_NAME)
 embedding_size = model.get_sentence_embedding_dimension()
 logger.info(f"✅ Loaded model '{MODEL_NAME}' with vector size {embedding_size}")
 
 # === Wait for Qdrant ===
-def wait_for_qdrant(url, timeout=30):
-    start = time.time()
-    while time.time() - start < timeout:
-        try:
-            r = httpx.get(f"{url}/collections", timeout=2.0)
-            if r.status_code == 200:
-                logger.info("✅ Qdrant is live.")
-                return
-        except:
-            pass
-        time.sleep(1)
+qdrant_wrapper = QdrantWrapper()
+if not qdrant_wrapper.ping():
     raise RuntimeError("❌ Qdrant not reachable.")
 
-wait_for_qdrant(QDRANT_URL)
+# Ensure collection exists
+qdrant_wrapper.ensure_collection(size=embedding_size)
 
 # === Connect Qdrant ===
-client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
-logger.info(f"✅ Connected to Qdrant at {QDRANT_HOST}:{QDRANT_PORT}")
+client = QdrantClient(host=QDRANT_URL, port=QDRANT_PORT)
+logger.info(f"✅ Connected to Qdrant at {QDRANT_URL}")
 
 # === Verify dimension match ===
 try:
@@ -69,12 +72,6 @@ class SearchResponse(BaseModel):
     results: List[SearchResult]
 
 # === /search Endpoint ===
-
-# @app.get("/search", response_model=SearchResponse)
-# def search(query: str, limit: int = 5, min_score: float = 0.6, source: str | None = None):
-#     ...
-#     # post-filter by score; add optional source filter using Qdrant 'filter' if desired
-
 @app.get("/search", response_model=SearchResponse)
 def search(query: str = Query(..., description="Search sentence or phrase"), limit: int = TOP_K):
     try:

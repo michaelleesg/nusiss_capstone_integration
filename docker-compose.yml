@@ -1,57 +1,15 @@
+version: '3.8'
+
 services:
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: qdrant
-    restart: unless-stopped
-    ports:
-      - "6333:6333"
-    volumes:
-      - qdrant_data:/qdrant/storage
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:6333/collections"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-
-  ingest:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ingest-once
-    depends_on:
-      qdrant:
-        condition: service_healthy
-    environment:
-      QDRANT_URL: http://qdrant:6333
-      COLLECTION_NAME: ner_vectors
-      MODEL_NAME: all-MiniLM-L6-v2
-      NER_BIO_SOURCE: /data/ner_training.txt
-      BATCH_SIZE: "1000"
-      EMBEDDING_BACKUP_PATH: /data/embedding_backup.npy
-    volumes:
-      - ./data:/data:rw
-    command: ["python", "/app/ingest_wrapper.py"]   # <— renamed
-    restart: "no"
-
-  api:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: cyberner-api
-    depends_on:
-      qdrant:
-        condition: service_healthy
-      ingest:
-        condition: service_completed_successfully
     environment:
-      QDRANT_HOST: qdrant
-      QDRANT_PORT: "6333"
-      COLLECTION_NAME: ner_vectors
-      MODEL_NAME: all-MiniLM-L6-v2
+      QDRANT_URL: http://localhost:6333
+      QDRANT_COLLECTION: heva_docs
+      VECTORS_SIZE: 384
     ports:
       - "8000:8000"
-    command: ["uvicorn", "3_search_api_rich:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info"]
     restart: unless-stopped
-
-volumes:
-  qdrant_data:

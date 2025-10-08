@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.12-slim AS base
+FROM python:3.11-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -16,24 +16,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create app dir
 WORKDIR /app
 
-# ----- Python deps -----
-# Torch CPU wheel first (fast, smaller)
-RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Core libs
-RUN pip install --no-cache-dir \
-    fastapi uvicorn[standard] \
-    qdrant-client \
-    sentence-transformers \
-    numpy httpx tqdm pydantic
+# ----- Python deps -----
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # ----- App files -----
-# Copy only what we need
 COPY 3_search_api_rich.py /app/3_search_api_rich.py
-# A tiny ingestion wrapper that reads env vars (see below). If you already
-# have a suitable script, copy that instead and adjust compose command.
-COPY ingest_wrapper.py /app/ingest_wrapper.py
+COPY api/qdrant_client.py /app/api/qdrant_client.py
 
-# Default to API server; ingestion will override the CMD in docker-compose
+# Default to API server
 EXPOSE 8000
 CMD ["uvicorn", "3_search_api_rich:app", "--host", "0.0.0.0", "--port", "8000"]
