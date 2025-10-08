@@ -1,0 +1,4 @@
+sentence-transformers
+beautifulsoup4
+nltk
+pandas
