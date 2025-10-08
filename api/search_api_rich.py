@@ -46,7 +46,7 @@ if not qdrant_wrapper.ping():
 qdrant_wrapper.ensure_collection(size=embedding_size)
 
 # === Connect Qdrant ===
-client = QdrantClient(host=QDRANT_URL, port=QDRANT_PORT)
+client = QdrantClient(url=QDRANT_URL)
 logger.info(f"✅ Connected to Qdrant at {QDRANT_URL}")
 
 # === Verify dimension match ===
