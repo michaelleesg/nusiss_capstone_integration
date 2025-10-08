@@ -30,7 +30,33 @@ def health():
 def version():
     return {"name": "agent-b-heva", "version": "0.1.0"}
 
-# === Search Endpoint ===
+# === Initialize Qdrant Client ===
+client = QdrantClient(url=QDRANT_URL)
+
+logger.info("🔍 Loading model...")
+model = SentenceTransformer(MODEL_NAME)
+embedding_size = model.get_sentence_embedding_dimension()
+logger.info(f"✅ Loaded model '{MODEL_NAME}' with vector size {embedding_size}")
+
+# === Wait for Qdrant ===
+qdrant_wrapper = QdrantWrapper()
+if not qdrant_wrapper.ping():
+    raise RuntimeError("❌ Qdrant not reachable.")
+
+# Ensure collection exists
+qdrant_wrapper.ensure_collection(size=embedding_size)
+
+# === Verify dimension match ===
+try:
+    info = client.get_collection(COLLECTION_NAME)
+    qdrant_dim = info.model_dump()["config"]["params"]["vectors"]["size"]
+    if qdrant_dim != embedding_size:
+        raise ValueError(f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}")
+    logger.info(f"✅ Vector size matches: {qdrant_dim}")
+except Exception as e:
+    logger.error(f"❌ Could not verify vector dimensions: {e}")
+
+# === Enhanced Response Schemas ===
 class SearchResult(BaseModel):
     score: float
     payload: dict
@@ -40,6 +66,7 @@ class SearchResponse(BaseModel):
     query: str
     results: List[SearchResult]
 
+# === /search Endpoint ===
 @app.get("/search", response_model=SearchResponse)
 def search(
     query: str = Query(..., description="Search sentence or phrase"),
@@ -71,7 +98,7 @@ def search(
         filter_conditions["ioc.hashes"] = {"$exists": True, "$ne": []}
 
     # Perform vector search
-    vector = SentenceTransformer(MODEL_NAME).encode(query).tolist()
+    vector = model.encode(query).tolist()
     search_result = client.search(
         collection_name=COLLECTION_NAME,
         query_vector=vector,
