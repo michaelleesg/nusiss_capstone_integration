@@ -1,0 +1,60 @@
+\section{Agent C: Risk \& Triage}
+\label{sec:agentC}
+
+\subsection{Objective}
+Agent C prioritizes CTI findings for an organization by combining external signals (CISA KEV, EPSS, CVSS, ATT\&CK mapping) with internal context (asset inventory, SBOM, exposure). It emits ranked tickets with SLAs and escalation paths.
+
+\subsection{Signals \& Features}
+\begin{itemize}
+  \item \textbf{CVE/CVSS}: Normalize CVE identifiers and CVSS base scores from official feeds \cite{cve_reference}.
+  \item \textbf{CISA KEV}: Binary feature and date of inclusion indicating known exploitation \cite{cisa_kev}.
+  \item \textbf{EPSS}: Probability of exploitation in the wild (latest available EPSS score) \cite{epss_reference}.
+  \item \textbf{ATT\&CK}: Tactic/technique mapping (e.g., T1190) to weight by adversary utility and detection coverage gaps \cite{mitre_attack}.
+  \item \textbf{Org Context}: Asset criticality (tier 1--3), internet exposure, compensating controls, patch window, and SBOM package presence/version match.
+\end{itemize}
+
+\subsection{Context Matching}
+We join NER outputs (from Agent B) with CMDB/SBOM to determine if vulnerable packages or products are present and externally exposed. Matching uses vendor/product alias tables, CPE-like heuristics, and version range checks.
+
+\subsection{Scoring}
+We compute a composite priority score:
+\[
+\text{Score} = w_1 \cdot f(\text{CVSS}) + w_2 \cdot \text{EPSS} + w_3 \cdot \mathbb{1}[\text{KEV}] + 
+w_4 \cdot g(\text{ATT\&CK}) + w_5 \cdot h(\text{Exposure}) + w_6 \cdot c(\text{Criticality}),
+\]
+where $f,g,h,c$ map raw features into $[0,1]$ via monotonic transforms (e.g., CVSS/10, ATT\&CK tactic weights, exposure flags). Default weights are empirically chosen for conservative triage (Table~\ref{tab:weights}); they can be tuned per-tenant.
+
+\begin{table}[!t]
+\centering
+\caption{Default Risk Weighting (can be tenant-tuned)}
+\label{tab:weights}
+\begin{tabular}{lcc}
+\toprule
+Feature & Transform & Weight ($w$)\\
+\midrule
+CVSS Base & $f(\text{cvss})=\min(1,\text{cvss}/10)$ & 0.25\\
+EPSS & raw $[0,1]$ & 0.30\\
+CISA KEV & indicator $\{0,1\}$ & 0.25\\
+ATT\&CK & tactic/technique weight $[0,1]$ & 0.10\\
+Exposure & internet-facing $\{0,1\}$ & 0.05\\
+Asset Criticality & tier map $\{0.3,0.6,1.0\}$ & 0.05\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Prioritization \& Policies}
+Findings are bucketed into P1--P4 based on score thresholds and guardrails:
+\begin{itemize}
+  \item \textbf{Overrides}: Any KEV-listed CVE on internet-facing tier-1 assets $\Rightarrow$ force P1.
+  \item \textbf{SLA}: P1=24h, P2=3d, P3=14d, P4=best-effort (configurable).
+  \item \textbf{Suppression}: Findings with compensating controls (e.g., virtual patch/WAF) may downgrade one tier with justification.
+\end{itemize}
+
+\subsection{Escalation \& Routing}
+P1/P2 create tickets in the IR queue and post to on-call channels with enriched context (affected assets, change windows, known exploits, detection content). P3/P4 are grouped into weekly maintenance batches.
+
+\subsection{Outputs}
+Agent C emits a signed triage artifact including: (i) final priority and score decomposition, (ii) evidence links (KEV item, EPSS score, source documents), (iii) impacted assets, and (iv) recommended actions (patch, config change, mitigation).
+
+\subsection{Evaluation}
+We simulate historical windows: if a CVE later enters KEV, backtest whether our scoring would have pre-ranked it P1/P2. We also measure mean-time-to-triage reduction versus baseline CVSS-only sorting, and analyst accept/reject rates in user testing.

@@ -1,0 +1,44 @@
+\section{Agent D: Assurance \& Explainability}
+\label{sec:agentD}
+
+\subsection{Objective}
+Agent D enforces governance and safety, and produces \emph{evidence-grounded} explanations for all surfaced findings. It ensures traceability, auditability, and responsible behavior before results reach users and systems.
+
+\subsection{Evidence Traceability}
+Each claim (e.g., ``CVE-2025-12345 affects Asset X'') must be backed by:
+\begin{enumerate}
+  \item \textbf{Source provenance}: document IDs, canonical URLs, retrieval timestamps, content hashes.
+  \item \textbf{Extraction lineage}: which Agent B spans/offsets produced the entity linkages and with what confidence.
+  \item \textbf{Risk lineage}: which Agent C features and policies contributed to the score (CVSS/EPSS/KEV/ATT\&CK) \cite{cve_reference,epss_reference,cisa_kev,mitre_attack}.
+\end{enumerate}
+We store a compact \emph{decision record} per finding containing the above, signed with a record hash for tamper-evidence.
+
+\subsection{Explanation Generation}
+Explanations are generated via retrieval-augmented prompting constrained to \emph{cite} evidence snippets. Templates vary by audience:
+\begin{itemize}
+  \item \textbf{Executive}: business impact, exposure, SLA.
+  \item \textbf{Analyst}: entities, techniques (ATT\&CK), exploit intel (KEV/EPSS), affected assets, recommended response.
+  \item \textbf{Engineer}: package/version paths (from SBOM), patch references, change steps.
+\end{itemize}
+The LLM is required to include inline citations (document IDs, URLs) for statements of fact; unsupported claims are filtered or replaced by ``insufficient evidence''.
+
+\subsection{Governance \& Safety Controls}
+\begin{itemize}
+  \item \textbf{Hallucination control}: rejection sampling unless each claim has at least one high-trust citation; fallback to extractive summaries.
+  \item \textbf{Prompt-injection resilience}: input sanitization, instruction delimiters, domain-constrained tools, and minimal context exposure.
+  \item \textbf{Bias/fairness}: source diversity checks (avoid over-weighting a single vendor/blog), periodic audits on score disparities across product vendors.
+  \item \textbf{Policy conformance}: alignment with organizational AI governance and sector guidance; we log rationale categories and reviewer outcomes.
+\end{itemize}
+
+\subsection{Human-in-the-Loop \& Escalation}
+High-impact or low-confidence findings are queued for human review with \emph{explanation + evidence} pre-attached. Review actions (approve/modify/reject) update the decision record and retraining datasets for future runs.
+
+\subsection{Dashboards \& Audit}
+We surface:
+\begin{itemize}
+  \item \textbf{Assurance dashboards}: coverage (perc. of claims with citations), evidence quality distribution, rejection/handoff rates, and time-to-approve.
+  \item \textbf{Audit trails}: immutable logs of prompts, tools used, versions of models/rules, and output hashes for post-hoc investigations.
+\end{itemize}
+
+\subsection{Outputs}
+Agent D publishes user-facing reports (HTML/PDF) and machine-readable artifacts (JSON) containing explanations and citation links; it also raises alerts if assurance checks fail (e.g., missing evidence, anomalous scoring drift).

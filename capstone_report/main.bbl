@@ -1,0 +1,55 @@
+\begin{thebibliography}{10}
+
+\bibitem{cve_reference}
+{MITRE Corporation}, ``Common vulnerabilities and exposures (cve).''
+  \url{https://www.cve.org/}.
+\newblock Accessed 2025.
+
+\bibitem{epss_reference}
+{FIRST}, ``Exploit prediction scoring system (epss).''
+  \url{https://www.first.org/epss/}.
+\newblock Accessed 2025.
+
+\bibitem{cisa_kev}
+{Cybersecurity and Infrastructure Security Agency}, ``Known exploited
+  vulnerabilities catalog.''
+  \url{https://www.cisa.gov/known-exploited-vulnerabilities-catalog}.
+\newblock Accessed 2025.
+
+\bibitem{mitre_attack}
+{MITRE Corporation}, ``{MITRE ATT\&CK\textsuperscript{\textregistered}}
+  framework.'' \url{https://attack.mitre.org/}.
+\newblock Accessed 2025.
+
+\bibitem{devlin2018bert}
+J.~Devlin, M.-W. Chang, K.~Lee, and K.~Toutanova, ``Bert: Pre-training of deep
+  bidirectional transformers for language understanding,'' {\em arXiv preprint
+  arXiv:1810.04805}, 2018.
+
+\bibitem{liu2019roberta}
+Y.~Liu, M.~Ott, N.~Goyal, J.~Du, M.~Joshi, D.~Chen, O.~Levy, M.~Lewis,
+  L.~Zettlemoyer, and V.~Stoyanov, ``Roberta: A robustly optimized bert
+  pretraining approach,'' {\em arXiv preprint arXiv:1907.11692}, 2019.
+
+\bibitem{jehangir2023ner}
+B.~Jehangir {\em et~al.}, ``A survey on named entity recognition — datasets,
+  tools, approaches,'' {\em Array}, 2023.
+\newblock
+  \url{https://www.sciencedirect.com/science/article/pii/S2949719123000146}.
+
+\bibitem{secbert2020}
+J.~Zhang, P.~Liu, and Y.~Wang, ``Secbert: A pre-trained language model for
+  cybersecurity,'' in {\em Proceedings of IEEE Security and Privacy Workshops},
+  2020.
+
+\bibitem{keraghel2024recentner}
+I.~Keraghel, S.~Morbieu, and M.~Nadif, ``Recent advances in named entity
+  recognition: A comprehensive survey and comparative study.''
+  \url{https://arxiv.org/abs/2401.10825}, 2024.
+
+\bibitem{securebert2022}
+E.~Aghaei {\em et~al.}, ``Securebert: A domain-specific language model for
+  cybersecurity.'' \url{https://arxiv.org/abs/2204.02685}, 2022.
+\newblock arXiv.
+
+\end{thebibliography}

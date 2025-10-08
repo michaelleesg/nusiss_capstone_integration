@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venvs/
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Big/binary & generated
+*.npy
+*.npz
+*.pdf
+*.zip
+*.docx
+*.pptx
+*.log
+
+# Qdrant & models
+qdrant_storage/**
+qdrant/**
+ner_model/**
+
+# Large data dumps in this repo
+Article_Storage.*.json
+original_*.json
+combined.json
+embedding_backup.npy
+ner_vector_output.csv
+
+# Aider
+.aiderignore

@@ -1,0 +1,13 @@
+2025-09-20 17:01:58 ==== Sync started ====
+2025-09-20 17:01:59 ERROR: list-objects-v2 failed (code 252). Output follows:
+System.Management.Automation.RemoteException
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+System.Management.Automation.RemoteException
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+System.Management.Automation.RemoteException
+aws: error: the following arguments are required: command
+System.Management.Automation.RemoteException
+2025-09-20 17:01:59 ==== Sync finished ====

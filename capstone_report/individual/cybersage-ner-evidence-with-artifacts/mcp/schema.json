@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CyberSage Agent Envelope v1",
+  "type": "object",
+  "required": ["from","to","doc_id","timestamp","payload"],
+  "properties": {
+    "from": {"type":"string"},
+    "to": {"type":"string"},
+    "doc_id": {"type":"string"},
+    "timestamp": {"type":"string","format":"date-time"},
+    "payload": {"type":"object"}
+  }
+}
