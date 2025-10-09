@@ -40,6 +40,23 @@ def extract_iocs(text: str) -> Dict[str, List[str]]:
         "actors": dedup(actors),
     }
 
+def generate_queries(text: str, title: str = "") -> list[str]:
+    qs = []
+    if title:
+        qs.append(title)
+    # first ~40 words as a bag-of-words query
+    snippet = " ".join((text or "").split()[:40])
+    if snippet:
+        qs.append(snippet)
+    # pull obvious indicators from the *full chunk text*
+    cves = re.findall(r"CVE-\d{4}-\d{4,7}", text, flags=re.I)
+    ips = re.findall(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", text)
+    domains = re.findall(r"\b[a-z0-9][a-z0-9-]*\.[a-z]{2,}\b", text, flags=re.I)
+    hashes = re.findall(r"\b[a-f0-9]{32,64}\b", text, flags=re.I)
+    qs += cves[:2] + ips[:2] + domains[:2] + hashes[:1]
+    # de-dup while preserving order; cap to 6
+    return list(dict.fromkeys(qs))[:6]
+
 def chunk_text(text: str, max_chars=1200, overlap=150) -> List[Dict[str, Any]]:
     t = re.sub(r"\s+", " ", (text or "")).strip()
     out, i, n = [], 0, len(t)
@@ -101,6 +118,11 @@ def build_payload(rec: Dict[str, Any], ch: Dict[str, Any], *, doc_id: str, idx: 
     title = rec.get("caps_title") or rec.get("title") or ""
     source_url = rec.get("_id") or rec.get("url") or ""
     published_at_str = rec.get("published_at") or rec.get("date_time")
+    
+    ioc_chunk = extract_iocs(ch["text"])
+    queries = generate_queries(ch["text"], title)
+    has_ioc = any(ioc_chunk.get(k) for k in ("cves", "ips", "domains", "hashes"))
+
     payload = {
         "doc_id": doc_id,
         "chunk_id": chunk_id,
@@ -116,7 +138,9 @@ def build_payload(rec: Dict[str, Any], ch: Dict[str, Any], *, doc_id: str, idx: 
         "published_at": published_at_str,
         "published_at_ts": to_ts(published_at_str),
         "tags": ["source:combined.json"],
-        "ioc": extract_iocs(ch["text"]),
+        "ioc": ioc_chunk,
+        "queries": queries,
+        "has_ioc": has_ioc,
         "neighborhood": {"prev_chunk_id": prev_id, "next_chunk_id": None},
         "emb_model": EMB_MODEL,
         "emb_dim": EMB_DIM,
