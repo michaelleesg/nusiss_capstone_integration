@@ -215,9 +215,11 @@ def main():
         doc_id = rec.get("_id") or rec.get("id") or str(uuid.uuid4())
         chunks = chunk_text(text, args.max_chars, args.overlap)
         n = len(chunks)
+        prev_id_for_doc = None  # track the previous chunk ID for this doc
+
         for idx, ch in enumerate(chunks):
             chunk_uuid = str(uuid.uuid4())
-            prev_id = batch[-1].id if idx > 0 else None
+
             iocs = extract_iocs(ch["text"])
             payload = create_payload(
                 doc_id=doc_id,
@@ -227,11 +229,14 @@ def main():
                 ch=ch,
                 rec=rec,
                 iocs=iocs,
-                prev_id=chunks[idx-1]["chunk_id"] if idx > 0 else None,
+                prev_id=prev_id_for_doc,   # <-- use our running prev id
             )
+
             vec = model.encode(ch["text"]).tolist()
             batch.append(PointStruct(id=chunk_uuid, vector=vec, payload=payload))
+            prev_id_for_doc = chunk_uuid      # <-- update for next iteration
             total_chunks += 1
+
             if len(batch) >= 500:
                 client.upsert(collection_name=args.collection, points=batch)
                 batch.clear()
