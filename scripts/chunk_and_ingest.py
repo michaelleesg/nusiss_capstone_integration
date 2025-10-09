@@ -1,58 +1,42 @@
-import argparse
-import json
-import os
-import re
-import uuid
-import hashlib
-from datetime import datetime
+import argparse, json, os, re, uuid, hashlib
 from pathlib import Path
-from typing import List
-
+from datetime import datetime
+from typing import List, Dict, Any, Iterable, Tuple
 from tqdm import tqdm
+
+import torch
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import (
-    Distance,
-    VectorParams,
-    PointStruct,
-    PayloadSchemaType,
-)
+from qdrant_client.http.models import Distance, VectorParams, PointStruct, PayloadSchemaType
 
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "heva_docs")
 EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 EMB_DIM = 384
 
-DEF_MAX_CHARS = 1200
-DEF_OVERLAP = 150
+def md5_hex(s: str) -> str:
+    return hashlib.md5(s.encode("utf-8"), usedforsecurity=False).hexdigest()
 
-
-def extract_iocs(text: str) -> dict:
-    cves = re.findall(r"CVE-\d{4}-\d{4,7}", text)
+def extract_iocs(text: str) -> Dict[str, List[str]]:
+    cves = re.findall(r"CVE-\d{4}-\d{4,7}", text, flags=re.I)
     ips = re.findall(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", text)
-    domains = re.findall(r"\b(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}\b", text)
+    domains = re.findall(r"\b[a-z0-9][a-z0-9-]*\.[a-z]{2,}\b", text, flags=re.I)
     hashes = re.findall(r"\b[a-f0-9]{32,64}\b", text, flags=re.I)
-    mitre_techniques = re.findall(r"T\d{4}(?:\.\d{3})?", text)
-    actors = re.findall(
-        r"\b(?:TA402|APT-C-23|Molerats|Arid Viper|IronWind|NimbleMamba|SharpSploit)\b",
-        text,
-        flags=re.I,
-    )
+    mitre = re.findall(r"\bT\d{4}(?:\.\d{3})?\b", text)
+    actors = re.findall(r"\b(?:TA402|APT-C-23|IronWind|NimbleMamba|SharpSploit|Molerats|Arid\s+Viper)\b", text, flags=re.I)
+    def dedup(xs): return list(dict.fromkeys(xs))
     return {
-        "cves": cves,
-        "ips": ips,
-        "domains": domains,
-        "hashes": hashes,
-        "mitre_techniques": mitre_techniques,
-        "actors": actors,
+        "cves": dedup(cves),
+        "ips": dedup(ips),
+        "domains": dedup(domains),
+        "hashes": dedup(hashes),
+        "mitre_techniques": dedup(mitre),
+        "actors": dedup(actors),
     }
 
-
-def chunk_text(text: str, max_chars=DEF_MAX_CHARS, overlap=DEF_OVERLAP) -> List[dict]:
-    """Greedy sentence-ish chunking with character overlap & offsets."""
+def chunk_text(text: str, max_chars=1200, overlap=150) -> List[Dict[str, Any]]:
     t = re.sub(r"\s+", " ", (text or "")).strip()
-    out = []
-    i, n = 0, len(t)
+    out, i, n = [], 0, len(t)
     while i < n:
         j = min(n, i + max_chars)
         cut = t.rfind(". ", i, j)
@@ -66,19 +50,12 @@ def chunk_text(text: str, max_chars=DEF_MAX_CHARS, overlap=DEF_OVERLAP) -> List[
         i = max(cut - overlap, i + 1)
     return out
 
-
-def md5_hex(s: str) -> str:
-    return hashlib.md5(s.encode("utf-8"), usedforsecurity=False).hexdigest()
-
-
-def parse_ts(dt: str | None) -> int | None:
-    if not dt:
-        return None
+def to_ts(dt_str: str | None) -> int | None:
+    if not dt_str: return None
     try:
-        return int(datetime.fromisoformat(dt.replace("Z", "+00:00")).timestamp())
+        return int(datetime.fromisoformat(dt_str.replace("Z", "+00:00")).timestamp())
     except Exception:
         return None
-
 
 def ensure_collection(client: QdrantClient, name: str, size: int = EMB_DIM):
     if not client.collection_exists(name):
@@ -87,38 +64,35 @@ def ensure_collection(client: QdrantClient, name: str, size: int = EMB_DIM):
             vectors_config=VectorParams(size=size, distance=Distance.COSINE),
         )
 
-
 def maybe_create_indexes(client: QdrantClient, name: str):
-    try:
-        client.create_payload_index(name, field_name="tags", field_schema=PayloadSchemaType.KEYWORD)
-        client.create_payload_index(name, field_name="ioc.cves", field_schema=PayloadSchemaType.KEYWORD)
-        client.create_payload_index(name, field_name="attacks.actors", field_schema=PayloadSchemaType.KEYWORD)
-        client.create_payload_index(name, field_name="published_at_ts", field_schema=PayloadSchemaType.INTEGER)
-    except Exception:
-        # benign if they already exist
-        pass
+    for field, schema in [
+        ("tags", PayloadSchemaType.KEYWORD),
+        ("doc_id", PayloadSchemaType.KEYWORD),
+        ("source_type", PayloadSchemaType.KEYWORD),
+        ("published_at_ts", PayloadSchemaType.INTEGER),
+        ("ioc.cves", PayloadSchemaType.KEYWORD),
+        ("ioc.ips", PayloadSchemaType.KEYWORD),
+        ("ioc.domains", PayloadSchemaType.KEYWORD),
+        ("ioc.hashes", PayloadSchemaType.KEYWORD),
+    ]:
+        try:
+            client.create_payload_index(collection_name=name, field_name=field, field_schema=schema)
+        except Exception:
+            pass
 
+def load_records(path: str) -> Iterable[Dict[str, Any]]:
+    txt = Path(path).read_text(encoding="utf-8").strip()
+    if txt.startswith("["):
+        for rec in json.loads(txt): yield rec
+    else:
+        for line in txt.splitlines():
+            line = line.strip()
+            if line: yield json.loads(line)
 
-def create_payload(
-    *,
-    doc_id: str,
-    chunk_id: str,
-    idx: int,
-    total: int,
-    ch: dict,
-    rec: dict,
-    iocs: dict,
-    prev_id: str | None,
-) -> dict:
-    title = rec.get("caps_title") or rec.get("title")
-    source_url = rec.get("_id") or rec.get("url")
-    published_at = rec.get("date_time") or rec.get("published_at")
-    authors = rec.get("authors")
-
-    tags = ["source:combined.json"]
-    if rec.get("tags"):
-        tags += [t for t in rec["tags"] if t not in tags]
-
+def build_payload(rec: Dict[str, Any], ch: Dict[str, Any], *, doc_id: str, idx: int, total: int, prev_id: str | None, chunk_id: str) -> Dict[str, Any]:
+    title = rec.get("caps_title") or rec.get("title") or ""
+    source_url = rec.get("_id") or rec.get("url") or ""
+    published_at_str = rec.get("published_at") or rec.get("date_time")
     payload = {
         "doc_id": doc_id,
         "chunk_id": chunk_id,
@@ -131,118 +105,89 @@ def create_payload(
         "source_url": source_url,
         "source_type": rec.get("source_type"),
         "title": title,
-        "authors": authors,
-        "published_at": published_at,
-        "published_at_ts": parse_ts(published_at),
-        "harvested_at": rec.get("harvest_date", {}).get("$date")
-        if isinstance(rec.get("harvest_date"), dict)
-        else rec.get("harvest_date"),
-        "language": rec.get("language"),
-        "ioc": iocs,
-        "entities": rec.get("entities", []),
-        "attacks": {
-            "actors": iocs.get("actors", []),
-            "malware": re.findall(r"\b[A-Z][A-Za-z0-9_-]{3,}\b", ch["text"]),
-            "mitre_techniques": iocs.get("mitre_techniques", []),
-        },
-        "tags": tags,
-        "queries": list(
-            {
-                *(iocs.get("cves", [])[:2]),
-                *(iocs.get("ips", [])[:2]),
-                *(iocs.get("domains", [])[:1]),
-            }
-        )
-        or ([title] if title else []),
+        "published_at": published_at_str,
+        "published_at_ts": to_ts(published_at_str),
+        "tags": ["source:combined.json"],
+        "ioc": extract_iocs(ch["text"]),
+        "neighborhood": {"prev_chunk_id": prev_id, "next_chunk_id": None},
         "emb_model": EMB_MODEL,
         "emb_dim": EMB_DIM,
-        "neighborhood": {"prev_chunk_id": prev_id, "next_chunk_id": None},
-        "scoring": {"risk_score": None, "confidence": None},
-        "eval": {},
         "fingerprint": f"md5:{md5_hex(ch['text'][:512])}",
+        "eval": {},
+        "scoring": {"risk_score": None, "confidence": None},
         "acl": ["public"],
     }
+    if isinstance(rec.get("tags"), list):
+        for t in rec["tags"]:
+            if t not in payload["tags"]:
+                payload["tags"].append(t)
     return payload
-
-
-def load_records(path: str) -> list[dict]:
-    raw = Path(path).read_text(encoding="utf-8").strip()
-    if raw.startswith("["):
-        return json.loads(raw)
-    out = []
-    for line in raw.splitlines():
-        line = line.strip()
-        if line:
-            out.append(json.loads(line))
-    return out
-
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--src", required=True, help="Source JSON/JSONL (array JSON or JSONL)")
-    ap.add_argument("--collection", default=QDRANT_COLLECTION, help="Qdrant collection")
-    ap.add_argument("--qdrant-url", default=QDRANT_URL, help="Qdrant URL")
-    ap.add_argument("--max-chars", type=int, default=DEF_MAX_CHARS)
-    ap.add_argument("--overlap", type=int, default=DEF_OVERLAP)
-    ap.add_argument("--create-indexes", action='store_true', help="Create indexes for fields")
+    ap.add_argument("--src", required=True, help="JSON array or JSONL file")
+    ap.add_argument("--collection", default=QDRANT_COLLECTION)
+    ap.add_argument("--qdrant-url", default=QDRANT_URL)
+    ap.add_argument("--max-chars", type=int, default=1200)
+    ap.add_argument("--overlap", type=int, default=150)
+    ap.add_argument("--create-indexes", action="store_true")
+    ap.add_argument("--max-docs", type=int, default=0, help="Stop after N docs (0 = all)")
+    ap.add_argument("--batch-chunks", type=int, default=4000, help="How many chunks per encode/upsert")
+    ap.add_argument("--encode-batch-size", type=int, default=64, help="Mini-batches inside model.encode")
+    ap.add_argument("--normalize", action="store_true", help="L2-normalize embeddings")
     args = ap.parse_args()
 
-    # Load data (array JSON or JSONL)
-    path = Path(args.src)
-    raw = path.read_text(encoding="utf-8").strip()
-    data = []
-    if raw.startswith("["):
-        data = json.loads(raw)
-    else:
-        for line in raw.splitlines():
-            line = line.strip()
-            if line:
-                data.append(json.loads(line))
-
-    # Initialize model & Qdrant
-    model = SentenceTransformer(EMB_MODEL)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = SentenceTransformer(EMB_MODEL, device=device)
     client = QdrantClient(url=args.qdrant_url)
     ensure_collection(client, args.collection, EMB_DIM)
     if args.create_indexes:
         maybe_create_indexes(client, args.collection)
 
+    texts: List[str] = []
+    metas: List[Tuple[str, Dict[str, Any]]] = []  # (point_id, payload)
     total_chunks = 0
-    batch: List[PointStruct] = []
-    for rec in tqdm(data, desc="Processing records"):
+    seen_docs = 0
+
+    def flush_batch():
+        nonlocal texts, metas, total_chunks
+        if not texts: return
+        vecs = model.encode(
+            texts,
+            batch_size=args.encode_batch_size,
+            show_progress_bar=False,
+            normalize_embeddings=args.normalize,
+            convert_to_numpy=True,
+        )
+        points = [PointStruct(id=pid, vector=vec.tolist(), payload=pl) for (pid, pl), vec in zip(metas, vecs)]
+        client.upsert(collection_name=args.collection, points=points)
+        total_chunks += len(points)
+        texts.clear(); metas.clear()
+
+    for rec in tqdm(load_records(args.src), desc="Processing records"):
+        if args.max_docs and seen_docs >= args.max_docs:
+            break
         text = rec.get("text") or ""
         if not text.strip():
             continue
         doc_id = rec.get("_id") or rec.get("id") or str(uuid.uuid4())
         chunks = chunk_text(text, args.max_chars, args.overlap)
+        prev_id_for_doc = None
         n = len(chunks)
-        prev_id_for_doc = None  # track the previous chunk ID for this doc
 
         for idx, ch in enumerate(chunks):
-            chunk_uuid = str(uuid.uuid4())
+            pid = str(uuid.uuid4())
+            payload = build_payload(rec, ch, doc_id=doc_id, idx=idx, total=n, prev_id=prev_id_for_doc, chunk_id=pid)
+            prev_id_for_doc = pid
+            texts.append(ch["text"])
+            metas.append((pid, payload))
+            if len(texts) >= args.batch_chunks:
+                flush_batch()
 
-            iocs = extract_iocs(ch["text"])
-            payload = create_payload(
-                doc_id=doc_id,
-                chunk_id=chunk_uuid,
-                idx=idx,
-                total=n,
-                ch=ch,
-                rec=rec,
-                iocs=iocs,
-                prev_id=prev_id_for_doc,   # <-- use our running prev id
-            )
+        seen_docs += 1
 
-            vec = model.encode(ch["text"]).tolist()
-            batch.append(PointStruct(id=chunk_uuid, vector=vec, payload=payload))
-            prev_id_for_doc = chunk_uuid      # <-- update for next iteration
-            total_chunks += 1
-
-            if len(batch) >= 500:
-                client.upsert(collection_name=args.collection, points=batch)
-                batch.clear()
-    if batch:
-        client.upsert(collection_name=args.collection, points=batch)
-    print(f"✅ Ingested {len(data)} documents / {total_chunks} chunks into '{args.collection}'.")
+    flush_batch()
+    print(f"✅ Ingested {seen_docs} documents with {total_chunks} chunks into '{args.collection}' on device={device}.")
 
 if __name__ == "__main__":
     main()
