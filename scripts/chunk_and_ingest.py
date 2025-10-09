@@ -1,4 +1,9 @@
-import argparse, json, os, re, uuid, hashlib
+import argparse
+import json
+import os
+import re
+import uuid
+import hashlib
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Iterable, Tuple
@@ -163,6 +168,8 @@ def main():
     metas: List[Tuple[str, Dict[str, Any]]] = []  # (point_id, payload)
     total_chunks = 0
     seen_docs = 0
+
+    model = SentenceTransformer(EMB_MODEL, device=device)
 
     def flush_batch():
         nonlocal texts, metas, total_chunks
