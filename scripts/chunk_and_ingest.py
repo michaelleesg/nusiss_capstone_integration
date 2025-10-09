@@ -53,6 +53,8 @@ def chunk_text(text: str, max_chars=1200, overlap=150) -> List[Dict[str, Any]]:
         chunk = t[i:cut].strip()
         if chunk:
             out.append({"text": chunk, "start": i, "end": cut})
+        if cut >= n:
+            break  # stop; we consumed the end of the text
         i = max(cut - overlap, i + 1)
     return out
 
