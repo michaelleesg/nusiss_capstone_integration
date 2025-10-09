@@ -173,7 +173,8 @@ def main():
 
     def flush_batch():
         nonlocal texts, metas, total_chunks
-        if not texts: return
+        if not texts:
+            return
         vecs = model.encode(
             texts,
             batch_size=args.encode_batch_size,
@@ -181,10 +182,14 @@ def main():
             normalize_embeddings=args.normalize,
             convert_to_numpy=True,
         )
-        points = [PointStruct(id=pid, vector=vec.tolist(), payload=pl) for (pid, pl), vec in zip(metas, vecs)]
+        points = [
+            PointStruct(id=pid, vector=vec.tolist(), payload=pl)
+            for (pid, pl), vec in zip(metas, vecs)
+        ]
         upsert_with_retry(client, args.collection, points)
         total_chunks += len(points)
-        texts.clear(); metas.clear()
+        texts.clear()
+        metas.clear()
 
     for rec in tqdm(load_records(args.src), desc="Processing records"):
         if args.max_docs and seen_docs >= args.max_docs:
