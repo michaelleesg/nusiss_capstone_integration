@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Iterable, Tuple
 from tqdm import tqdm
+import time
 
 import torch
 from sentence_transformers import SentenceTransformer
@@ -123,6 +124,21 @@ def build_payload(rec: Dict[str, Any], ch: Dict[str, Any], *, doc_id: str, idx: 
                 payload["tags"].append(t)
     return payload
 
+def _chunks(seq, n):
+    for i in range(0, len(seq), n):
+        yield seq[i:i+n]
+
+def upsert_with_retry(client, collection, points, sub_batch=500, max_retries=3):
+    for part in _chunks(points, sub_batch):
+        for attempt in range(1, max_retries + 1):
+            try:
+                client.upsert(collection_name=collection, points=part, wait=True)
+                break
+            except Exception as e:
+                if attempt == max_retries:
+                    raise
+                time.sleep(2 ** attempt)
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True, help="JSON array or JSONL file")
@@ -132,14 +148,13 @@ def main():
     ap.add_argument("--overlap", type=int, default=150)
     ap.add_argument("--create-indexes", action="store_true")
     ap.add_argument("--max-docs", type=int, default=0, help="Stop after N docs (0 = all)")
-    ap.add_argument("--batch-chunks", type=int, default=4000, help="How many chunks per encode/upsert")
+    ap.add_argument("--batch-chunks", type=int, default=1500, help="How many chunks per encode/upsert")
     ap.add_argument("--encode-batch-size", type=int, default=64, help="Mini-batches inside model.encode")
     ap.add_argument("--normalize", action="store_true", help="L2-normalize embeddings")
     args = ap.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = SentenceTransformer(EMB_MODEL, device=device)
-    client = QdrantClient(url=args.qdrant_url)
+    client = QdrantClient(url=args.qdrant_url, timeout=60.0, prefer_grpc=True)
     ensure_collection(client, args.collection, EMB_DIM)
     if args.create_indexes:
         maybe_create_indexes(client, args.collection)
@@ -160,7 +175,7 @@ def main():
             convert_to_numpy=True,
         )
         points = [PointStruct(id=pid, vector=vec.tolist(), payload=pl) for (pid, pl), vec in zip(metas, vecs)]
-        client.upsert(collection_name=args.collection, points=points)
+        upsert_with_retry(client, args.collection, points)
         total_chunks += len(points)
         texts.clear(); metas.clear()
 
