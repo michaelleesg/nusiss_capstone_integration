@@ -7,6 +7,10 @@ def test_health(client):
     assert r.json() == {"ok": True}
 
 
+def test_search_empty_query(client):
+    r = client.get("/search", params={"q": ""})
+    assert r.status_code == 422  # Expecting a validation error for empty query
+
 def test_search_smoke(client):
     r = client.get("/search", params={"q": "cve"})
     assert r.status_code == 200
