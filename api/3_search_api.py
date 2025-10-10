@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import List, Tuple, Optional, Dict
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import SearchRequest, Filter, FieldCondition, MatchValue
+from qdrant_client.http.models import Filter, FieldCondition, MatchValue
 from fastapi.responses import JSONResponse
 import logging
 import os
@@ -12,7 +12,7 @@ import re
 # === Config ===
 QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", 6333))
-COLLECTION_NAME = os.getenv("QDRANT_COLLECTION", "ner_vectors")
+COLLECTION_NAME = os.getenv("QDRANT_COLLECTION", "heva_docs")
 MODEL_NAME = "all-MiniLM-L6-v2"
 TOP_K = 1
 
@@ -51,8 +51,9 @@ except Exception as e:
 
 # === Response Schemas ===
 class SearchResult(BaseModel):
-    text: str
     score: float
+    payload: dict
+    id: str
 
 class SearchResponse(BaseModel):
     query: str
@@ -128,7 +129,11 @@ def merge_and_rank(ioc_hits, vec_hits, *, ioc_bonus=1.0, vec_weight=1.0, limit=1
 
     # Adapt to your response model
     return [
-        SearchResult(score=round(r["score"], 4), text=r["payload"].get("text", "<no text>"), id=r["id"])
+        SearchResult(
+            score=round(r["score"], 4),
+            payload=r["payload"],
+            id=r["id"],
+        )
         for r in ranked
     ]
 
@@ -172,17 +177,16 @@ def search(
 
     # If has_ioc flag was requested by caller, apply it after merging
     merged = merge_and_rank(ioc_hits, vec_hits, ioc_bonus=1.2, vec_weight=1.0, limit=limit, min_score=min_score)
-
     if has_ioc:
         merged = [m for m in merged if (m.payload or {}).get("has_ioc")]
 
     return SearchResponse(query=query, results=merged)
 
 # === Health Check ===
-@app.get("/")
+@app.get("/health")
 def root():
     return {
-        "message": "🧠 Semantic Search API is running",
+        "status": "ok",
         "model": MODEL_NAME,
         "collection": COLLECTION_NAME
     }
