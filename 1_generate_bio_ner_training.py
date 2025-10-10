@@ -21,8 +21,7 @@ CHECKPOINT_FILE = "C:/Users/mike/Downloads/capstone/checkpoint.json"
 # CHECKPOINT_FILE = "C:/Users/mike/Downloads/capstone/checkpoint.json"
 # === Logging Setup ===
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("NER_Preprocessor")
 
@@ -31,7 +30,9 @@ try:
     nlp = spacy.load("en_core_web_sm")
     logger.info("✅ Loaded spaCy model 'en_core_web_sm'")
 except OSError:
-    logger.error("❌ spaCy model 'en_core_web_sm' not found. Run: python -m spacy download en_core_web_sm")
+    logger.error(
+        "❌ spaCy model 'en_core_web_sm' not found. Run: python -m spacy download en_core_web_sm"
+    )
     raise
 
 # === Rule-based patterns ===
@@ -39,11 +40,13 @@ RULE_PATTERNS = {
     "CVE": r"\bCVE-\d{4}-\d{4,7}\b",
     "EMAIL": r"\b[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+\b",
     "IP": r"\b(?:\d{1,3}\.){3}\d{1,3}\b",
-    "URL": r"http[s]?://[^\s\"']+"
+    "URL": r"http[s]?://[^\s\"']+",
 }
+
 
 def extract_sentences(text):
     return [sent.text.strip() for sent in nlp(text).sents if sent.text.strip()]
+
 
 def apply_rule_based(text):
     spans = []
@@ -51,6 +54,7 @@ def apply_rule_based(text):
         for match in re.finditer(pattern, text):
             spans.append((match.start(), match.end(), label))
     return spans
+
 
 def get_combined_entities(text):
     doc = nlp(text)
@@ -64,6 +68,7 @@ def get_combined_entities(text):
             final_spans.append((start, end, label))
             last_end = end
     return final_spans
+
 
 def tokenize_bio_by_words(sentence, entity_spans):
     doc = nlp(sentence)
@@ -85,6 +90,7 @@ def load_checkpoint():
         with open(CHECKPOINT_FILE, "r") as f:
             return json.load(f).get("last_index", 0)
     return 0
+
 
 def save_checkpoint(index):
     with open(CHECKPOINT_FILE, "w") as f:
@@ -109,7 +115,9 @@ def main():
         for i in range(start, end):
             item = data[i]
             if not isinstance(item, dict):
-                logger.warning(f"⚠️ Skipped non-dict entry at index {i}: {str(item)[:100]}")
+                logger.warning(
+                    f"⚠️ Skipped non-dict entry at index {i}: {str(item)[:100]}"
+                )
                 skipped += 1
                 continue
 
@@ -149,4 +157,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

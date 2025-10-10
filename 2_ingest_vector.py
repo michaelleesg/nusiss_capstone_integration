@@ -21,8 +21,13 @@ EMBEDDING_BACKUP_PATH = "embedding_backup.npy"
 
 # === CLI Arguments ===
 parser = argparse.ArgumentParser()
-parser.add_argument("--skip-recreate", action="store_true", help="Skip collection deletion and recreation")
+parser.add_argument(
+    "--skip-recreate",
+    action="store_true",
+    help="Skip collection deletion and recreation",
+)
 args = parser.parse_args()
+
 
 # === Wait for Qdrant to be ready ===
 def wait_for_qdrant(url, timeout=60):
@@ -40,7 +45,9 @@ def wait_for_qdrant(url, timeout=60):
         time.sleep(1)
     raise RuntimeError(f"❌ Qdrant not reachable after {timeout} seconds.")
 
+
 wait_for_qdrant(QDRANT_URL)
+
 
 # === Load BIO sentences ===
 def load_bio_sentences(path):
@@ -59,6 +66,7 @@ def load_bio_sentences(path):
                 if len(parts) == 2:
                     current.append((parts[0], parts[1]))
     return sentences
+
 
 sentences = load_bio_sentences(NER_BIO_SOURCE)
 print(f"✅ Loaded {len(sentences)} sentences.")
@@ -93,10 +101,13 @@ try:
     info = client.get_collection(COLLECTION_NAME)
     qdrant_dim = info.model_dump()["config"]["params"]["vectors"]["size"]
     if qdrant_dim != embedding_size:
-        raise ValueError(f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}")
+        raise ValueError(
+            f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}"
+        )
     print(f"✅ Dimension verified: {qdrant_dim}")
 except Exception as e:
     print(f"❌ Could not verify vector dimensions: {e}")
+
 
 # === Upload in Batches (with retry) ===
 def upload_batch(points, retries=3):
@@ -109,10 +120,11 @@ def upload_batch(points, retries=3):
             time.sleep(2 * attempt)
     raise RuntimeError("❌ All retries failed for batch upload.")
 
+
 print("🚀 Uploading vectors in batches...")
 for i in tqdm(range(0, len(sentences), BATCH_SIZE), desc="Ingesting", unit="batch"):
-    batch_sentences = sentences[i:i + BATCH_SIZE]
-    batch_vectors = vectors[i:i + BATCH_SIZE]
+    batch_sentences = sentences[i : i + BATCH_SIZE]
+    batch_vectors = vectors[i : i + BATCH_SIZE]
     payloads = [{"text": s} for s in batch_sentences]
     points = [
         PointStruct(id=str(uuid.uuid4()), vector=v.tolist(), payload=p)

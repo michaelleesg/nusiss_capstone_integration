@@ -22,15 +22,18 @@ TOP_K = 5
 app = FastAPI(title="CyberNER Vector Search API")
 logger = logging.getLogger("uvicorn.error")
 
+
 # Health check endpoint
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 # Version endpoint
 @app.get("/version")
 def version():
     return {"name": "agent-b-heva", "version": "0.1.0"}
+
 
 logger.info("🔍 Loading model...")
 model = SentenceTransformer(MODEL_NAME)
@@ -54,10 +57,13 @@ try:
     info = client.get_collection(COLLECTION_NAME)
     qdrant_dim = info.model_dump()["config"]["params"]["vectors"]["size"]
     if qdrant_dim != embedding_size:
-        raise ValueError(f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}")
+        raise ValueError(
+            f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}"
+        )
     logger.info(f"✅ Vector size matches: {qdrant_dim}")
 except Exception as e:
     logger.error(f"❌ Could not verify vector dimensions: {e}")
+
 
 # === Enhanced Response Schemas ===
 class SearchResult(BaseModel):
@@ -67,31 +73,35 @@ class SearchResult(BaseModel):
     tags: List[str] = []
     score: float
 
+
 class SearchResponse(BaseModel):
     query: str
     results: List[SearchResult]
 
+
 # === /search Endpoint ===
 @app.get("/search", response_model=SearchResponse)
-def search(query: str = Query(..., description="Search sentence or phrase"), limit: int = TOP_K):
+def search(
+    query: str = Query(..., description="Search sentence or phrase"), limit: int = TOP_K
+):
     try:
         vector = model.encode(query).tolist()
         search_result = client.search(
-            collection_name=COLLECTION_NAME,
-            query_vector=vector,
-            limit=limit
+            collection_name=COLLECTION_NAME, query_vector=vector, limit=limit
         )
 
         results = []
         for hit in search_result:
             payload = hit.payload or {}
-            results.append(SearchResult(
-                text=payload.get("text", "<missing>"),
-                tokens=payload.get("tokens", []),
-                labels=payload.get("labels", []),
-                tags=payload.get("tags", []),
-                score=round(hit.score, 4)
-            ))
+            results.append(
+                SearchResult(
+                    text=payload.get("text", "<missing>"),
+                    tokens=payload.get("tokens", []),
+                    labels=payload.get("labels", []),
+                    tags=payload.get("tags", []),
+                    score=round(hit.score, 4),
+                )
+            )
 
         return SearchResponse(query=query, results=results)
 
@@ -99,11 +109,12 @@ def search(query: str = Query(..., description="Search sentence or phrase"), lim
         logger.error(f"❌ Search failed: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
+
 # === Health Check ===
 @app.get("/")
 def root():
     return {
         "message": "🧠 CyberNER Semantic Search is up",
         "model": MODEL_NAME,
-        "collection": COLLECTION_NAME
+        "collection": COLLECTION_NAME,
     }

@@ -20,15 +20,18 @@ TOP_K = 5
 app = FastAPI(title="CyberNER Vector Search API")
 logger = logging.getLogger("uvicorn.error")
 
+
 # Health check endpoint
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 # Version endpoint
 @app.get("/version")
 def version():
     return {"name": "agent-b-heva", "version": "0.1.0"}
+
 
 # === Initialize Qdrant Client ===
 client = QdrantClient(url=QDRANT_URL)
@@ -51,10 +54,13 @@ try:
     info = client.get_collection(COLLECTION_NAME)
     qdrant_dim = info.model_dump()["config"]["params"]["vectors"]["size"]
     if qdrant_dim != embedding_size:
-        raise ValueError(f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}")
+        raise ValueError(
+            f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}"
+        )
     logger.info(f"✅ Vector size matches: {qdrant_dim}")
 except Exception as e:
     logger.error(f"❌ Could not verify vector dimensions: {e}")
+
 
 # === Enhanced Response Schemas ===
 class SearchResult(BaseModel):
@@ -62,9 +68,11 @@ class SearchResult(BaseModel):
     payload: dict
     id: str
 
+
 class SearchResponse(BaseModel):
     query: str
     results: List[SearchResult]
+
 
 # === /search Endpoint ===
 @app.get("/search", response_model=SearchResponse)
@@ -77,7 +85,7 @@ def search(
     doc_id: Optional[str] = Query(None, description="Filter by document ID"),
     after: Optional[str] = Query(None, description="Filter by published date after"),
     before: Optional[str] = Query(None, description="Filter by published date before"),
-    has_ioc: Optional[bool] = Query(None, description="Filter by presence of IOCs")
+    has_ioc: Optional[bool] = Query(None, description="Filter by presence of IOCs"),
 ):
     # Build Qdrant Filter (must = AND of simple conditions)
     must = []
@@ -85,18 +93,23 @@ def search(
     for t in tag_list:
         must.append(FieldCondition(key="tags", match=MatchValue(value=t)))
     if source_type:
-        must.append(FieldCondition(key="source_type", match=MatchValue(value=source_type)))
+        must.append(
+            FieldCondition(key="source_type", match=MatchValue(value=source_type))
+        )
     if doc_id:
         must.append(FieldCondition(key="doc_id", match=MatchValue(value=doc_id)))
+
     # Date filtering expects numeric; use published_at_ts in payload
     def to_ts(s: Optional[str]) -> Optional[int]:
         if not s:
             return None
         try:
             from datetime import datetime
+
             return int(datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp())
         except Exception:
             return None
+
     gte = to_ts(after)
     lte = to_ts(before)
     if gte is not None or lte is not None:
@@ -110,7 +123,7 @@ def search(
         collection_name=COLLECTION_NAME,
         query_vector=vector,
         limit=limit,
-        query_filter=qfilter
+        query_filter=qfilter,
     )
 
     def ioc_present(p: dict) -> bool:
@@ -135,11 +148,12 @@ def search(
 
     return SearchResponse(query=query, results=results)
 
+
 # === Health Check ===
 @app.get("/")
 def root():
     return {
         "message": "🧠 CyberNER Semantic Search is up",
         "model": MODEL_NAME,
-        "collection": COLLECTION_NAME
+        "collection": COLLECTION_NAME,
     }
