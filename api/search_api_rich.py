@@ -24,7 +24,8 @@ logger = logging.getLogger("uvicorn.error")
 # Health check endpoint
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    # Align with tests expecting {"ok": True}
+    return {"ok": True}
 
 
 # Version endpoint
