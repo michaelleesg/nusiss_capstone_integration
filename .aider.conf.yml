@@ -1,2 +1,10 @@
 model: openai/gpt-4o-mini
 edit-format: diff
+auto-lint: true
+lint-cmd:
+  - "python: ruff check --fix {files}"
+  - "python: black {files}"
+  - "javascript: eslint --fix {files}"
+  - "typescript: eslint --fix {files}"
+  - "markdown: prettier --write {files}"
+  - "yaml: yamllint {files}"
