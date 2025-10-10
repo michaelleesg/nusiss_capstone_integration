@@ -156,9 +156,6 @@ def search(
             query_filter=qfilter,
         )
 
-
-
-
     def ioc_present(p: dict) -> bool:
         if not p:
             return False
@@ -179,7 +176,7 @@ def search(
     #             id=str(hit.id),
     #         )
     #     )
-    
+
     for hit in hits:
         if hasattr(hit, "score"):
             score = float(hit.score)
@@ -204,8 +201,6 @@ def search(
             )
         )
 
-    
-    
     return SearchResponse(query=term, results=results)
 
 
