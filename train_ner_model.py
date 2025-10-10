@@ -1,4 +1,10 @@
-from transformers import AutoTokenizer, AutoModelForTokenClassification, DataCollatorForTokenClassification, TrainingArguments, Trainer
+from transformers import (
+    AutoTokenizer,
+    AutoModelForTokenClassification,
+    DataCollatorForTokenClassification,
+    TrainingArguments,
+    Trainer,
+)
 from datasets import Dataset
 import os
 from dotenv import load_dotenv
@@ -49,6 +55,7 @@ dataset = dataset.map(lambda x: {"labels": [tag2id[t] for t in x["ner_tags"]]})
 # Tokenizer and alignment
 tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
 
+
 def tokenize_and_align_labels(example):
     tokenized_inputs = tokenizer(
         example["tokens"],
@@ -56,7 +63,7 @@ def tokenize_and_align_labels(example):
         padding="max_length",
         is_split_into_words=True,
         return_tensors=None,
-        max_length=128
+        max_length=128,
     )
     word_ids = tokenized_inputs.word_ids()
 
@@ -73,6 +80,7 @@ def tokenize_and_align_labels(example):
 
     tokenized_inputs["labels"] = aligned_labels
     return tokenized_inputs
+
 
 tokenized_dataset = dataset.map(tokenize_and_align_labels)
 
@@ -96,7 +104,7 @@ args = TrainingArguments(
     num_train_epochs=3,
     logging_steps=1,
     save_steps=5,
-    remove_unused_columns=False
+    remove_unused_columns=False,
 )
 
 trainer = Trainer(

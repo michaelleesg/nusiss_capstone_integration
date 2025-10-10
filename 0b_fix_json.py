@@ -11,20 +11,26 @@ import os
 input_path = "C:/Users/mike/Downloads/capstone/Raw_Crawled_Data_With_LLM.json"
 output_path = "C:/Users/mike/Downloads/capstone/Raw_Crawled_Fixed.json"
 
+
 def fix_quotes_and_formatting(raw_text):
     # Fix keys: foo: → "foo":
     raw_text = re.sub(r'(?<!")(?P<key>\b\w+)\s*:', r'"\g<key>":', raw_text)
 
     # Fix common Python booleans and None
-    raw_text = raw_text.replace("None", "null").replace("True", "true").replace("False", "false")
+    raw_text = (
+        raw_text.replace("None", "null")
+        .replace("True", "true")
+        .replace("False", "false")
+    )
 
     # Remove trailing commas before } or ]
-    raw_text = re.sub(r',(\s*[}\]])', r'\1', raw_text)
+    raw_text = re.sub(r",(\s*[}\]])", r"\1", raw_text)
 
     # Remove inline comments
-    raw_text = re.sub(r'#.*', '', raw_text)
+    raw_text = re.sub(r"#.*", "", raw_text)
 
     return raw_text.strip()
+
 
 def parse_line(line, index):
     line = fix_quotes_and_formatting(line)
@@ -41,6 +47,7 @@ def parse_line(line, index):
     except Exception as e:
         print(f"❌ Still broken at index {index}: {e}")
         return None
+
 
 with open(input_path, "r", encoding="utf-8") as f:
     lines = f.read().strip().splitlines()
