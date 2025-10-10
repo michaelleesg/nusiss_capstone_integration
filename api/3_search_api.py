@@ -49,20 +49,24 @@ except Exception as e:
     logger.error(f"❌ Failed to validate collection: {e}")
     raise
 
+
 # === Response Schemas ===
 class DebugInfo(BaseModel):
     ioc_hits: int
     vec_hits: int
+
 
 class SearchResult(BaseModel):
     score: float
     payload: dict
     id: str
 
+
 class SearchResponse(BaseModel):
     query: str
     results: List[SearchResult]
     debug: Optional[DebugInfo] = None
+
 
 # === IOC Detection ===
 CVE_RE = re.compile(r"(?i)\bCVE-\d{4}-\d{4,7}\b")
@@ -70,24 +74,33 @@ IP_RE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
 DOM_RE = re.compile(r"\b[a-z0-9][a-z0-9-]*\.[a-z]{2,}\b", re.I)
 HASH_RE = re.compile(r"\b[a-f0-9]{32,64}\b", re.I)
 
+
 def detect_ioc(q: str) -> Optional[Tuple[str, str, str]]:
     """Return (payload_key, value, kind) or None."""
     m = CVE_RE.search(q)
-    if m: return ("ioc.cves", m.group(0).upper(), "cve")
+    if m:
+        return ("ioc.cves", m.group(0).upper(), "cve")
     m = IP_RE.search(q)
-    if m: return ("ioc.ips", m.group(0), "ip")
+    if m:
+        return ("ioc.ips", m.group(0), "ip")
     m = DOM_RE.search(q)
-    if m: return ("ioc.domains", m.group(0).lower(), "domain")
+    if m:
+        return ("ioc.domains", m.group(0).lower(), "domain")
     m = HASH_RE.search(q)
-    if m: return ("ioc.hashes", m.group(0).lower(), "hash")
+    if m:
+        return ("ioc.hashes", m.group(0).lower(), "hash")
     return None
+
 
 def key_from_hit_id_and_payload(hit) -> str:
     """Prefer chunk_id in payload; fallback to point id."""
     p = hit.payload or {}
     return p.get("chunk_id") or str(hit.id)
 
-def merge_and_rank(ioc_hits, vec_hits, *, ioc_bonus=1.0, vec_weight=1.0, limit=10, min_score=0.0):
+
+def merge_and_rank(
+    ioc_hits, vec_hits, *, ioc_bonus=1.0, vec_weight=1.0, limit=10, min_score=0.0
+):
     """
     ioc_hits: iterable of Qdrant points (from scroll), treated as exact matches
     vec_hits: iterable of Qdrant scored points (from client.search)
@@ -142,6 +155,7 @@ def merge_and_rank(ioc_hits, vec_hits, *, ioc_bonus=1.0, vec_weight=1.0, limit=1
         for r in ranked
     ]
 
+
 # === Search Endpoint ===
 @app.get("/search", response_model=SearchResponse)
 def search(
@@ -163,9 +177,9 @@ def search(
         ioc_filter = Filter(must=[FieldCondition(key=key, match=MatchValue(value=val))])
         pts, _ = client.scroll(
             collection_name=COLLECTION_NAME,
-            limit=max(limit, 50),   # bumped limit for recall
+            limit=max(limit, 50),  # bumped limit for recall
             with_payload=True,
-            query_filter=ioc_filter
+            query_filter=ioc_filter,
         )
         ioc_hits = pts
 
@@ -176,13 +190,20 @@ def search(
     vec_hits = client.search(
         collection_name=COLLECTION_NAME,
         query_vector=vector,
-        limit=max(limit, 50),   # bump recall for short queries
-        query_filter=qfilter if 'qfilter' in locals() else None,
+        limit=max(limit, 50),  # bump recall for short queries
+        query_filter=qfilter if "qfilter" in locals() else None,
     )
 
     # If has_ioc flag was requested by caller, apply it after merging
     if ioc_hits and not vec_hits:  # Added check for ioc_hits and no vec_hits
-        merged = merge_and_rank(ioc_hits, [], ioc_bonus=2.0, vec_weight=1.0, limit=limit, min_score=min_score)
+        merged = merge_and_rank(
+            ioc_hits,
+            [],
+            ioc_bonus=2.0,
+            vec_weight=1.0,
+            limit=limit,
+            min_score=min_score,
+        )
         if has_ioc:
             merged = [m for m in merged if (m.payload or {}).get("has_ioc")]
         return SearchResponse(
@@ -191,7 +212,14 @@ def search(
             debug=DebugInfo(ioc_hits=len(ioc_hits or []), vec_hits=len(vec_hits or [])),
         )
 
-    merged = merge_and_rank(ioc_hits, vec_hits, ioc_bonus=1.2, vec_weight=1.0, limit=limit, min_score=min_score)
+    merged = merge_and_rank(
+        ioc_hits,
+        vec_hits,
+        ioc_bonus=1.2,
+        vec_weight=1.0,
+        limit=limit,
+        min_score=min_score,
+    )
     if has_ioc:
         merged = [m for m in merged if (m.payload or {}).get("has_ioc")]
 
@@ -201,11 +229,8 @@ def search(
         debug=DebugInfo(ioc_hits=len(ioc_hits or []), vec_hits=len(vec_hits or [])),
     )
 
+
 # === Health Check ===
 @app.get("/health")
 def root():
-    return {
-        "status": "ok",
-        "model": MODEL_NAME,
-        "collection": COLLECTION_NAME
-    }
+    return {"status": "ok", "model": MODEL_NAME, "collection": COLLECTION_NAME}
