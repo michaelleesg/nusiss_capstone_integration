@@ -15,6 +15,8 @@ def test_search_smoke():
     r = requests.get("http://127.0.0.1:8000/search", params={"q": "cve"})
     assert r.status_code == 200
     assert r.text.strip().startswith("{") or r.text.strip().startswith("[")
+
+
 import os
 import threading
 import time
@@ -30,6 +32,7 @@ pytestmark = pytest.mark.skipif(
     reason="Set RUN_EXTERNAL=1 to run external smoke test.",
 )
 
+
 def _run_server():
     config = uvicorn.Config(
         app,
@@ -41,6 +44,7 @@ def _run_server():
     server = uvicorn.Server(config)
     server.install_signal_handlers = lambda: None
     server.run()
+
 
 def test_external_health():
     # Start server in background
