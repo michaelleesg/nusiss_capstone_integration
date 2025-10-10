@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import SearchRequest, Filter, FieldCondition, MatchValue
@@ -128,43 +128,55 @@ def merge_and_rank(ioc_hits, vec_hits, *, ioc_bonus=1.0, vec_weight=1.0, limit=1
 
     # Adapt to your response model
     return [
-        SearchResult(score=round(r["score"], 4), payload=r["payload"], id=r["id"])
+        SearchResult(score=round(r["score"], 4), text=r["payload"].get("text", "<no text>"), id=r["id"])
         for r in ranked
     ]
 
 # === Search Endpoint ===
 @app.get("/search", response_model=SearchResponse)
-def search(query: str = Query(..., description="Search sentence or phrase"), limit: int = TOP_K):
-    hit = detect_ioc(query)
-    if hit:
-        key, val = hit
-        # exact payload-filter scroll
-        qfilter = Filter(must=[FieldCondition(key=key, match=MatchValue(value=val))])
-        scrolled = client.scroll(collection_name=COLLECTION_NAME, limit=limit, with_payload=True, filter=qfilter)
-        payload_hits = []
-        for pt in scrolled[0]:
-            payload_hits.append(
-                SearchResult(text=pt.payload.get("text", "<no text>"), score=1.0)
-            )
-        if payload_hits:
-            return SearchResponse(query=query, results=payload_hits)
-    # fall through to vector search if none found
+def search(
+    query: str,
+    limit: int = TOP_K,
+    min_score: Optional[float] = 0.0,
+    tags: Optional[str] = None,
+    source_type: Optional[str] = None,
+    doc_id: Optional[str] = None,
+    after: Optional[str] = None,
+    before: Optional[str] = None,
+    has_ioc: Optional[bool] = None,
+):
+    # 1) IOC payload hits (deterministic)
+    ioc_hits = []
+    ioc = detect_ioc(query)
+    if ioc:
+        key, val, _kind = ioc
+        ioc_filter = Filter(must=[FieldCondition(key=key, match=MatchValue(value=val))])
+        pts, _ = client.scroll(
+            collection_name=COLLECTION_NAME,
+            limit=limit,  # cap to limit for cheapness; can make bigger if desired
+            with_payload=True,
+            query_filter=ioc_filter
+        )
+        ioc_hits = pts
+
+    # 2) Vector hits (your existing filter-building code can stay)
+    #    Build qfilter for tags/source_type/doc_id/dates, etc…
+    qfilter = None  # Placeholder for any additional filters you may want to implement
     vector = model.encode(query).tolist()
-    search_result = client.search(
+    vec_hits = client.search(
         collection_name=COLLECTION_NAME,
         query_vector=vector,
-        limit=limit
+        limit=max(limit, 50),   # bump recall for short queries
+        query_filter=qfilter if 'qfilter' in locals() else None,
     )
 
-    results = [
-        SearchResult(
-            text=hit.payload.get("text", "<no text>"),
-            score=round(hit.score, 4)
-        )
-        for hit in search_result
-    ]
+    # If has_ioc flag was requested by caller, apply it after merging
+    merged = merge_and_rank(ioc_hits, vec_hits, ioc_bonus=1.2, vec_weight=1.0, limit=limit, min_score=min_score)
 
-    return SearchResponse(query=query, results=results)
+    if has_ioc:
+        merged = [m for m in merged if (m.payload or {}).get("has_ioc")]
+
+    return SearchResponse(query=query, results=merged)
 
 # === Health Check ===
 @app.get("/")
