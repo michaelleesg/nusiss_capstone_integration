@@ -11,6 +11,13 @@ from sentence_transformers import SentenceTransformer
 
 from api.qdrant_client import QdrantWrapper
 
+# add near your other imports
+try:
+    from qdrant_client.http.models import QueryRequest  # new API
+except Exception:
+    QueryRequest = None
+
+
 # === Config ===
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 COLLECTION_NAME = os.getenv("QDRANT_COLLECTION", "heva_docs")
@@ -122,13 +129,29 @@ def search(
     qfilter = Filter(must=must) if must else None
 
     # Perform vector search
-    vector = model.encode(term).tolist()
-    search_result = client.search(
-        collection_name=COLLECTION_NAME,
-        query_vector=vector,
-        limit=limit,
-        query_filter=qfilter,
-    )
+    # after
+    if QueryRequest and hasattr(client, "query_points"):
+       # New API (preferred): server-side score_threshold + explicit with_payload
+       req = QueryRequest(
+         vector=vector,
+         limit=limit,
+         filter=qfilter,
+         with_payload=True,
+         with_vectors=False,
+         score_threshold=(min_score or None),
+       )
+       qp = client.query_points(collection_name=COLLECTION_NAME, query=req)
+       hits = qp.points  # normalize shape to match old code below
+    else:
+       # Fallback: old API
+       hits = client.search(
+         collection_name=COLLECTION_NAME,
+         query_vector=vector,
+         limit=limit,
+         query_filter=qfilter,
+       )
+
+
 
     def ioc_present(p: dict) -> bool:
         if not p:
@@ -137,20 +160,47 @@ def search(
         return any(i.get(k) for k in ("cves", "ips", "domains", "hashes"))
 
     results: List[SearchResult] = []
-    for hit in search_result:
-        if hit.score < (min_score or 0):
+
+    # for hit in search_result:
+    #     if hit.score < (min_score or 0):
+    #         continue
+    #     if has_ioc and not ioc_present(hit.payload or {}):
+    #         continue
+    #     results.append(
+    #         SearchResult(
+    #             score=round(float(hit.score), 4),
+    #             payload=hit.payload or {},
+    #             id=str(hit.id),
+    #         )
+    #     )
+    
+    for hit in hits:
+        if hasattr(hit, "score"):
+            score = float(hit.score)
+            payload = hit.payload or {}
+            _id = str(hit.id)
+        else:
+            # extremely defensive; most clients expose .score/.payload/.id
+            score = float(hit.get("score", 0))
+            payload = hit.get("payload", {}) or {}
+            _id = str(hit.get("id"))
+
+        if (min_score or 0) and score < (min_score or 0):
             continue
-        if has_ioc and not ioc_present(hit.payload or {}):
+        if has_ioc and not ioc_present(payload):
             continue
+
         results.append(
             SearchResult(
-                score=round(float(hit.score), 4),
-                payload=hit.payload or {},
-                id=str(hit.id),
+                score=round(score, 4),
+                payload=payload,
+                id=_id,
             )
         )
 
-    return SearchResponse(query=query, results=results)
+    
+    
+    return SearchResponse(query=term, results=results)
 
 
 # === Health Check ===
