@@ -11,11 +11,7 @@ from sentence_transformers import SentenceTransformer
 
 from api.qdrant_client import QdrantWrapper
 
-# add near your other imports
-try:
-    from qdrant_client.http.models import QueryRequest  # new API
-except Exception:
-    QueryRequest = None
+# (no need to import QueryRequest; we'll call query_points directly when available)
 
 
 # === Config ===
