@@ -2,7 +2,8 @@ import logging
 import os
 from typing import List, Optional
 
-from fastapi import FastAPI, Query
+from typing import Optional
+from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import FieldCondition, Filter, MatchValue, Range
@@ -76,7 +77,8 @@ class SearchResponse(BaseModel):
 # === /search Endpoint ===
 @app.get("/search", response_model=SearchResponse)
 def search(
-    query: str = Query(..., description="Search sentence or phrase"),
+    q: Optional[str] = Query(None, min_length=1, description="Search term", alias="q"),
+    query: Optional[str] = Query(None, min_length=1, description="Alias for q"),
     limit: int = Query(5, description="Number of results to return"),
     min_score: Optional[float] = Query(0, description="Minimum score for results"),
     tags: Optional[str] = Query(None, description="Comma-separated tags to filter"),
@@ -86,6 +88,11 @@ def search(
     before: Optional[str] = Query(None, description="Filter by published date before"),
     has_ioc: Optional[bool] = Query(None, description="Filter by presence of IOCs"),
 ):
+    term = q or query
+    if not term:
+        # Be explicit instead of letting Pydantic throw a 422
+        raise HTTPException(status_code=400, detail="Missing search query ('q' or 'query')")
+    
     # Build Qdrant Filter (must = AND of simple conditions)
     must = []
     tag_list = [t for t in (tags.split(",") if tags else []) if t]
@@ -115,7 +122,7 @@ def search(
     qfilter = Filter(must=must) if must else None
 
     # Perform vector search
-    vector = model.encode(query).tolist()
+    vector = model.encode(term).tolist()
     search_result = client.search(
         collection_name=COLLECTION_NAME,
         query_vector=vector,
