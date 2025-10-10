@@ -1,13 +1,19 @@
-.PHONY: start stop restart test iterate
+.PHONY: lint format test security check all
 
-start:
-	./scripts/restart_api.sh
+lint:
+	ruff check --fix $(shell git ls-files "*.py")
+
+format:
+	black $(shell git ls-files "*.py")
 
 test:
-	./scripts/healthcheck.sh
+	pytest -q --cov=. --cov-report=term-missing
 
-iterate:
-	MAX_ITERS?=3 ./scripts/iterate_heva.sh
+security:
+	bandit -r .
+	pip-audit || true
 
-restart: start
+check: lint format test security
+
+all: check
 
