@@ -101,7 +101,7 @@ def merge_and_rank(ioc_hits, vec_hits, *, ioc_bonus=1.0, vec_weight=1.0, limit=1
         merged[k] = {
             "id": str(pt.id),
             "payload": pt.payload or {},
-            "score": 1.0 * ioc_bonus,
+            "score": 2.0 * ioc_bonus,  # Changed to 2.0 * ioc_bonus
             "sources": {"ioc"},
         }
 
@@ -181,6 +181,16 @@ def search(
     )
 
     # If has_ioc flag was requested by caller, apply it after merging
+    if ioc_hits and not vec_hits:  # Added check for ioc_hits and no vec_hits
+        merged = merge_and_rank(ioc_hits, [], ioc_bonus=2.0, vec_weight=1.0, limit=limit, min_score=min_score)
+        if has_ioc:
+            merged = [m for m in merged if (m.payload or {}).get("has_ioc")]
+        return SearchResponse(
+            query=query,
+            results=merged,
+            debug=DebugInfo(ioc_hits=len(ioc_hits or []), vec_hits=len(vec_hits or [])),
+        )
+
     merged = merge_and_rank(ioc_hits, vec_hits, ioc_bonus=1.2, vec_weight=1.0, limit=limit, min_score=min_score)
     if has_ioc:
         merged = [m for m in merged if (m.payload or {}).get("has_ioc")]
