@@ -1,13 +1,13 @@
-from fastapi import FastAPI, Query
-from pydantic import BaseModel
-from typing import List, Tuple, Optional, Dict
-from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import Filter, FieldCondition, MatchValue
-from fastapi.responses import JSONResponse
 import logging
 import os
 import re
+from typing import Dict, List, Optional, Tuple
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import FieldCondition, Filter, MatchValue
+from sentence_transformers import SentenceTransformer
 
 # === Config ===
 QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
@@ -98,9 +98,7 @@ def key_from_hit_id_and_payload(hit) -> str:
     return p.get("chunk_id") or str(hit.id)
 
 
-def merge_and_rank(
-    ioc_hits, vec_hits, *, ioc_bonus=1.0, vec_weight=1.0, limit=10, min_score=0.0
-):
+def merge_and_rank(ioc_hits, vec_hits, *, ioc_bonus=1.0, vec_weight=1.0, limit=10, min_score=0.0):
     """
     ioc_hits: iterable of Qdrant points (from scroll), treated as exact matches
     vec_hits: iterable of Qdrant scored points (from client.search)
