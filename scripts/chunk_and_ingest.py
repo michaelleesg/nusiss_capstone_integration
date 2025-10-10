@@ -20,6 +20,18 @@ QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "heva_docs")
 EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 EMB_DIM = 384
 
+CVE_RE = re.compile(r"(?i)\bCVE-\d{4}-\d{4,7}\b")
+IP_RE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
+DOM_RE = re.compile(r"\b[a-z0-9][a-z0-9-]*\.[a-z]{2,}\b", re.I)
+HASH_RE = re.compile(r"\b[a-f0-9]{32,64}\b", re.I)
+
+def detect_ioc(q: str):
+    if CVE_RE.search(q):   return ("ioc.cves", CVE_RE.search(q).group(0).upper())
+    if IP_RE.search(q):    return ("ioc.ips", IP_RE.search(q).group(0))
+    if DOM_RE.search(q):   return ("ioc.domains", DOM_RE.search(q).group(0).lower())
+    if HASH_RE.search(q):  return ("ioc.hashes", HASH_RE.search(q).group(0).lower())
+    return None
+
 def md5_hex(s: str) -> str:
     return hashlib.md5(s.encode("utf-8"), usedforsecurity=False).hexdigest()
 
