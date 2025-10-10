@@ -128,32 +128,34 @@ def search(
         must.append(FieldCondition(key="published_at_ts", range=rng))
     qfilter = Filter(must=must) if must else None
 
-        # --- Perform vector search (prefer new API; fallback to old) ---
-        # Compute vector first (was causing NameError before)
-        vector = model.encode(term).tolist()
+    # --- Perform vector search (prefer new API; fallback to old) ---
+    # Compute vector first (was causing NameError before)
+    vector = model.encode(term).tolist()
 
-        hits = None
-        if QueryRequest and hasattr(client, "query_points"):
-            # New API (preferred): server-side score_threshold + explicit payload toggle
-            req = QueryRequest(
-                vector=vector,
-                limit=limit,
-                filter=qfilter,
-                with_payload=True,
-                with_vectors=False,
-                # None means "no threshold" on server side
-                score_threshold=(min_score if (min_score and min_score > 0) else None),
-            )
-            qp = client.query_points(collection_name=COLLECTION_NAME, query=req)
-            hits = qp.points  # normalize shape to match old code below
-        if hits is None:
-            # Fallback: old API (kept for backward compatibility)
-            hits = client.search(
-                collection_name=COLLECTION_NAME,
-                query_vector=vector,
-                limit=limit,
-                query_filter=qfilter,
-            )
+    hits = None
+    if QueryRequest and hasattr(client, "query_points"):
+        # New API (preferred): server-side score_threshold + explicit payload toggle
+        req = QueryRequest(
+            vector=vector,
+            limit=limit,
+            filter=qfilter,
+            with_payload=True,
+            with_vectors=False,
+            # None means "no threshold" on server side
+            score_threshold=(min_score if (min_score and min_score > 0) else None),
+        )
+        qp = client.query_points(collection_name=COLLECTION_NAME, query=req)
+        hits = qp.points  # normalize shape to match old code below
+
+    if hits is None:
+        # Fallback: old API (kept for backward compatibility)
+        hits = client.search(
+            collection_name=COLLECTION_NAME,
+            query_vector=vector,
+            limit=limit,
+            query_filter=qfilter,
+        )
+
 
 
 
