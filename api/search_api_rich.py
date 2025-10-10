@@ -92,7 +92,7 @@ def search(
     if not term:
         # Be explicit instead of letting Pydantic throw a 422
         raise HTTPException(status_code=400, detail="Missing search query ('q' or 'query')")
-    
+
     # Build Qdrant Filter (must = AND of simple conditions)
     must = []
     tag_list = [t for t in (tags.split(",") if tags else []) if t]
