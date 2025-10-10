@@ -22,3 +22,5 @@ Makefile text eol=lf
 combined.json filter=lfs diff=lfs merge=lfs -text
 ner_training.txt filter=lfs diff=lfs merge=lfs -text
 *.docx text eol=crlf export-ignore
+.aider.tags.cache.v4/* merge=ours
+.aider.conf.yml merge=ours
