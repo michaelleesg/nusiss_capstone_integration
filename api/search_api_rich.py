@@ -1,13 +1,13 @@
+import logging
+import os
+from typing import List, Optional
+
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
-from typing import List, Optional
-from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import Filter, FieldCondition, MatchValue, Range
-from fastapi.responses import JSONResponse
-import logging
-import httpx
-import os
+from qdrant_client.http.models import FieldCondition, Filter, MatchValue, Range
+from sentence_transformers import SentenceTransformer
+
 from api.qdrant_client import QdrantWrapper
 
 # === Config ===
@@ -54,9 +54,7 @@ try:
     info = client.get_collection(COLLECTION_NAME)
     qdrant_dim = info.model_dump()["config"]["params"]["vectors"]["size"]
     if qdrant_dim != embedding_size:
-        raise ValueError(
-            f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}"
-        )
+        raise ValueError(f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}")
     logger.info(f"✅ Vector size matches: {qdrant_dim}")
 except Exception as e:
     logger.error(f"❌ Could not verify vector dimensions: {e}")
@@ -93,9 +91,7 @@ def search(
     for t in tag_list:
         must.append(FieldCondition(key="tags", match=MatchValue(value=t)))
     if source_type:
-        must.append(
-            FieldCondition(key="source_type", match=MatchValue(value=source_type))
-        )
+        must.append(FieldCondition(key="source_type", match=MatchValue(value=source_type)))
     if doc_id:
         must.append(FieldCondition(key="doc_id", match=MatchValue(value=doc_id)))
 
