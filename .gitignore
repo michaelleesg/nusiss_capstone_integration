@@ -33,3 +33,7 @@ ner_vector_output.csv
 
 # Aider
 .aiderignore
+
+# Local env
+.env
+.aider*
