@@ -107,12 +107,33 @@ def maybe_create_indexes(client: QdrantClient, name: str):
 
 def load_records(path: str) -> Iterable[Dict[str, Any]]:
     txt = Path(path).read_text(encoding="utf-8").strip()
+    idx = 0
+    def coerce(r, i):
+        if isinstance(r, dict):
+            return r
+        if isinstance(r, str):
+            return {"_id": f"string-{i}", "text": r}
+        # fallback: stringify unknown types
+        return {"_id": f"unknown-{i}", "text": str(r)}
+
     if txt.startswith("["):
-        for rec in json.loads(txt): yield rec
+        try:
+            arr = json.loads(txt)
+        except json.JSONDecodeError:
+            arr = []
+        for r in arr:
+            yield coerce(r, idx); idx += 1
     else:
         for line in txt.splitlines():
             line = line.strip()
-            if line: yield json.loads(line)
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except json.JSONDecodeError:
+                # treat raw line as text record
+                r = line
+            yield coerce(r, idx); idx += 1
 
 def build_payload(rec: Dict[str, Any], ch: Dict[str, Any], *, doc_id: str, idx: int, total: int, prev_id: str | None, chunk_id: str) -> Dict[str, Any]:
     title = rec.get("caps_title") or rec.get("title") or ""
@@ -220,6 +241,8 @@ def main():
     for rec in tqdm(load_records(args.src), desc="Processing records"):
         if args.max_docs and seen_docs >= args.max_docs:
             break
+        if isinstance(rec, str):
+            rec = {"_id": f"string-{seen_docs}", "text": rec}
         text = rec.get("text") or ""
         if not text.strip():
             continue
