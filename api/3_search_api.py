@@ -50,6 +50,10 @@ except Exception as e:
     raise
 
 # === Response Schemas ===
+class DebugInfo(BaseModel):
+    ioc_hits: int
+    vec_hits: int
+
 class SearchResult(BaseModel):
     score: float
     payload: dict
@@ -58,6 +62,7 @@ class SearchResult(BaseModel):
 class SearchResponse(BaseModel):
     query: str
     results: List[SearchResult]
+    debug: Optional[DebugInfo] = None
 
 # === IOC Detection ===
 CVE_RE = re.compile(r"(?i)\bCVE-\d{4}-\d{4,7}\b")
@@ -158,7 +163,7 @@ def search(
         ioc_filter = Filter(must=[FieldCondition(key=key, match=MatchValue(value=val))])
         pts, _ = client.scroll(
             collection_name=COLLECTION_NAME,
-            limit=limit,  # cap to limit for cheapness; can make bigger if desired
+            limit=max(limit, 50),   # bumped limit for recall
             with_payload=True,
             query_filter=ioc_filter
         )
@@ -180,7 +185,11 @@ def search(
     if has_ioc:
         merged = [m for m in merged if (m.payload or {}).get("has_ioc")]
 
-    return SearchResponse(query=query, results=merged)
+    return SearchResponse(
+        query=query,
+        results=merged,
+        debug=DebugInfo(ioc_hits=len(ioc_hits or []), vec_hits=len(vec_hits or [])),
+    )
 
 # === Health Check ===
 @app.get("/health")
