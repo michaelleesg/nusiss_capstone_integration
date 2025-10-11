@@ -1,6 +1,5 @@
 # Normalize text files
 * text=auto
-
 # Enforce LF for scripts/code (avoid CRLF issues on WSL/CI)
 *.sh text eol=lf
 *.py text eol=lf
