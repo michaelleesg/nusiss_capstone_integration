@@ -57,3 +57,5 @@ capstone_report/*.log
 dir_listing.txt
 .DS_Store
 Thumbs.db
+*.pdf
+Miniconda3-latest-Linux-x86_64.sh
