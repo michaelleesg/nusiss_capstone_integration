@@ -1,15 +1,30 @@
 version: '3.8'
 
 services:
-  app:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - ./.qdrant:/qdrant/storage
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:6333/readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: cyberner-api
     environment:
-      QDRANT_URL: http://localhost:6333
-      QDRANT_COLLECTION: heva_docs
-      VECTORS_SIZE: 384
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_COLLECTION=heva_docs
+      # - QDRANT_API_KEY=   # only if your Qdrant requires auth
     ports:
       - "8000:8000"
-    restart: unless-stopped
+    depends_on:
+      qdrant:
+        condition: service_healthy
