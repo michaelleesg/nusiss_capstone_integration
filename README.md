@@ -1,231 +1,347 @@
-# Agent B — README
+# Agent B — HEVA Search API (FastAPI + Qdrant)
 
-Agent B is a lightweight FastAPI service that exposes semantic search and threat-intel helpers over an indexed corpus. It ships with a clean local/dev workflow, optional Docker & Compose setups, and a simple test suite so you can verify everything is working end-to-end. The steps below turn a fresh machine into a working Agent B instance with reproducible commands.
+> Historical Evidence Vector Archive (HEVA): semantic search and threat‑intel helpers powering CyberSage Agent B.
+
+[![Built with FastAPI](https://img.shields.io/badge/Built%20with-FastAPI-109989.svg)](#) [![Python](https://img.shields.io/badge/Python-3.11+-3776AB)](#) [![Docker Compose](https://img.shields.io/badge/Docker-Compose-blue)](#) [![License](https://img.shields.io/badge/License-Your%20Choice-informational)](#)
+
+Agent B exposes a minimal, production‑lean **HTTP API** for **semantic retrieval** over a Qdrant collection populated by Agent A. It is designed for:
+- **Local dev** (venv + uvicorn)
+- **Containerized** runs (Docker/Compose)
+- **CI‑friendly** testing (mockable dependencies, `HEVA_SKIP_QDRANT`)
+- **Evidence‑driven** triage (filters for KEV/IOC/assets/CVEs/time windows)
 
 ---
 
 ## Contents
-- [What you’ll install](#what-youll-install)
-- [Quick start (best path)](#quick-start-best-path)
-- [Local dev setup (Python venv)](#local-dev-setup-python-venv)
-- [Run with Docker](#run-with-docker)
-- [Run with Docker Compose](#run-with-docker-compose)
-- [Environment variables](#environment-variables)
-- [Seed / ingest data (optional)](#seed--ingest-data-optional)
-- [API usage](#api-usage)
-- [Run tests & tooling](#run-tests--tooling)
-- [Troubleshooting](#troubleshooting)
+- [TL;DR](#tldr)
+- [Install & Run](#install--run)
+  - [Quick start (Docker Compose)](#quick-start-docker-compose)
+  - [Local development (venv)](#local-development-venv)
+  - [Single container](#single-container)
+- [Configuration](#configuration)
+- [Ingest / Seed](#ingest--seed)
+- [API](#api)
+  - [OpenAPI & discovery](#openapi--discovery)
+  - [`GET /health`](#get-health)
+  - [`GET /version`](#get-version)
+  - [`GET /search`](#get-search)
+  - [Error model](#error-model)
+- [Observability](#observability)
+- [Testing](#testing)
+- [Security & Hardening](#security--hardening)
+- [Performance Notes](#performance-notes)
+- [FAQ](#faq)
+- [Makefile (optional)](#makefile-optional)
+- [Changelog](#changelog)
+- [License](#license)
 
 ---
 
-## What you’ll install
-
-> Tested on Linux/WSL2 & macOS with Python 3.11+
-
-- **Python 3.11+** and **pip**
-- **Git**
-- **Docker** and (optional) **Docker Compose** (v2+)
-- (Dev only) **uvicorn** (installed via `requirements.txt`)
-
----
-
-## Quick start (best path)
-
-Use Docker Compose to bring up **Agent B** (API) and its vector DB in one go.
+## TL;DR
 
 ```bash
-# 1) Clone and enter the repo
-git clone https://github.com/<your-org-or-user>/<your-repo>.git agent-b
-cd agent-b
-
-# 2) Copy default envs (edit values if needed)
+# compose: API + Qdrant
 cp .env.example .env
+docker compose up --build
 
-# 3) Start everything (builds images on first run)
+# then visit:
+#   http://localhost:8000/docs
+# or curl:
+curl "http://localhost:8000/search?q=cve&min_score=0.25&tags=kev,blog&has_ioc=true"
+```
+
+---
+
+## Install & Run
+
+### Quick start (Docker Compose)
+
+Runs **Agent B** (FastAPI) and **Qdrant** together.
+
+```bash
+git clone https://github.com/<your-org>/<repo>.git agent-b
+cd agent-b
+cp .env.example .env
 docker compose up --build
 ```
 
-When it’s ready, visit:
+Endpoints:
+- Swagger UI: <http://localhost:8000/docs>  
+- Health: `GET http://localhost:8000/health`  
+- Version: `GET http://localhost:8000/version`
 
-- API docs: http://localhost:8000/docs  
-- Health check: `curl http://localhost:8000/health`  
-- Version: `curl http://localhost:8000/version`  
+Stop/clean:
+```bash
+docker compose down
+```
 
-> You can stop everything with `Ctrl+C`, then `docker compose down`.
+> **Heads‑up (WSL2/Windows):** If Compose warns about a symlink‑derived project name, it’s safe to ignore. Or set an explicit `name:` in `compose.yaml`.
 
----
-
-## Local dev setup (Python venv)
-
-Prefer this path if you’re developing code, running tests, or iterating quickly.
+### Local development (venv)
 
 ```bash
-# 1) Clone and enter the repo
-git clone https://github.com/<your-org-or-user>/<your-repo>.git agent-b
+git clone https://github.com/<your-org>/<repo>.git agent-b
 cd agent-b
-
-# 2) Create & activate a virtual environment
-python3 -m venv .venv
-# Linux/macOS:
+python -m venv .venv
+# Linux/macOS
 source .venv/bin/activate
-# Windows (PowerShell):
+# Windows PowerShell
 # .\.venv\Scripts\Activate.ps1
 
-# 3) Upgrade pip and install deps
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 
-# 4) Copy default envs (then edit if needed)
 cp .env.example .env
+# Ensure Qdrant is reachable (local or remote)
+# e.g. docker run -p 6333:6333 qdrant/qdrant:latest
 
-# 5) (Optional) make sure your vector DB is reachable (local or remote)
-
-# 6) Run the API with uvicorn
 uvicorn api.search_api_rich:app --host 0.0.0.0 --port 8000
 ```
 
----
-
-## Run with Docker
-
-Build a single container for **Agent B** (assumes you already have a running vector DB reachable via env vars).
+### Single container
 
 ```bash
-# From repo root
 docker build -t agent-b-api .
 docker run -d --name agent-b   --env-file .env   -p 8000:8000   agent-b-api
-```
-
-Stop and remove:
-
-```bash
+# stop & remove
 docker stop agent-b && docker rm agent-b
 ```
 
 ---
 
-## Run with Docker Compose
+## Configuration
 
-If your repo includes a `docker-compose.yml` with both the API and vector DB:
+Create `.env` from `.env.example` and adjust as needed.
 
-```bash
-docker compose up --build
-# Stop & clean:
-# docker compose down
-```
-
----
-
-## Environment variables
-
-Create `.env` from `.env.example` and adjust as needed:
-
-```bash
-cp .env.example .env
-```
-
-Typical keys you’ll see:
-
-```
+```ini
 # API
 APP_ENV=dev
 APP_PORT=8000
+HOST=0.0.0.0
 
-# Vector DB (Qdrant or compatible)
-QDRANT_URL=http://localhost:6333
-QDRANT_API_KEY=            # if your instance is secured
+# Vector DB (Qdrant)
+QDRANT_URL=http://localhost:6333     # host usage
+# QDRANT_URL=http://qdrant:6333      # service name inside Compose network
+QDRANT_API_KEY=                      # set if secured
 QDRANT_COLLECTION=heva_docs
 
-# Embeddings / model (example)
+# Embeddings / model
 EMBEDDING_MODEL=all-MiniLM-L6-v2
+
+# Feature flags
+HEVA_SKIP_QDRANT=0                   # 1: allow tests without live Qdrant
+SEARCH_DEFAULT_LIMIT=10
+SEARCH_DEFAULT_MIN_SCORE=0.0
 ```
 
-> If you run Qdrant in Compose alongside the API, the `QDRANT_URL` might be `http://qdrant:6333` inside the Docker network and `http://localhost:6333` for your host.
+**Networking tip:** Inside Docker Compose, use `http://qdrant:6333`; from host, use `http://localhost:6333`.
 
 ---
 
-## Seed / ingest data (optional)
+## Ingest / Seed
 
-If the project contains scripts for ingesting documents (common examples below), run them **after** your vector DB is up:
+Populate the collection **after** Qdrant is up. Your project may expose one or more of the following:
 
 ```bash
-# Example 1: one-shot ingestion
-python scripts/chunk_and_ingest.py --input data/raw/ --collection $QDRANT_COLLECTION
+# Generic example
+python scripts/chunk_and_ingest.py --input data/raw --collection $QDRANT_COLLECTION
 
-# Example 2: wrapper
-python ingest_wrapper.py --input data/raw/ --collection $QDRANT_COLLECTION
+# Wrapper
+python ingest_wrapper.py --input data/raw --collection $QDRANT_COLLECTION
 
-# Example 3: platform-specific
-python 2_ingest_vector.py          # or 2_ingest_vector_wsl.py
+# Project‑specific
+python 2_ingest_vector.py            # or 2_ingest_vector_wsl.py
 ```
 
-> Adjust script names/paths for your repo. If you don’t need ingestion (e.g., your collection is already populated), skip this section.
+Skip if your collection is already populated.
 
 ---
 
-## API usage
+## API
 
-Start the API (any method above), then:
+### OpenAPI & discovery
+- Swagger UI: `/docs`
+- OpenAPI JSON: `/openapi.json`
+
+> Use `/openapi.json` in downstream clients to generate typed SDKs.
+
+### `GET /health`
+Health probe for liveness/readiness.
+
+**200 OK**
+```json
+{"status":"ok"}
+```
+
+### `GET /version`
+Returns app build/version metadata.
+
+**200 OK**
+```json
+{"name":"agent-b-heva","version":"2025.10.11","commit":"<git-sha>"}
+```
+
+### `GET /search`
+
+**Query parameters**
+
+| Name          | Type    | Default | Notes |
+|---------------|---------|---------|------|
+| `q`/`query`   | string  | —       | Required search text. |
+| `limit`       | int     | `10`    | Max results to return. |
+| `min_score`   | float   | `0.0`   | Filter out hits below this score. |
+| `after`       | RFC3339 | —       | Include docs created/updated at or after this timestamp. |
+| `before`      | RFC3339 | —       | Include docs created/updated at or before this timestamp. |
+| `tags`        | csv     | —       | e.g. `kev,blog,advisory`. |
+| `has_ioc`     | bool    | `false` | Require presence of IOCs. |
+| `assets`      | csv     | —       | e.g. `veeam,cisco,exchange`. |
+| `cves`        | csv     | —       | e.g. `CVE-2024-1234,CVE-2017-0199`. |
+| `offset`      | int     | `0`     | Pagination offset (if supported). |
+
+**Examples**
 
 ```bash
-# Health
-curl http://localhost:8000/health
-
-# Version
-curl http://localhost:8000/version
-
-# Search (vector search over your collection)
-curl "http://localhost:8000/search?q=cve"
-
-# With filters (examples)
+# Tuned search with filters
 curl "http://localhost:8000/search?q=cve&min_score=0.25&tags=kev,blog&has_ioc=true"
-curl "http://localhost:8000/search?q=cve&after=2025-01-01T00:00:00Z&before=2025-12-31T23:59:59Z"
+
+# Time‑bounded
+curl "http://localhost:8000/search?q=veeam&after=2025-01-01T00:00:00Z&before=2025-12-31T23:59:59Z"
+
+# Specific CVEs and assets
+curl "http://localhost:8000/search?q=remote%20code%20exec&cves=CVE-2017-0199&assets=office"
 ```
 
-Open the interactive docs at **`/docs`** to explore endpoints via Swagger UI.
+**Response (200 OK)**
+```json
+{
+  "query": "cve",
+  "count": 2,
+  "results": [
+    {
+      "id": "doc-123",
+      "score": 0.78,
+      "title": "Remote Code Execution in XYZ",
+      "summary": "…",
+      "created_at": "2025-09-30T12:34:56Z",
+      "tags": ["kev","advisory"],
+      "ioc": {"cves":["CVE-2017-0199"], "domains":["…"], "hashes":["…"]},
+      "assets": ["office","exchange"],
+      "url": "https://…"
+    }
+  ]
+}
+```
+
+### Error model
+
+| Code | When                          | Body (shape) |
+|------|-------------------------------|--------------|
+| 400  | Missing/invalid query params  | `{"error":"<message>","field":"<name>"}` |
+| 401  | Auth required (if enabled)    | `{"error":"unauthorized"}` |
+| 404  | Resource not found            | `{"error":"not_found"}` |
+| 5xx  | Upstream/Qdrant/network issues| `{"error":"internal","trace_id":"<id>"}` |
 
 ---
 
-## Run tests & tooling
+## Observability
+
+- **Logging:** structured logs to stdout; include `trace_id` for correlation.
+- **Metrics (optional):** expose Prometheus at `/metrics` (if `prometheus_client` enabled).
+- **Tracing (optional):** OpenTelemetry exporter can be wired for Qdrant calls + request spans.
+
+---
+
+## Testing
 
 ```bash
-# In your venv
+# full test suite
 pytest -q
 
-# If you have pre-commit hooks configured:
-pre-commit install
-pre-commit run -a
+# skip live Qdrant calls
+export HEVA_SKIP_QDRANT=1
+pytest -q -m "not external"
+```
+
+Suggested markers:
+- `external`: hits live Qdrant; guard behind env flags
+- `unit`: pure python tests for ranking/merging
+- `api`: tests for FastAPI routes and validation
+
+---
+
+## Security & Hardening
+
+- Use `QDRANT_API_KEY` and TLS on managed Qdrant.
+- Run containers as non‑root; add a read‑only FS where possible.
+- Rate‑limit `/search` in front (API gateway / reverse proxy).
+- Sanitize outbound links in results; avoid leaking tenant‑specific data.
+- Consider RBAC for future multi‑tenant deployments.
+
+---
+
+## Performance Notes
+
+- Prefer compact models in dev (`all-MiniLM-L6-v2`); switch to higher‑capacity embeddings only if justified.
+- Batch Qdrant queries and use `limit` conservatively.
+- Apply `min_score` to reduce downstream rendering payloads.
+- Cache hot queries at the edge (e.g., Cloudflare/NGINX micro‑cache).
+
+---
+
+## FAQ
+
+**Q: I get port collisions on 8000/6333.**  
+A: Change `APP_PORT`, use `uvicorn … --port 8001`, or map `-p 8001:8000`. For Qdrant, map `-p 6334:6333` and set `QDRANT_URL=http://localhost:6334`.
+
+**Q: Compose can’t reach Qdrant.**  
+A: Inside the compose network the hostname is `qdrant`, not `localhost`. Use `http://qdrant:6333` in the API container.
+
+**Q: How do I paginate?**  
+A: Use `offset` + `limit`. Depending on your store, you may also add `next_token` in the future for cursor‑based paging.
+
+---
+
+## Makefile (optional)
+
+```Makefile
+.PHONY: dev test build up down fmt lint
+
+dev:        ## run local uvicorn dev server
+	uvicorn api.search_api_rich:app --host 0.0.0.0 --port \$(APP_PORT)
+
+test:       ## run tests
+	pytest -q
+
+build:      ## docker build
+	docker build -t agent-b-api .
+
+up:         ## docker compose up
+	docker compose up --build -d
+
+down:       ## docker compose down
+	docker compose down
+
+fmt:        ## format
+	rufflehog >/dev/null 2>&1 || true
+	black . && isort .
+
+lint:       ## lint
+	flake8 .
 ```
 
 ---
 
-## Troubleshooting
+## Changelog
 
-**Port in use**  
-- Change `APP_PORT` in `.env`, or pass `--port 8001` to `uvicorn`, or `-p 8001:8000` in Docker/Compose.
-
-**Auth or connection errors to vector DB**  
-- Verify `QDRANT_URL` and `QDRANT_API_KEY` (if applicable).  
-- Make sure the DB is running and reachable from where the API runs (host vs. container networking).
-
-**Search call returns 400 (“Missing search query”)**  
-- Use `?q=...` or `?query=...` in the request. Both are accepted.
-
-**Large files in Git / CI failures**  
-- Use `.gitignore` to exclude installers or datasets.  
-- Use Git LFS for artifacts <100 MB; avoid committing >100 MB files altogether.
-
----
-
-## What changed since Oct 9, 2025 (high level)
-
-- Polished `/search` endpoint parameter handling and unified response field behavior.
-- Migrated Qdrant client usage to prefer `query_points` API while retaining backward compatibility.
-- Improved local/dev and Docker paths; standardized `.env` loading.
-- Smoothed test and pre-commit flows for cleaner CI integration.
+- **2025‑10‑11**
+  - Tightened structure & anchors (TOC, sections).
+  - Clarified `/search` params and examples.
+  - Added error model, observability, security, performance notes.
+  - Added optional Makefile targets and FAQ.
+  - Documented `HEVA_SKIP_QDRANT` and common WSL2/Compose gotchas.
 
 ---
 
 ## License
 
-Add your project license here (e.g., MIT/Apache-2.0).
+Insert your license (MIT/Apache‑2.0/Proprietary).
