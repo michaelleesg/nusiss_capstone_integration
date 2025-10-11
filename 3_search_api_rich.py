@@ -49,7 +49,10 @@ if not qdrant_wrapper.ping():
 qdrant_wrapper.ensure_collection(size=embedding_size)
 
 # === Connect Qdrant ===
-client = QdrantClient(host=QDRANT_URL, port=QDRANT_PORT)
+# after (and keep your env QDRANT_URL=http://qdrant:6333)
+client = QdrantClient(url=QDRANT_URL)
+# if you have an API key:
+# client = QdrantClient(url=QDRANT_URL, api_key=os.getenv("QDRANT_API_KEY"))
 logger.info(f"✅ Connected to Qdrant at {QDRANT_URL}")
 
 # === Verify dimension match ===
