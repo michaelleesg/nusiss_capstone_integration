@@ -21,3 +21,4 @@ Makefile text eol=lf
 *.ipynb filter=lfs diff=lfs merge=lfs -text
 combined.json filter=lfs diff=lfs merge=lfs -text
 ner_training.txt filter=lfs diff=lfs merge=lfs -text
+*.docx text eol=crlf export-ignore
