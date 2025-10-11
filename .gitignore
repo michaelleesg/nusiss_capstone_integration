@@ -1,1 +1,59 @@
-<paste the block above>
+# -----------------------------
+# Core secrets
+.env
+
+# Python cache & virtualenvs
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.venv*/
+*.egg-info/
+
+# Tooling caches & editor junk
+.ruff_cache/
+.pytest_cache/
+.aider.tags.cache.v4/
+.aider.input.history
+.aider.chat.history.md
+.aiderignore
+.vscode/
+*.code-workspace
+
+# Logs & runtime
+nohup.out
+*.log
+qdrant_logs.log
+.uvicorn.log
+.coverage
+
+# Local stateful DB / volumes
+qdrant_storage/
+
+# Data/model artifacts (kept out of git; fetch via script or LFS if essential)
+ner_model/
+embedding_backup.npy
+Article_Storage.Article_Collection_2025.json
+cybersage_deploy_bundle.zip
+IS06_Capstone_Slides_2425.pdf
+capstone_report/20251001_original_capstone_report.zip
+capstone_report/individual.zip
+
+# Build artifacts (LaTeX, PDFs, zips)
+capstone_report/*.pdf
+capstone_report/*.zip
+capstone_report/*.aux
+capstone_report/*.bbl
+capstone_report/*.blg
+capstone_report/*.out
+capstone_report/*.toc
+capstone_report/*.log
+
+# Jupyter runtime
+.ipynb_checkpoints/
+*.ipynb#*
+
+# Misc
+dir_listing.txt
+.DS_Store
+Thumbs.db
