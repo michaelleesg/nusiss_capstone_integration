@@ -41,3 +41,7 @@ ner_vector_output.csv
 # large/binary files to ignore
 ner_training.txt
 Miniconda3-*.sh
+
+# large/binary files to ignore
+ner_training.txt
+Miniconda3-*.sh
