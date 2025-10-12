@@ -95,3 +95,6 @@ Makefile.bak.*
 *.tex
 app/indexer.py.bak*
 tests/*.bak*
+capstone_agent_a/
+agent_a_localremote
+agent_a_localremote/

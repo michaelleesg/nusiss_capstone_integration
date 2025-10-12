@@ -1,7 +1,6 @@
 # --- LFS: keep large data as pointers ---
 combined.json filter=lfs diff=lfs merge=lfs -text
 ner_training.txt filter=lfs diff=lfs merge=lfs -text
-
 # --- Always take our side for ephemeral/aider cache stuff ---
 .aider.tags.cache.v4/* merge=ours
 .aider.conf.yml merge=ours
