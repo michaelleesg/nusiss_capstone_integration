@@ -1,0 +1,177 @@
+{
+  "active_exploitation": false,
+  "active_exploitation_mentioned": true,
+  "affected_products": [
+    "SonicWall SSL VPN",
+    "SonicWall VPN",
+    "Windows",
+    "VMware ESXi"
+  ],
+  "affects_asean": false,
+  "affects_singapore": false,
+  "cve": {
+    "active_exploitation": true,
+    "enriched_count": 1,
+    "highest_cvss": 9.8,
+    "highest_severity": "CRITICAL",
+    "not_enriched_count": 0,
+    "patch_availability": false,
+    "total_count": 1,
+    "vulnerabilities": [
+      {
+        "active_exploitation": true,
+        "affected_versions": [],
+        "cpe_strings": [
+          "cpe:2.3:o:sonicwall:sonicos:*:*:*:*:*:*:*:*"
+        ],
+        "cvss_score": 9.8,
+        "id": "CVE-2024-40766",
+        "patch_available": false,
+        "products": [
+          "Sonicwall Sonicos"
+        ],
+        "relevance_category": "primary",
+        "relevance_reasoning": "Main vulnerability exploited in the Akira ransomware campaign, directly linked to the attacks on SonicWall devices.",
+        "relevance_score": 1.0,
+        "severity": "CRITICAL"
+      }
+    ]
+  },
+  "cve_extraction_attempted": true,
+  "cve_severity": [],
+  "cve_vulns": [
+    "CVE-2024-40766"
+  ],
+  "entities_extraction_attempted": true,
+  "escalation_potential": "The risk of escalation exists if ransomware attacks lead to significant disruptions in critical infrastructure, potentially prompting retaliatory measures or collective defense responses from affected nations.",
+  "geographic_analysis_attempted": true,
+  "geopolitical_analysis": {
+    "analysis_metadata": {
+      "confidence": "high",
+      "method": "llm_enhanced",
+      "reasoning": "The analysis is based on observable evidence from the threat intelligence content, including the geographic spread of attacks, the motivations of the threat actors, and the implications for regional and global security dynamics. The assessment considers the interconnectedness of cyber threats and their potential to escalate into broader geopolitical issues."
+    },
+    "escalation_potential": "The risk of escalation exists if ransomware attacks lead to significant disruptions in critical infrastructure, potentially prompting retaliatory measures or collective defense responses from affected nations.",
+    "escalation_risk": "medium",
+    "historical_precedents": "Previous ransomware incidents, such as the WannaCry attack, have demonstrated how cyber incidents can escalate into broader geopolitical tensions, particularly when state actors are implicated or when critical infrastructure is targeted.",
+    "regional_context": "The current regional political climate is characterized by heightened tensions over cybersecurity, with nations increasingly viewing cyber capabilities as integral to national defense. The proliferation of ransomware groups complicates this landscape, as states may struggle to attribute attacks and respond effectively.",
+    "stakeholder_interests": "Various state and non-state actors have vested interests in the outcomes of ransomware campaigns. Governments seek to protect national security and economic interests, while cybercriminals aim for financial gain. Additionally, organizations must balance cybersecurity investments against operational costs.",
+    "strategic_implications": [
+      "The rise of ransomware attacks poses a significant threat to regional stability, as critical sectors such as manufacturing, healthcare, and education are increasingly targeted, potentially disrupting essential services.",
+      "International alliances may be strained as nations grapple with the implications of cyber threats on national security and economic stability, leading to calls for enhanced cooperation in cybersecurity."
+    ],
+    "underlying_causes": [
+      "The resurgence of ransomware attacks like Akira is driven by the increasing reliance on digital infrastructure across sectors, coupled with the exploitation of known vulnerabilities, highlighting gaps in cybersecurity practices.",
+      "Economic competition and the need for organizations to protect sensitive data have made them attractive targets for financially motivated cybercriminals."
+    ]
+  },
+  "global_implications": true,
+  "high_tension_event": true,
+  "iocs": {
+    "commands": [],
+    "domains": [],
+    "email_addresses": [],
+    "excluded": {
+      "commands": [],
+      "domains": [
+        {
+          "ioc": "advanced-ip-scanner.com",
+          "reason": "domain belongs to the reporting organization"
+        }
+      ],
+      "email_addresses": [],
+      "file_paths": [],
+      "hashes": [],
+      "ips": [],
+      "processes": [],
+      "registry_keys": [],
+      "urls": []
+    },
+    "file_paths": [],
+    "hashes": [],
+    "ips": [],
+    "processes": [],
+    "registry_keys": [],
+    "urls": []
+  },
+  "iocs_extraction_attempted": true,
+  "malware": [
+    "Akira"
+  ],
+  "markdown": "# Old SonicWall Vulnerability Resurfaces in Akira Ransomware Campaign, Darktrace Warns\n\n**Date:** October 09, 2025\n\nNew research from Darktrace revealed that starting in July this year, Akira ransomware attacks escalated worldwide, primarily targeting SonicWall SSL VPN devices. In August, Darktrace identified suspicious activity within a U.S. network, including scanning, lateral movement, and data exfiltration. Investigation traced the compromise to a SonicWall VPN server, linking the incident to the broader Akira campaign exploiting known vulnerabilities. Akira targets organizations across multiple sectors, with a notable focus on manufacturing, education, and healthcare, spanning regions including North America, Latin America, Europe, and Asia-Pacific.\n\n“Initially believed to be the result of an unknown zero-day vulnerability, SonicWall later released an advisory announcing that the activity was strongly linked to a previously disclosed vulnerability, **CVE-2024-40766**, first identified over a year earlier,” Darktrace researchers wrote in a Thursday blog post.\n\nOn Aug. 20, this year, Darktrace observed unusual activity on the network of a customer in the U.S. Darktrace detected a range of suspicious activity, including network scanning and reconnaissance, lateral movement, privilege escalation, and data exfiltration. One of the compromised devices was later identified as a SonicWall virtual private network (VPN) server, suggesting that the incident was part of the broader Akira ransomware campaign targeting SonicWall technology.\n\n“As the customer was subscribed to the Managed Detection and Response (MDR) service, Darktrace’s Security Operations Centre (SOC) team was able to rapidly triage critical alerts, restrict the activity of affected devices, and notify the customer of the threat,” according to the post. “As a result, the impact of the attack was limited – approximately 2 GiB of data had been observed leaving the network, but any further escalation of malicious activity was stopped.”\n\nAkira ransomware was first observed in the wild in March 2023 and has since become one of the most prolific ransomware strains across the threat landscape. The group operates under a Ransomware-as-a-Service (RaaS) model and frequently uses double extortion tactics, pressuring victims to pay not only to decrypt files but also to prevent the public release of sensitive exfiltrated data.\n\nThe ransomware initially targeted Windows systems, but a Linux variant was later observed targeting VMware ESXi virtual machines. In 2024, it was assessed that Akira would continue to target ESXi hypervisors, making attacks highly disruptive due to the central role of virtualization in large-scale cloud deployments. Encrypting the ESXi file system enables rapid and widespread encryption with minimal lateral movement or credential theft. The lack of comprehensive security protections on many ESXi hypervisors also makes them an attractive target for ransomware operators.\n\n## Attack Vector and Techniques\n\nAkira ransomware gains initial access by targeting remote access services such as RDP and VPN, exploiting vulnerabilities, or using stolen credentials. Once inside, it performs reconnaissance using network scanning tools like SoftPerfect and Advanced IP Scanner to map the environment and identify potential targets.\n\nThe ransomware then moves laterally across the network, typically using legitimate administrative tools via RDP. To maintain persistence, it employs techniques such as Kerberoasting and pass-the-hash, using tools like Mimikatz to extract credentials, and is known to create new domain accounts to secure continued access.\n\nFor command and control, Akira relies on remote access tools including AnyDesk, RustDesk, Ngrok, and Cloudflare Tunnel. During exfiltration, it uses tools such as FileZilla, WinRAR, WinSCP, and Rclone, transferring data via protocols like FTP and SFTP or through cloud storage services such as Mega.\n\nDarktrace first detected unusual network activity around 05:10 UTC, when a desktop device was observed performing a network scan and making an unusual number of DCE-RPC requests to the endpoint mapper (epmapper) service. “Network scans are typically used to identify open ports, while querying the epmapper service can reveal exposed RPC services on the network. Multiple other devices were also later seen with similar reconnaissance activity, and use of the Advanced IP Scanner tool, indicated by connections to the domain advanced-ip-scanner[.]com,” the post added.\n\nShortly after the initial reconnaissance, the same desktop device exhibited unusual use of administrative tools. Darktrace observed the user agent ‘Ruby WinRM Client’ and the URI ‘/wsman,’ as the device initiated a rare outbound Windows Remote Management (WinRM) connection to two domain controllers. WinRM is a Microsoft service that uses the WS-Management (WSMan) protocol to enable remote management and control of network devices.\n\nDarktrace also observed the desktop device connecting to an ESXi device via RDP using an LDAP service credential, likely with administrative privileges.\n\n## Mitigation Actions\n\nIn response to the multiple anomalous activities observed across the network, Darktrace’s Autonomous Response initiated targeted mitigation actions to contain the attack. These included:\n\n- Blocking connections to known malicious or rare external endpoints\n- Blocking internal traffic to sensitive ports, including 88 (Kerberos), 3389 (RDP), and 49339 (DCE-RPC), to disrupt lateral movement and credential abuse\n- Enforcing a block on all outgoing connections from affected devices to contain potential data exfiltration and C2 activity\n\nDarktrace highlights that the campaign by Akira ransomware actors underscores the critical importance of maintaining up-to-date patching practices. Threat actors continue to exploit previously disclosed vulnerabilities, not just zero-days, highlighting the need for ongoing vigilance even after patches are released. It also demonstrates how misconfigurations and overlooked weaknesses can be leveraged for initial access or privilege escalation, even in otherwise well-maintained environments.\n\n“Darktrace’s observations further reveal that ransomware actors are increasingly relying on legitimate administrative tools, such as WinRM, to blend in with normal network activity and evade detection,” the post pointed out. “In addition to previously documented Kerberos-based credential access techniques like Kerberoasting and pass-the-hash, this campaign featured the use of UnPAC the hash to extract NTLM hashes via PKINIT and U2U authentication for lateral movement or privilege escalation.”\n\nThe Darktrace report follows new findings from the GuidePoint Research and Intelligence Team (GRIT), which revealed a 57% year-over-year increase in active ransomware groups, even as the overall number of victims has stabilized. The report underscores that the growing diversity of ransomware actors is creating new challenges for defenders.\n\nIn the third quarter of 2025, 56% of observed ransomware victims were based in the U.S., followed by Germany at 4.89% and the U.K. at 3.81%. The manufacturing, technology, and legal sectors were hit hardest, with ransomware attacks on manufacturing rising 26% quarter over quarter.\n\n“While established actors like Qilin and Akira are streamlining their operations, newer groups such as SafePay demonstrate how even small, insular actors can thrive by staying under the radar,” Nick Hyatt, senior threat intelligence analyst at GuidePoint Security, said in a Thursday statement. “This ‘new normal’ isn’t a reason for complacency — it underscores the need for sustained vigilance in an increasingly fragmented threat landscape.”",
+  "mitre_analysis": {
+    "attack_pattern": "The attack pattern demonstrates a coherent sequence of actions starting with exploitation of a vulnerability (T1203), followed by reconnaissance (T1018), lateral movement (T1021.001), privilege escalation (T1003.001), data exfiltration (T1041), command and control (T1071.001), and evasion tactics (T1218). Each technique is supported by explicit evidence from the original content, confirming their relevance to the Akira ransomware campaign.",
+    "confidence": 7,
+    "method": "enhanced_3step",
+    "processing_strategy": "full",
+    "step1_behaviors": 7,
+    "step2_behavioral": 7,
+    "step2_explicit": 0,
+    "step3_final": 7,
+    "validation_summary": {
+      "deduplication_actions": "No duplicates found; all techniques are unique.",
+      "false_positives_removed": [],
+      "high_confidence": 7,
+      "low_confidence": 0,
+      "medium_confidence": 0,
+      "total_techniques": 7
+    }
+  },
+  "mitre_ttps": [
+    "T1203",
+    "T1018",
+    "T1021.001",
+    "T1003.001",
+    "T1041",
+    "T1071.001",
+    "T1218"
+  ],
+  "mitre_ttps_extraction_attempted": true,
+  "patch_availability": false,
+  "possible_motivations": [
+    "financial",
+    "extortion",
+    "sabotage"
+  ],
+  "primary_motivation": "financial",
+  "primary_regions_affected": [
+    "North America",
+    "Latin America",
+    "Europe",
+    "Asia-Pacific"
+  ],
+  "recommendations_and_mitigations": "Maintain up-to-date patching practices and enforce strict network traffic controls to prevent lateral movement and data exfiltration.",
+  "regional_context": "The current regional political climate is characterized by heightened tensions over cybersecurity, with nations increasingly viewing cyber capabilities as integral to national defense. The proliferation of ransomware groups complicates this landscape, as states may struggle to attribute attacks and respond effectively.",
+  "secondary_motivations": [
+    "extortion",
+    "sabotage"
+  ],
+  "sectors": [
+    "Manufacturing",
+    "Education",
+    "Healthcare",
+    "Technology",
+    "Legal"
+  ],
+  "source_url": "https://industrialcyber.co/ransomware/old-sonicwall-vulnerability-resurfaces-in-akira-ransomware-campaign-darktrace-warns/",
+  "stakeholder_interests": "Various state and non-state actors have vested interests in the outcomes of ransomware campaigns. Governments seek to protect national security and economic interests, while cybercriminals aim for financial gain. Additionally, organizations must balance cybersecurity investments against operational costs.",
+  "strategic_implications": [
+    "The rise of ransomware attacks poses a significant threat to regional stability, as critical sectors such as manufacturing, healthcare, and education are increasingly targeted, potentially disrupting essential services.",
+    "International alliances may be strained as nations grapple with the implications of cyber threats on national security and economic stability, leading to calls for enhanced cooperation in cybersecurity."
+  ],
+  "summary": "Darktrace reports a resurgence of Akira ransomware attacks exploiting the previously disclosed vulnerability CVE-2024-40766 in SonicWall SSL VPN devices. Since July 2025, these attacks have escalated globally, particularly affecting sectors like manufacturing, education, and healthcare. The ransomware employs double extortion tactics and has been observed using legitimate administrative tools for lateral movement and data exfiltration. Darktrace's response included blocking malicious connections and enforcing traffic restrictions to mitigate the attack's impact.",
+  "tension_level": "medium",
+  "threat_actors": [
+    "Akira",
+    "Qilin",
+    "SafePay"
+  ],
+  "title": "Old SonicWall vulnerability resurfaces in Akira ransomware campaign, Darktrace warns - Industrial Cyber",
+  "underlying_causes": [
+    "The resurgence of ransomware attacks like Akira is driven by the increasing reliance on digital infrastructure across sectors, coupled with the exploitation of known vulnerabilities, highlighting gaps in cybersecurity practices.",
+    "Economic competition and the need for organizations to protect sensitive data have made them attractive targets for financially motivated cybercriminals."
+  ],
+  "url": "https://industrialcyber.co/ransomware/old-sonicwall-vulnerability-resurfaces-in-akira-ransomware-campaign-darktrace-warns/",
+  "victims": [],
+  "zero_day_mention": false
+}

@@ -1,0 +1,116 @@
+{
+  "active_exploitation": false,
+  "active_exploitation_mentioned": false,
+  "affected_products": [],
+  "affects_asean": false,
+  "affects_singapore": false,
+  "cve": {
+    "active_exploitation": false,
+    "highest_cvss": 0.0,
+    "highest_severity": "UNKNOWN",
+    "patch_availability": false,
+    "total_count": 0,
+    "vulnerabilities": []
+  },
+  "cve_extraction_attempted": true,
+  "cve_severity": [],
+  "cve_vulns": [],
+  "entities_extraction_attempted": true,
+  "escalation_potential": "The use of AI in cyber operations could lead to an arms race in cyber capabilities, increasing the risk of miscalculations and unintended escalations.",
+  "geographic_analysis_attempted": true,
+  "geopolitical_analysis": {
+    "analysis_metadata": {
+      "confidence": "medium",
+      "method": "llm_enhanced",
+      "reasoning": "The analysis is based on the content's focus on AI's role in CTI, the specific case study involving Russian and Ukrainian cyber activities, and the implications of these developments in the context of ongoing geopolitical tensions. The assessment considers the potential for escalation and the motivations of involved actors."
+    },
+    "escalation_potential": "The use of AI in cyber operations could lead to an arms race in cyber capabilities, increasing the risk of miscalculations and unintended escalations.",
+    "escalation_risk": "medium",
+    "historical_precedents": "Previous instances of cyber operations during conflicts, such as the Stuxnet attack or Russian cyber operations in Ukraine, highlight the potential for cyber incidents to escalate into broader conflicts.",
+    "regional_context": "The current geopolitical climate is characterized by heightened tensions in Eastern Europe, particularly due to the ongoing conflict between Russia and Ukraine, which influences global cyber threat dynamics.",
+    "stakeholder_interests": "State actors, particularly those involved in the Russia-Ukraine conflict, have vested interests in leveraging AI for espionage and cyber warfare, while private sector entities may seek to protect their assets and data from such threats.",
+    "strategic_implications": [
+      "The integration of AI into Cyber Threat Intelligence (CTI) may enhance the capabilities of state and non-state actors, leading to more sophisticated cyber operations and potential destabilization of geopolitical landscapes."
+    ],
+    "underlying_causes": [
+      "The ongoing conflict between Russia and Ukraine has heightened the use of cyber operations as a tool for espionage and information warfare."
+    ]
+  },
+  "global_implications": true,
+  "high_tension_event": false,
+  "iocs": {
+    "commands": [],
+    "domains": [],
+    "email_addresses": [],
+    "excluded": {
+      "commands": [],
+      "domains": [],
+      "email_addresses": [],
+      "file_paths": [],
+      "hashes": [],
+      "ips": [],
+      "processes": [],
+      "registry_keys": [],
+      "urls": []
+    },
+    "file_paths": [],
+    "hashes": [],
+    "ips": [],
+    "processes": [],
+    "registry_keys": [],
+    "urls": []
+  },
+  "iocs_extraction_attempted": true,
+  "malware": [],
+  "markdown": "# LABScon25 Replay | Auto-Poking The Bear: Analytical Tradecraft In The AI Age\n\n**Date:** October 9, 2025\n\nIn this LABScon25 talk, Dreadnode’s Martin Wendiggensen and Brad Palm explore how AI is changing Cyber Threat Intelligence (CTI) and the research practices that support it. Analytical tradecraft and shared standards have transformed CTI from a niche discipline into a collaborative industry-wide research endeavor. Researchers and analysts now routinely build on each other’s work, creating a foundation of trust and shared methodology.\n\n## Key Insights\n\n- The ecosystem is being disrupted as teams increasingly hand off data preparation, analysis, and entire workflows to AI assistants. \n- While these tools boost productivity, they introduce new costs and concerns over reliability and transparency.\n- The CTI community will need to adapt its research methodology and develop a new joint understanding of the promises, pitfalls, and probabilities inherent in AI-assisted work.\n\n## Case Study\n\nWendiggensen and Palm present a case study illustrating their approach. They created an LLM-driven agentic system to analyze Russian internet content leaked by Ukrainian cyber activists. The speakers detail the system’s architecture and demonstrate its performance across tasks from straightforward data collation to complex analytical pipelines used to track adversaries.\n\n### Technology Assessment\n\n- The presentation explains how to assess the technology’s strengths and limits.\n- It emphasizes the importance of communicating those judgments to peers and wider audiences to preserve both accountability and transparency.\n\nThis engaging talk lays the groundwork for discussions not only in threat intelligence but in any collaborative discipline seeking to navigate the challenges of integrating agentic systems into their data analysis and decision-making pipelines.\n\n## About the Authors\n\n- **Martin Wendiggensen**: AI Research Scientist at Dreadnode and PhD candidate at Johns Hopkins AIST. His research focuses on how AI is shifting the Cybersecurity Offensive-Defensive Balance.\n  \n- **Brad Palm**: COO at Dreadnode. Previously, he was a VP of Services and Technology for Pathfynder and the Managing Director of Software at Ascent, focusing on SOC automation and the integration of CTI in the delivery of managed services.",
+  "mitre_analysis": {
+    "attack_pattern": "The original content does not provide any specific techniques related to MITRE ATT&CK. It discusses the impact of AI on Cyber Threat Intelligence and does not detail any attack methods or techniques.",
+    "confidence": 0,
+    "method": "enhanced_3step",
+    "processing_strategy": "full",
+    "step1_behaviors": 0,
+    "step2_behavioral": 0,
+    "step2_explicit": 0,
+    "step3_final": 0,
+    "validation_summary": {
+      "deduplication_actions": "No techniques to deduplicate as none were identified.",
+      "false_positives_removed": [],
+      "high_confidence": 0,
+      "low_confidence": 0,
+      "medium_confidence": 0,
+      "total_techniques": 0
+    }
+  },
+  "mitre_ttps": [],
+  "mitre_ttps_extraction_attempted": true,
+  "patch_availability": false,
+  "possible_motivations": [
+    "espionage",
+    "destabilization"
+  ],
+  "primary_motivation": "espionage",
+  "primary_regions_affected": [
+    "Global"
+  ],
+  "recommendations_and_mitigations": "",
+  "regional_context": "The current geopolitical climate is characterized by heightened tensions in Eastern Europe, particularly due to the ongoing conflict between Russia and Ukraine, which influences global cyber threat dynamics.",
+  "secondary_motivations": [
+    "destabilization"
+  ],
+  "sectors": [],
+  "source_url": "https://www.sentinelone.com/labs/labscon25-replay-auto-poking-the-bear-analytical-tradecraft-in-the-ai-age/",
+  "stakeholder_interests": "State actors, particularly those involved in the Russia-Ukraine conflict, have vested interests in leveraging AI for espionage and cyber warfare, while private sector entities may seek to protect their assets and data from such threats.",
+  "strategic_implications": [
+    "The integration of AI into Cyber Threat Intelligence (CTI) may enhance the capabilities of state and non-state actors, leading to more sophisticated cyber operations and potential destabilization of geopolitical landscapes."
+  ],
+  "summary": "The LABScon25 presentation by Martin Wendiggensen and Brad Palm discusses the transformative impact of AI on Cyber Threat Intelligence (CTI), emphasizing the shift towards collaborative research practices. They highlight the benefits of AI tools in enhancing productivity while also raising concerns about reliability and transparency. A case study showcases an LLM-driven system analyzing Russian internet content leaked by Ukrainian activists, illustrating the potential and challenges of integrating AI into CTI workflows.",
+  "tension_level": "medium",
+  "threat_actors": [],
+  "title": "LABScon25 Replay | Auto-Poking The Bear: Analytical Tradecraft In The AI Age | SentinelOne",
+  "underlying_causes": [
+    "The ongoing conflict between Russia and Ukraine has heightened the use of cyber operations as a tool for espionage and information warfare."
+  ],
+  "url": "https://www.sentinelone.com/labs/labscon25-replay-auto-poking-the-bear-analytical-tradecraft-in-the-ai-age/",
+  "victims": [],
+  "zero_day_mention": false
+}

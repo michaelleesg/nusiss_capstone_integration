@@ -1,0 +1,32 @@
+# Lightweight MCP Server image (tools only, no ML/NLP dependencies)
+FROM python:3.12-slim
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y \
+    libmagic1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy only necessary files for MCP server
+COPY pyproject.toml /app/
+COPY app/ /app/app/
+
+# Install Python dependencies (but skip heavy ML packages)
+# Note: We install from pyproject.toml but the heavy ML libs won't be used by MCP server
+RUN pip install --no-cache-dir -e .
+
+# Create output directory
+RUN mkdir -p /app/out /app/data
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV OUTPUT_DIR=/app/out
+
+# Expose MCP TCP port
+EXPOSE 8765
+
+# Run MCP server
+CMD ["python", "-m", "app.cli", "mcp-server", "--transport", "tcp", "--host", "0.0.0.0", "--port", "8765"]

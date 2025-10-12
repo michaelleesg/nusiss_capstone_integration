@@ -1,0 +1,121 @@
+{
+  "active_exploitation": false,
+  "active_exploitation_mentioned": false,
+  "affected_products": [],
+  "affects_asean": false,
+  "affects_singapore": false,
+  "cve": {
+    "active_exploitation": false,
+    "highest_cvss": 0.0,
+    "highest_severity": "UNKNOWN",
+    "patch_availability": false,
+    "total_count": 0,
+    "vulnerabilities": []
+  },
+  "cve_extraction_attempted": true,
+  "cve_severity": [],
+  "cve_vulns": [],
+  "entities_extraction_attempted": true,
+  "escalation_potential": "Low risk of escalation as this incident is primarily a financial crime rather than a politically motivated attack.",
+  "geographic_analysis_attempted": true,
+  "geopolitical_analysis": {
+    "analysis_metadata": {
+      "confidence": "high",
+      "method": "llm_enhanced",
+      "reasoning": "The analysis is based on the specific details of the data breach, the context of Venezuela's economic situation, and the nature of the threat actor's actions. The motivations are clear, and the implications are grounded in observable trends in the region."
+    },
+    "escalation_potential": "Low risk of escalation as this incident is primarily a financial crime rather than a politically motivated attack.",
+    "escalation_risk": "low",
+    "historical_precedents": "Similar data breaches have occurred in Venezuela, reflecting ongoing vulnerabilities in the country's cybersecurity landscape.",
+    "regional_context": "Venezuela is experiencing significant economic challenges, which may drive individuals towards cybercrime as a source of income.",
+    "stakeholder_interests": "Local businesses may face reputational damage, while consumers may become more cautious about sharing personal information.",
+    "strategic_implications": [
+      "Potential erosion of consumer trust in digital transactions and data security within Venezuela, impacting local businesses."
+    ],
+    "underlying_causes": [
+      "Economic instability in Venezuela leading to increased cybercrime as a means of financial gain."
+    ]
+  },
+  "global_implications": false,
+  "high_tension_event": false,
+  "iocs": {
+    "commands": [],
+    "domains": [],
+    "email_addresses": [],
+    "excluded": {
+      "commands": [],
+      "domains": [],
+      "email_addresses": [],
+      "file_paths": [],
+      "hashes": [],
+      "ips": [],
+      "processes": [],
+      "registry_keys": [],
+      "urls": []
+    },
+    "file_paths": [],
+    "hashes": [],
+    "ips": [],
+    "processes": [],
+    "registry_keys": [],
+    "urls": []
+  },
+  "iocs_extraction_attempted": true,
+  "malware": [],
+  "markdown": "# KFC Venezuela Customer and Order Database Leaked for Sale\n\n**Date:** October 9, 2025  \n**Location:** Venezuela\n\nA threat actor claims to have breached KFC Venezuela and is now selling the allegedly stolen database. KFC Venezuela is the Venezuelan franchise of the major American fast food restaurant chain specializing in fried chicken.\n\nAccording to a post dated October 8, 2025, the threat actor is offering a database containing **1,067,291 records** related to customers and their orders. The actor claims the **405 MB** database contains a wide range of sensitive information, including:\n\n- Full customer names\n- Phone numbers\n- Email addresses\n- Full delivery addresses\n- Payment method & exchange rate\n- Ordered items with quantity & price\n- Order creation & update timestamps\n- Store information (name, code, address, contact)\n- Order IDs, delivery info, store & aggregator IDs\n- Sales channel & order status\n\n**Tags:**  \n- customer-data  \n- CyberSecurity  \n- data-breach  \n- data-leak  \n- fast food  \n- KFC Venezuela  \n- restaurant  \n- venezuela  ",
+  "mitre_analysis": {
+    "attack_pattern": "The attack pattern involves a data breach leading to the exfiltration of sensitive customer information. The techniques identified are coherent and represent a logical sequence where sensitive data is collected and subsequently exfiltrated.",
+    "confidence": 2,
+    "method": "enhanced_3step",
+    "processing_strategy": "full",
+    "step1_behaviors": 2,
+    "step2_behavioral": 2,
+    "step2_explicit": 0,
+    "step3_final": 2,
+    "validation_summary": {
+      "deduplication_actions": "No duplicates found; all techniques are unique.",
+      "false_positives_removed": [],
+      "high_confidence": 2,
+      "low_confidence": 0,
+      "medium_confidence": 0,
+      "total_techniques": 2
+    }
+  },
+  "mitre_ttps": [
+    "T1041",
+    "T1005"
+  ],
+  "mitre_ttps_extraction_attempted": true,
+  "patch_availability": false,
+  "possible_motivations": [
+    "financial"
+  ],
+  "primary_motivation": "financial",
+  "primary_regions_affected": [
+    "South America",
+    "Latin America"
+  ],
+  "recommendations_and_mitigations": "",
+  "regional_context": "Venezuela is experiencing significant economic challenges, which may drive individuals towards cybercrime as a source of income.",
+  "secondary_motivations": [],
+  "sectors": [
+    "Food Service"
+  ],
+  "source_url": "https://dailydarkweb.net/kfc-venezuela-customer-and-order-database-leaked-for-sale/",
+  "stakeholder_interests": "Local businesses may face reputational damage, while consumers may become more cautious about sharing personal information.",
+  "strategic_implications": [
+    "Potential erosion of consumer trust in digital transactions and data security within Venezuela, impacting local businesses."
+  ],
+  "summary": "A threat actor has breached KFC Venezuela, offering a database for sale that contains over 1 million records of customer information, including names, phone numbers, email addresses, and payment details. The database, sized at 405 MB, poses significant privacy risks to affected individuals. This incident highlights the ongoing threat of data breaches in the fast food sector, particularly in regions with less stringent cybersecurity measures.",
+  "tension_level": "low",
+  "threat_actors": [],
+  "title": "KFC Venezuela Customer and Order Database Leaked for Sale  - Daily Dark Web",
+  "underlying_causes": [
+    "Economic instability in Venezuela leading to increased cybercrime as a means of financial gain."
+  ],
+  "url": "https://dailydarkweb.net/kfc-venezuela-customer-and-order-database-leaked-for-sale/",
+  "victims": [
+    "KFC Venezuela"
+  ],
+  "zero_day_mention": false
+}

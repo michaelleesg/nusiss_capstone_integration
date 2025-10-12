@@ -1,0 +1,122 @@
+{
+  "active_exploitation": false,
+  "active_exploitation_mentioned": false,
+  "affected_products": [
+    "Microsoft 365",
+    "Azure Front Door",
+    "Azure",
+    "Entra",
+    "Exchange Online",
+    "Microsoft Teams"
+  ],
+  "affects_asean": false,
+  "affects_singapore": false,
+  "cve": {
+    "active_exploitation": false,
+    "highest_cvss": 0.0,
+    "highest_severity": "UNKNOWN",
+    "patch_availability": false,
+    "total_count": 0,
+    "vulnerabilities": []
+  },
+  "cve_extraction_attempted": true,
+  "cve_severity": [],
+  "cve_vulns": [],
+  "entities_extraction_attempted": true,
+  "escalation_potential": "Low risk of escalation as this incident appears to be a technical failure rather than a politically motivated attack.",
+  "geographic_analysis_attempted": true,
+  "geopolitical_analysis": {
+    "analysis_metadata": {
+      "confidence": "medium",
+      "method": "llm_enhanced",
+      "reasoning": "The analysis is based on the incident's description, focusing on geographic impact, the nature of the outage, and its implications for businesses and regional stability. The lack of identified threat actors suggests a technical failure rather than a deliberate attack."
+    },
+    "escalation_potential": "Low risk of escalation as this incident appears to be a technical failure rather than a politically motivated attack.",
+    "escalation_risk": "low",
+    "historical_precedents": "Previous outages of Microsoft services indicate a pattern of technical vulnerabilities rather than targeted cyber threats.",
+    "regional_context": "The incident highlights the vulnerabilities of cloud services that are critical for business operations, especially in regions heavily reliant on digital infrastructure.",
+    "stakeholder_interests": "Businesses and organizations relying on Microsoft services have a vested interest in the reliability of cloud infrastructure, while Microsoft aims to maintain service integrity and customer trust.",
+    "strategic_implications": [
+      "Potential impact on businesses relying on Microsoft 365 services, leading to operational disruptions and economic losses in affected regions."
+    ],
+    "underlying_causes": [
+      "Technical failures in cloud infrastructure, possibly exacerbated by increased demand or inadequate capacity planning."
+    ]
+  },
+  "global_implications": true,
+  "high_tension_event": false,
+  "iocs": {
+    "commands": [],
+    "domains": [],
+    "email_addresses": [],
+    "excluded": {
+      "commands": [],
+      "domains": [],
+      "email_addresses": [],
+      "file_paths": [],
+      "hashes": [],
+      "ips": [],
+      "processes": [],
+      "registry_keys": [],
+      "urls": []
+    },
+    "file_paths": [],
+    "hashes": [],
+    "ips": [],
+    "processes": [],
+    "registry_keys": [],
+    "urls": []
+  },
+  "iocs_extraction_attempted": true,
+  "malware": [],
+  "markdown": "# Azure Outage Blocks Access to Microsoft 365 Services\n\n**Date:** October 9, 2025  \n**Author:** Sergiu Gatlan\n\nMicrosoft is currently addressing an outage affecting its Azure Front Door content delivery network (CDN), which is preventing customers from accessing several Microsoft 365 services. \n\n## Incident Overview\n\n- **Start Time:** The incident began around 07:40 UTC.\n- **Affected Regions:** Customers in Europe, Africa, and the Middle East are experiencing delays and timeouts when connecting to the Azure and Entra portals.\n- **Response Actions:** Microsoft’s engineering teams are restarting Kubernetes instances that caused capacity loss across Azure Front Door instances to restore service.\n\n## Current Status\n\n- Microsoft has not disclosed the number of affected customers but is tracking the incident on the Service Health Dashboard as an ongoing critical service issue.\n- **Service Restoration:** Approximately 98% of the Azure Front Door service has been restored. Microsoft is actively monitoring telemetry to confirm full recovery and is initiating failover for the Microsoft 365 Portal service to expedite the restoration process.\n- Users may still experience intermittent issues accessing some Microsoft 365 services and may be unable to access their cloud PCs via the Windows app web client.\n\n## Updates\n\nIn the latest update to the official Azure status page, published at 12:33 UTC (almost five hours after the incident was acknowledged), Microsoft reported that the Azure Front Door capacity issues now affect only around 4% of the customers initially impacted. \n\n- **Recovery Progress:** Microsoft has successfully recovered 96% of impacted resources and is working on recovering the remaining 4%.\n\n## Previous Incidents\n\nOn Wednesday, Microsoft resolved another hours-long outage that prevented users worldwide from accessing Microsoft 365 services, including Exchange Online, Microsoft Teams, and the admin center. A similar incident occurred in July, affecting Microsoft 365 admins with enterprise or business subscriptions.\n\nThis is a developing story.",
+  "mitre_analysis": {
+    "attack_pattern": "The original content describes an outage affecting Azure services, which does not indicate any malicious activity or specific MITRE techniques. Therefore, no techniques were validated or deduplicated.",
+    "confidence": 0,
+    "method": "enhanced_3step",
+    "processing_strategy": "full",
+    "step1_behaviors": 0,
+    "step2_behavioral": 0,
+    "step2_explicit": 0,
+    "step3_final": 0,
+    "validation_summary": {
+      "deduplication_actions": "No techniques to deduplicate as none were identified.",
+      "false_positives_removed": [],
+      "high_confidence": 0,
+      "low_confidence": 0,
+      "medium_confidence": 0,
+      "total_techniques": 0
+    }
+  },
+  "mitre_ttps": [],
+  "mitre_ttps_extraction_attempted": true,
+  "patch_availability": false,
+  "possible_motivations": [
+    "unknown"
+  ],
+  "primary_motivation": "unknown",
+  "primary_regions_affected": [
+    "Europe",
+    "Africa",
+    "Middle East"
+  ],
+  "recommendations_and_mitigations": "",
+  "regional_context": "The incident highlights the vulnerabilities of cloud services that are critical for business operations, especially in regions heavily reliant on digital infrastructure.",
+  "secondary_motivations": [],
+  "sectors": [],
+  "source_url": "https://www.bleepingcomputer.com/news/microsoft/azure-outage-blocks-access-to-microsoft-365-services-admin-portals/",
+  "stakeholder_interests": "Businesses and organizations relying on Microsoft services have a vested interest in the reliability of cloud infrastructure, while Microsoft aims to maintain service integrity and customer trust.",
+  "strategic_implications": [
+    "Potential impact on businesses relying on Microsoft 365 services, leading to operational disruptions and economic losses in affected regions."
+  ],
+  "summary": "On October 9, 2025, Microsoft experienced an outage affecting its Azure Front Door CDN, disrupting access to Microsoft 365 services for customers in Europe, Africa, and the Middle East. The incident began around 07:40 UTC, leading to delays and timeouts, with Microsoft engineering teams working to restore service by restarting Kubernetes instances. As of the latest update, approximately 98% of the service has been restored, although some users may still face intermittent access issues.",
+  "tension_level": "low",
+  "threat_actors": [],
+  "title": "Azure outage blocks access to Microsoft 365 services, admin portals",
+  "underlying_causes": [
+    "Technical failures in cloud infrastructure, possibly exacerbated by increased demand or inadequate capacity planning."
+  ],
+  "url": "https://www.bleepingcomputer.com/news/microsoft/azure-outage-blocks-access-to-microsoft-365-services-admin-portals/",
+  "victims": [],
+  "zero_day_mention": false
+}

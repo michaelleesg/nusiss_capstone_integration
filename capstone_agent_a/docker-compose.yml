@@ -1,0 +1,53 @@
+services:
+  # MCP Server with TCP transport (lightweight, tools only)
+  mcp-server-tcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: mcp-server-tcp
+    image: cti-mcp-server:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o-mini}
+      - OUTPUT_DIR=/app/out
+      - DATABASE_URL=sqlite:////app/data/cti.db
+    volumes:
+      - ./out:/app/out
+      - ./data:/app/data
+      - ./.env:/app/.env:ro
+    ports:
+      - "8765:8765"
+    command: python -m app.cli mcp-server --transport tcp --host 0.0.0.0 --port 8765
+    profiles:
+      - mcp-tcp
+
+  # URL processor - processes single or batch URLs (full ML/NLP stack)
+  # Depends on MCP server for tool execution
+  cti-processor:
+    build:
+      context: .
+      dockerfile: Dockerfile.processor
+    container_name: cti-processor
+    image: cti-processor:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o-mini}
+      - OUTPUT_DIR=/app/out
+      - DATABASE_URL=sqlite:////app/data/cti.db
+      - TARGET_URL=${TARGET_URL:-https://www.inoreader.com/stream/user/1005039686/tag/Grade%20A}
+
+      # MCP Server connection
+      - MCP_TRANSPORT=tcp
+      - MCP_HOST=mcp-server-tcp
+      - MCP_PORT=8765
+      - MCP_START_SERVER=false  # Connect to existing MCP server
+    volumes:
+      - ./out:/app/out
+      - ./data:/app/data
+      - ./.env:/app/.env:ro
+    depends_on:
+      mcp-server-tcp:
+        condition: service_started
+    command: sh -c 'python -m app.cli run "$${TARGET_URL}"'
+    profiles:
+      - processor

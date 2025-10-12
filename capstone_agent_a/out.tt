@@ -1,0 +1,207 @@
+2025-10-09 23:54:28,172 - __main__ - INFO - Processing 1 URLs with agentic processing
+2025-10-09 23:54:35,249 - __main__ - INFO - Processing 1/1: https://www.inoreader.com/stream/user/1005039686/tag/Grade%20A
+2025-10-09 23:54:35,249 - app.graph - INFO - Processing URL: https://www.inoreader.com/stream/user/1005039686/tag/Grade%20A
+2025-10-09 23:54:35,444 - agent.agentic_orchestrator - INFO - [agentic_orchestrator] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:54:35,445 - app.orchestrator.agent_repository - INFO - Agent repository initialized with lazy loading for all agents
+2025-10-09 23:54:35,445 - app.orchestrator.agents.agentic_orchestrator - INFO - AgenticOrchestrator initialized with 18 agent capabilities
+2025-10-09 23:54:35,445 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Starting processing - Starting agentic processing
+2025-10-09 23:54:35,446 - app.orchestrator.agents.guardrails_helper - INFO - DetectJailbreak guardrail temporarily disabled due to false positives with CTI content
+2025-10-09 23:54:37,972 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3164, 'completion_tokens': 38, 'total_tokens': 3202}, Time: 2.39s
+2025-10-09 23:54:37,973 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '2.39s', 'token_usage': {'prompt_tokens': 3164, 'completion_tokens': 38, 'total_tokens': 3202}, 'action': 'use_agent', 'capability': 'fetch_content', 'reasoning': 'Start with mandatory fetch step to retrieve content from the provided URL.'}
+2025-10-09 23:54:37,973 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:54:37,973 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:54:37,973 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: Must fetch content first
+2025-10-09 23:54:37,973 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: fetch_content - Mandatory: must fetch content before any processing
+2025-10-09 23:54:37,973 - agent.fetch - INFO - [fetch] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:54:37,974 - agent.fetch - INFO - [FETCH] Starting fetch - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'url': 'https://www.inoreader.com/stream/user/1005039686/tag/Grade%20A'}
+2025-10-09 23:54:37,977 - app.mcp_client - ERROR - Failed to start/connect to MCP server: [Errno 111] Connection refused
+2025-10-09 23:54:37,977 - app.mcp_client - INFO - TCP connection closed
+2025-10-09 23:54:37,977 - app.tool_proxy - WARNING - MCP client initialization failed: [Errno 111] Connection refused
+2025-10-09 23:54:38,084 - app.tools.http_fetch - INFO - Fetching URL: https://www.inoreader.com/stream/user/1005039686/tag/Grade%20A
+2025-10-09 23:54:38,673 - app.tools.http_fetch - INFO - Fetched 54112 bytes, MIME: text/xml, SHA-256: e3b75bf050d38354...
+2025-10-09 23:54:38,677 - agent.fetch - INFO - Detected RSS/Atom feed - skipping memory storage for container URL: https://www.inoreader.com/stream/user/1005039686/tag/Grade%20A
+2025-10-09 23:54:38,677 - agent.fetch - INFO - [FETCH] Fetch complete - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'mime': 'text/xml', 'size': 72152, 'sha256': 'e3b75bf050d38354...'}
+2025-10-09 23:54:38,677 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability fetch_content executed successfully
+2025-10-09 23:54:38,677 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 1: use_agent - Mandatory: must fetch content before any processing
+2025-10-09 23:54:40,643 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3201, 'completion_tokens': 42, 'total_tokens': 3243}, Time: 1.93s
+2025-10-09 23:54:40,644 - app.orchestrator.agents.agentic_orchestrator - INFO - Enforcing mandatory sequence: forcing detect_content_type before parse_html_content
+2025-10-09 23:54:40,644 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.93s', 'token_usage': {'prompt_tokens': 3201, 'completion_tokens': 42, 'total_tokens': 3243}, 'action': 'use_agent', 'capability': 'detect_content_type', 'reasoning': 'Mandatory: must detect content type after fetch before parsing'}
+2025-10-09 23:54:40,644 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:54:40,644 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:54:40,644 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: Must detect content type first
+2025-10-09 23:54:40,644 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: detect_content_type - Mandatory: must detect content type before extraction
+2025-10-09 23:54:40,644 - agent.detect_type - INFO - [detect_type] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:54:40,742 - app.tools.detect_kind - INFO - Detected content type: RSS (confidence: 1.30)
+2025-10-09 23:54:40,742 - agent.detect_type - INFO - [DETECT_TYPE] Content type detected - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'type': 'RSS', 'confidence': 1.3, 'mime': 'text/xml'}
+2025-10-09 23:54:40,742 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability detect_content_type executed successfully
+2025-10-09 23:54:40,742 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 2: use_agent - Mandatory: must detect content type before extraction
+2025-10-09 23:54:42,807 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3201, 'completion_tokens': 40, 'total_tokens': 3241}, Time: 2.01s
+2025-10-09 23:54:42,808 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '2.01s', 'token_usage': {'prompt_tokens': 3201, 'completion_tokens': 40, 'total_tokens': 3241}, 'action': 'use_agent', 'capability': 'extract_rss_urls', 'reasoning': 'RSS feed detected, extracting child URLs for individual CTI processing'}
+2025-10-09 23:54:42,808 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:54:42,808 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:54:42,808 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: RSS feed detected, extracting child URLs
+2025-10-09 23:54:42,808 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: extract_rss_urls - RSS feeds are containers - extract child URLs for individual processing
+2025-10-09 23:54:42,808 - app.orchestrator.agent_repository - INFO - Extracting URLs from RSS feed
+2025-10-09 23:54:43,395 - app.tools.parsers.rss_parse - INFO - Parsed RSS feed: 20 items, title: Grade A via global_cti on Inoreader
+2025-10-09 23:54:43,396 - app.orchestrator.agent_repository - INFO - Extracted 20 URLs from RSS feed
+2025-10-09 23:54:43,396 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability extract_rss_urls executed successfully
+2025-10-09 23:54:43,397 - app.orchestrator.agents.agentic_orchestrator - INFO - RSS URLs extracted, processing each URL individually
+2025-10-09 23:54:43,397 - app.orchestrator.agents.agentic_orchestrator - INFO - Processing 20 RSS URLs individually
+2025-10-09 23:54:43,397 - app.orchestrator.agents.agentic_orchestrator - INFO - Processing RSS URL 1/20: https://hackread.com/discord-hackers-id-photos-dismisses-extortion-claim/
+2025-10-09 23:54:43,397 - app.graph - INFO - Processing URL: https://hackread.com/discord-hackers-id-photos-dismisses-extortion-claim/
+2025-10-09 23:54:43,417 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Starting processing - Starting agentic processing
+2025-10-09 23:54:45,522 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3155, 'completion_tokens': 38, 'total_tokens': 3193}, Time: 1.91s
+2025-10-09 23:54:45,522 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.91s', 'token_usage': {'prompt_tokens': 3155, 'completion_tokens': 38, 'total_tokens': 3193}, 'action': 'use_agent', 'capability': 'fetch_content', 'reasoning': 'Start with mandatory fetch step to retrieve content from the provided URL.'}
+2025-10-09 23:54:45,522 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:54:45,522 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:54:45,522 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: Must fetch content first
+2025-10-09 23:54:45,523 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: fetch_content - Mandatory: must fetch content before any processing
+2025-10-09 23:54:45,523 - agent.fetch - INFO - [FETCH] Starting fetch - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'url': 'https://hackread.com/discord-hackers-id-photos-dismisses-extortion-claim/'}
+2025-10-09 23:54:45,570 - app.tools.http_fetch - INFO - Fetching URL: https://hackread.com/discord-hackers-id-photos-dismisses-extortion-claim/
+2025-10-09 23:54:47,943 - app.tools.http_fetch - INFO - Fetched 248934 bytes, MIME: text/html, SHA-256: dbc6adfd568e094b...
+2025-10-09 23:54:47,980 - agent.fetch - INFO - [FETCH] Fetch complete - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'mime': 'text/html', 'size': 331912, 'sha256': 'dbc6adfd568e094b...'}
+2025-10-09 23:54:47,981 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability fetch_content executed successfully
+2025-10-09 23:54:47,981 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 1: use_agent - Mandatory: must fetch content before any processing
+2025-10-09 23:54:49,557 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3192, 'completion_tokens': 35, 'total_tokens': 3227}, Time: 1.49s
+2025-10-09 23:54:49,558 - app.orchestrator.agents.agentic_orchestrator - INFO - Enforcing mandatory sequence: forcing detect_content_type before parse_html_content
+2025-10-09 23:54:49,558 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.49s', 'token_usage': {'prompt_tokens': 3192, 'completion_tokens': 35, 'total_tokens': 3227}, 'action': 'use_agent', 'capability': 'detect_content_type', 'reasoning': 'Mandatory: must detect content type after fetch before parsing'}
+2025-10-09 23:54:49,558 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:54:49,558 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:54:49,558 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: Must detect content type first
+2025-10-09 23:54:49,558 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: detect_content_type - Mandatory: must detect content type before extraction
+2025-10-09 23:54:49,563 - app.tools.detect_kind - INFO - Detected content type: HTML (confidence: 1.00)
+2025-10-09 23:54:49,563 - agent.detect_type - INFO - [DETECT_TYPE] Content type detected - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'type': 'HTML', 'confidence': 1.0, 'mime': 'text/html'}
+2025-10-09 23:54:49,563 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability detect_content_type executed successfully
+2025-10-09 23:54:49,563 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 2: use_agent - Mandatory: must detect content type before extraction
+2025-10-09 23:54:50,708 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3192, 'completion_tokens': 35, 'total_tokens': 3227}, Time: 1.11s
+2025-10-09 23:54:50,708 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.11s', 'token_usage': {'prompt_tokens': 3192, 'completion_tokens': 35, 'total_tokens': 3227}, 'action': 'use_agent', 'capability': 'parse_html_content', 'reasoning': 'HTML content detected, must parse before extraction'}
+2025-10-09 23:54:50,708 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:54:50,708 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:54:50,708 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: Must parse HTML content first
+2025-10-09 23:54:50,708 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: parse_html_content - Mandatory: must parse HTML content before extraction
+2025-10-09 23:54:50,708 - agent.parse_html - INFO - [parse_html] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:54:50,861 - agent.parse_html - INFO - Processing 8560 chars with LLM filtering
+2025-10-09 23:54:59,236 - agent.parse_html - INFO - [PARSE_HTML] LLM Response - Tokens: {'prompt_tokens': 2428, 'completion_tokens': 409, 'total_tokens': 2837}, Time: 8.34s
+2025-10-09 23:54:59,236 - agent.parse_html - INFO - LLM filtering successful: 2060 chars
+2025-10-09 23:54:59,236 - agent.parse_html - INFO - Setting state.markdown with 2060 characters
+2025-10-09 23:54:59,236 - agent.parse_html - INFO - Setting state.extracted['markdown'] with 2060 characters
+2025-10-09 23:54:59,236 - agent.parse_html - INFO - First 100 chars: # Discord Data Breach: 70,000 ID Photos Exposed
+
+## Overview
+On October 3, 2025, Discord confirmed a
+2025-10-09 23:54:59,236 - agent.parse_html - INFO - [PARSE_HTML] LLM HTML parsing complete - {'processing_time': '8.34s', 'token_usage': {'prompt_tokens': 2428, 'completion_tokens': 409, 'total_tokens': 2837}, 'markdown_chars': 2060, 'title': 'Discord Says Hackers Stole 70,000 ID Photos, Dismi'}
+2025-10-09 23:54:59,236 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability parse_html_content executed successfully
+2025-10-09 23:54:59,236 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 3: use_agent - Mandatory: must parse HTML content before extraction
+2025-10-09 23:55:01,004 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3232, 'completion_tokens': 40, 'total_tokens': 3272}, Time: 1.73s
+2025-10-09 23:55:01,004 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.73s', 'token_usage': {'prompt_tokens': 3232, 'completion_tokens': 40, 'total_tokens': 3272}, 'action': 'use_agent', 'capability': 'generate_summary', 'reasoning': 'To create a concise summary for the missing summary field in the JSON structure.'}
+2025-10-09 23:55:01,004 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete - Missing fields: ['title=', 'summary=']
+2025-10-09 23:55:01,004 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:55:01,004 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:55:01,004 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: extract_cves - Mandatory extraction capability extract_cves not yet attempted
+2025-10-09 23:55:01,004 - agent.cve - INFO - [cve] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:55:01,006 - agent.cve - INFO - No CVEs found in text
+2025-10-09 23:55:01,006 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability extract_cves executed successfully
+2025-10-09 23:55:01,006 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 4: use_agent - Mandatory extraction capability extract_cves not yet attempted
+2025-10-09 23:55:02,673 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3247, 'completion_tokens': 40, 'total_tokens': 3287}, Time: 1.63s
+2025-10-09 23:55:02,673 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.63s', 'token_usage': {'prompt_tokens': 3247, 'completion_tokens': 40, 'total_tokens': 3287}, 'action': 'use_agent', 'capability': 'generate_summary', 'reasoning': 'To create a concise summary for the missing summary field in the JSON structure.'}
+2025-10-09 23:55:02,673 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete - Missing fields: ['title=', 'summary=']
+2025-10-09 23:55:02,673 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:55:02,673 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:55:02,673 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: extract_entities - Mandatory extraction capability extract_entities not yet attempted
+2025-10-09 23:55:02,673 - agent.entity - INFO - [entity] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:55:04,599 - agent.entity - INFO - [ENTITY] LLM Response - Tokens: {'prompt_tokens': 799, 'completion_tokens': 51, 'total_tokens': 850}, Time: 1.89s
+2025-10-09 23:55:04,600 - agent.entity - INFO - [ENTITY] Entity extraction complete - {'processing_time': '1.89s', 'token_usage': {'prompt_tokens': 799, 'completion_tokens': 51, 'total_tokens': 850}, 'threat_actors': 0, 'malware': 0, 'victims': 1, 'sectors': 0, 'products': 1, 'method': 'llm_only'}
+2025-10-09 23:55:04,600 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability extract_entities executed successfully
+2025-10-09 23:55:04,600 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 5: use_agent - Mandatory extraction capability extract_entities not yet attempted
+2025-10-09 23:55:07,461 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3268, 'completion_tokens': 40, 'total_tokens': 3308}, Time: 2.83s
+2025-10-09 23:55:07,461 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '2.83s', 'token_usage': {'prompt_tokens': 3268, 'completion_tokens': 40, 'total_tokens': 3308}, 'action': 'use_agent', 'capability': 'generate_summary', 'reasoning': 'To create a concise summary for the missing summary field.'}
+2025-10-09 23:55:07,462 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete - Missing fields: ['title=', 'summary=']
+2025-10-09 23:55:07,462 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:55:07,462 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:55:07,462 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: extract_iocs - Mandatory extraction capability extract_iocs not yet attempted
+2025-10-09 23:55:07,462 - agent.ioc - INFO - [ioc] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:55:07,630 - agent.ioc - INFO - [IOC] IOC extraction complete using LLM guidance - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'urls': 0, 'domains': 0, 'hashes': 0, 'ips': 0, 'file_paths': 0, 'processes': 0, 'registry_keys': 0, 'commands': 0, 'email_addresses': 0}
+2025-10-09 23:55:07,631 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability extract_iocs executed successfully
+2025-10-09 23:55:07,631 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 6: use_agent - Mandatory extraction capability extract_iocs not yet attempted
+2025-10-09 23:55:10,279 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3334, 'completion_tokens': 38, 'total_tokens': 3372}, Time: 2.50s
+2025-10-09 23:55:10,279 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '2.50s', 'token_usage': {'prompt_tokens': 3334, 'completion_tokens': 38, 'total_tokens': 3372}, 'action': 'use_agent', 'capability': 'generate_summary', 'reasoning': 'To create a concise summary that is missing from the JSON structure.'}
+2025-10-09 23:55:10,279 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete - Missing fields: ['title=', 'summary=']
+2025-10-09 23:55:10,280 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:55:10,280 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:55:10,280 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: map_mitre_ttps - Mandatory extraction capability map_mitre_ttps not yet attempted
+2025-10-09 23:55:10,280 - agent.mitre - INFO - [mitre] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:55:10,281 - agent.mitre - INFO - Starting enhanced 3-step MITRE analysis
+2025-10-09 23:55:10,281 - agent.mitre - INFO - Step 1: Analyzing attack behaviors
+2025-10-09 23:55:23,546 - agent.mitre - INFO - [MITRE] LLM Response - Tokens: {'prompt_tokens': 972, 'completion_tokens': 487, 'total_tokens': 1459}, Time: 13.16s
+2025-10-09 23:55:23,546 - agent.mitre - INFO - Step 2: Identifying MITRE techniques
+2025-10-09 23:55:38,933 - agent.mitre - INFO - [MITRE] LLM Response - Tokens: {'prompt_tokens': 1647, 'completion_tokens': 456, 'total_tokens': 2103}, Time: 15.35s
+2025-10-09 23:55:38,933 - agent.mitre - INFO - Step 3: Validating and deduplicating techniques
+2025-10-09 23:55:46,517 - agent.mitre - INFO - [MITRE] LLM Response - Tokens: {'prompt_tokens': 1190, 'completion_tokens': 492, 'total_tokens': 1682}, Time: 7.50s
+2025-10-09 23:55:46,518 - agent.mitre - INFO - [MITRE] Enhanced 3-step MITRE analysis complete - {'processing_time': '7.50s', 'token_usage': {'prompt_tokens': 1190, 'completion_tokens': 492, 'total_tokens': 1682}, 'final_techniques': 4, 'evidence_items': 4, 'step1_behaviors': 4, 'step2_total': 4, 'validation_removed': 0}
+2025-10-09 23:55:46,518 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability map_mitre_ttps executed successfully
+2025-10-09 23:55:46,518 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 7: use_agent - Mandatory extraction capability map_mitre_ttps not yet attempted
+2025-10-09 23:55:48,849 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3379, 'completion_tokens': 44, 'total_tokens': 3423}, Time: 2.23s
+2025-10-09 23:55:48,850 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '2.23s', 'token_usage': {'prompt_tokens': 3379, 'completion_tokens': 44, 'total_tokens': 3423}, 'action': 'use_agent', 'capability': 'generate_summary', 'reasoning': 'To create a concise summary for the missing summary field in the JSON structure.'}
+2025-10-09 23:55:48,850 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete - Missing fields: ['title=', 'summary=']
+2025-10-09 23:55:48,850 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:55:48,850 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:55:48,850 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: generate_summary - Populating missing JSON field 'title' using generate_summary
+2025-10-09 23:55:48,850 - agent.summarize - INFO - [summarize] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:55:58,392 - agent.summarize - INFO - [SUMMARIZE] LLM Response - Tokens: {'prompt_tokens': 1037, 'completion_tokens': 232, 'total_tokens': 1269}, Time: 9.51s
+2025-10-09 23:55:58,392 - agent.summarize - INFO - [SUMMARIZE] Summary generated using LLM - {'processing_time': '9.51s', 'token_usage': {'prompt_tokens': 1037, 'completion_tokens': 232, 'total_tokens': 1269}, 'summary_chars': 437, 'evidence_count': 3}
+2025-10-09 23:55:58,392 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability generate_summary executed successfully
+2025-10-09 23:55:58,392 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 8: use_agent - Populating missing JSON field 'title' using generate_summary
+2025-10-09 23:56:01,034 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3479, 'completion_tokens': 51, 'total_tokens': 3530}, Time: 2.55s
+2025-10-09 23:56:01,034 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '2.55s', 'token_usage': {'prompt_tokens': 3479, 'completion_tokens': 51, 'total_tokens': 3530}, 'action': 'use_agent', 'capability': 'extract_entities', 'reasoning': 'To populate missing fields such as underlying_causes, strategic_implications, regional_context, escalation_potential, and stakeholder_interests.'}
+2025-10-09 23:56:01,034 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:56:01,034 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:56:01,034 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: analyze_geographic_scope - Populating missing JSON field 'underlying_causes' using analyze_geographic_scope
+2025-10-09 23:56:01,034 - agent.geo_motivation - INFO - [geo_motivation] Agent initialized - LLM Configuration: {'model': 'gpt-4o-mini', 'temperature': 0.1, 'max_tokens': 2000, 'api_key_configured': True}
+2025-10-09 23:56:15,329 - agent.geo_motivation - INFO - [GEO_MOTIVATION] LLM Response - Tokens: {'prompt_tokens': 1566, 'completion_tokens': 511, 'total_tokens': 2077}, Time: 14.25s
+2025-10-09 23:56:15,329 - agent.geo_motivation - INFO - [GEO_MOTIVATION] Enhanced geo-motivation and geopolitical analysis complete - {'processing_time': '14.25s', 'token_usage': {'prompt_tokens': 1566, 'completion_tokens': 511, 'total_tokens': 2077}, 'affects_singapore': False, 'affects_asean': False, 'global_implications': True, 'regions_affected': 1, 'high_tension': False, 'tension_level': 'low', 'escalation_risk': 'low', 'primary_motivation': 'extortion', 'secondary_motivations': 2, 'geopolitical_insights': True, 'confidence': 'medium'}
+2025-10-09 23:56:15,330 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability analyze_geographic_scope executed successfully
+2025-10-09 23:56:15,330 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 9: use_agent - Populating missing JSON field 'underlying_causes' using analyze_geographic_scope
+2025-10-09 23:56:17,240 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3600, 'completion_tokens': 47, 'total_tokens': 3647}, Time: 1.88s
+2025-10-09 23:56:17,240 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.88s', 'token_usage': {'prompt_tokens': 3600, 'completion_tokens': 47, 'total_tokens': 3647}, 'action': 'use_agent', 'capability': 'store_results', 'reasoning': 'All fields in the JSON structure are complete, ready to store the final CTI artifact.'}
+2025-10-09 23:56:17,241 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:56:17,241 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: []
+2025-10-09 23:56:17,241 - app.orchestrator.agents.agentic_orchestrator - WARNING - store_results requested but JSON structure incomplete, overriding to continue processing
+2025-10-09 23:56:17,241 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: []
+2025-10-09 23:56:17,241 - app.orchestrator.agents.agentic_orchestrator - INFO - Processing completed: All extraction capabilities attempted, completing with current data
+2025-10-09 23:56:17,242 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic processing complete - {'processing_time': '1.88s', 'token_usage': {'prompt_tokens': 3600, 'completion_tokens': 47, 'total_tokens': 3647}, 'iterations': 10, 'total_time_seconds': 93.82, 'avg_time_per_iteration': 9.38, 'final_state': {'extracted_fields': ['title', 'source_url', 'summary', 'threat_actors', 'malware', 'cve_vulns', 'affected_products', 'iocs', 'mitre_ttps', 'victims', 'sectors', 'patch_availability', 'affects_singapore', 'affects_asean', 'active_exploitation', 'high_tension_event', 'possible_motivations', 'recommendations_and_mitigations', 'cve_severity', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests', 'markdown', 'url', 'cve', 'cve_extraction_attempted', 'entities_extraction_attempted', 'iocs_extraction_attempted', 'mitre_ttps_extraction_attempted', 'mitre_analysis', 'zero_day_mention', 'active_exploitation_mentioned', 'global_implications', 'primary_regions_affected', 'tension_level', 'primary_motivation', 'secondary_motivations', 'geopolitical_analysis', 'geographic_analysis_attempted'], 'evidence_count': 21}}
+2025-10-09 23:56:17,252 - app.graph - INFO - Processing complete for https://hackread.com/discord-hackers-id-photos-dismisses-extortion-claim/
+2025-10-09 23:56:17,257 - app.orchestrator.agents.agentic_orchestrator - INFO - RSS Item 1/20 completed ✅ SUCCESS: https://hackread.com/discord-hackers-id-photos-dismisses-extortion-claim/
+2025-10-09 23:56:17,258 - app.orchestrator.agents.agentic_orchestrator - INFO - Processing RSS URL 2/20: https://www.paloaltonetworks.com/blog/2025/10/closing-the-cloud-security-gap/
+2025-10-09 23:56:17,258 - app.graph - INFO - Processing URL: https://www.paloaltonetworks.com/blog/2025/10/closing-the-cloud-security-gap/
+2025-10-09 23:56:17,269 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Starting processing - Starting agentic processing
+2025-10-09 23:56:19,558 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3167, 'completion_tokens': 38, 'total_tokens': 3205}, Time: 2.23s
+2025-10-09 23:56:19,558 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '2.23s', 'token_usage': {'prompt_tokens': 3167, 'completion_tokens': 38, 'total_tokens': 3205}, 'action': 'use_agent', 'capability': 'fetch_content', 'reasoning': 'Start with mandatory fetch step to retrieve content from the provided URL.'}
+2025-10-09 23:56:19,558 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:56:19,558 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:56:19,558 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: Must fetch content first
+2025-10-09 23:56:19,558 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: fetch_content - Mandatory: must fetch content before any processing
+2025-10-09 23:56:19,558 - agent.fetch - INFO - [FETCH] Starting fetch - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'url': 'https://www.paloaltonetworks.com/blog/2025/10/closing-the-cloud-security-gap/'}
+2025-10-09 23:56:19,588 - app.tools.http_fetch - INFO - Fetching URL: https://www.paloaltonetworks.com/blog/2025/10/closing-the-cloud-security-gap/
+2025-10-09 23:56:20,405 - app.tools.http_fetch - INFO - Fetched 833225 bytes, MIME: application/javascript, SHA-256: 41da30a0ca33770b...
+2025-10-09 23:56:20,424 - agent.fetch - INFO - [FETCH] Fetch complete - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'mime': 'application/javascript', 'size': 1110968, 'sha256': '41da30a0ca33770b...'}
+2025-10-09 23:56:20,424 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability fetch_content executed successfully
+2025-10-09 23:56:20,424 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 1: use_agent - Mandatory: must fetch content before any processing
+2025-10-09 23:56:22,260 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3206, 'completion_tokens': 39, 'total_tokens': 3245}, Time: 1.81s
+2025-10-09 23:56:22,260 - app.orchestrator.agents.agentic_orchestrator - INFO - Enforcing mandatory sequence: forcing detect_content_type before parse_html_content
+2025-10-09 23:56:22,261 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.81s', 'token_usage': {'prompt_tokens': 3206, 'completion_tokens': 39, 'total_tokens': 3245}, 'action': 'use_agent', 'capability': 'detect_content_type', 'reasoning': 'Mandatory: must detect content type after fetch before parsing'}
+2025-10-09 23:56:22,261 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:56:22,261 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:56:22,261 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: Must detect content type first
+2025-10-09 23:56:22,261 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: detect_content_type - Mandatory: must detect content type before extraction
+2025-10-09 23:56:22,270 - app.tools.detect_kind - INFO - Detected content type: HTML (confidence: 0.40)
+2025-10-09 23:56:22,270 - agent.detect_type - INFO - [DETECT_TYPE] Content type detected - {'processing_time': '0.00s', 'token_usage': {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}, 'type': 'HTML', 'confidence': 0.4, 'mime': 'application/javascript'}
+2025-10-09 23:56:22,270 - app.orchestrator.agents.agentic_orchestrator - INFO - Agent capability detect_content_type executed successfully
+2025-10-09 23:56:22,270 - app.orchestrator.agents.agentic_orchestrator - INFO - Iteration 2: use_agent - Mandatory: must detect content type before extraction
+2025-10-09 23:56:23,838 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] LLM Response - Tokens: {'prompt_tokens': 3206, 'completion_tokens': 35, 'total_tokens': 3241}, Time: 1.54s
+2025-10-09 23:56:23,838 - agent.agentic_orchestrator - INFO - [AGENTIC_ORCHESTRATOR] Agentic decision made - {'processing_time': '1.54s', 'token_usage': {'prompt_tokens': 3206, 'completion_tokens': 35, 'total_tokens': 3241}, 'action': 'use_agent', 'capability': 'parse_html_content', 'reasoning': 'HTML content detected, must parse before extraction'}
+2025-10-09 23:56:23,839 - app.orchestrator.agents.agentic_orchestrator - INFO - JSON structure incomplete, overriding LLM decision with priority logic
+2025-10-09 23:56:23,839 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override called with missing_fields: ['title', 'summary', 'underlying_causes', 'strategic_implications', 'regional_context', 'escalation_potential', 'stakeholder_interests']
+2025-10-09 23:56:23,839 - app.orchestrator.agents.agentic_orchestrator - INFO - Priority override: Must parse HTML content first
+2025-10-09 23:56:23,839 - app.orchestrator.agents.agentic_orchestrator - INFO - Executing agent capability: parse_html_content - Mandatory: must parse HTML content before extraction
+2025-10-09 23:56:23,977 - agent.parse_html - INFO - Processing 11484 chars with LLM filtering
+2025-10-09 23:56:54,064 - openai._base_client - INFO - Retrying request to /chat/completions in 0.486666 seconds

@@ -1,0 +1,136 @@
+{
+  "active_exploitation": false,
+  "active_exploitation_mentioned": true,
+  "affected_products": [
+    "Cortex Cloud",
+    "Cortex XSIAM",
+    "Cortex XDR",
+    "Cortex XSOAR",
+    "Cortex Xpanse",
+    "Prisma Cloud"
+  ],
+  "affects_asean": false,
+  "affects_singapore": false,
+  "cve": {
+    "active_exploitation": false,
+    "highest_cvss": 0.0,
+    "highest_severity": "UNKNOWN",
+    "patch_availability": false,
+    "total_count": 0,
+    "vulnerabilities": []
+  },
+  "cve_extraction_attempted": true,
+  "cve_severity": [],
+  "cve_vulns": [],
+  "entities_extraction_attempted": true,
+  "escalation_potential": "While the current situation does not indicate immediate escalation to physical conflict, the financial motivations of threat actors could lead to increased cybercrime and retaliatory measures from affected organizations.",
+  "geographic_analysis_attempted": true,
+  "geopolitical_analysis": {
+    "analysis_metadata": {
+      "confidence": "medium",
+      "method": "llm_enhanced",
+      "reasoning": "The analysis is based on the content's emphasis on cloud security challenges and the motivations of identified threat actors. The global implications of cloud security incidents were considered, along with the potential for financial motivations to drive further cyber activities."
+    },
+    "escalation_potential": "While the current situation does not indicate immediate escalation to physical conflict, the financial motivations of threat actors could lead to increased cybercrime and retaliatory measures from affected organizations.",
+    "escalation_risk": "medium",
+    "historical_precedents": "Past incidents of cloud breaches have led to significant financial losses and reputational damage, highlighting the ongoing vulnerabilities in cloud security.",
+    "regional_context": "The global nature of cloud services means that incidents can have ripple effects across regions, impacting international businesses and supply chains.",
+    "stakeholder_interests": "Cloud service providers, businesses relying on cloud infrastructure, and governments are all stakeholders with vested interests in improving cloud security and mitigating risks.",
+    "strategic_implications": [
+      "The rise in cloud-related incidents indicates a shift in the cyber threat landscape, necessitating enhanced international cooperation on cybersecurity standards.",
+      "Organizations' reliance on cloud services may lead to increased scrutiny and regulation from governments, impacting the tech industry."
+    ],
+    "underlying_causes": [
+      "The rapid adoption of cloud technologies has outpaced security measures, leading to vulnerabilities that threat actors exploit for financial gain.",
+      "Increased complexity in cloud environments creates opportunities for both state and non-state actors to engage in cyber operations."
+    ]
+  },
+  "global_implications": true,
+  "high_tension_event": false,
+  "iocs": {
+    "commands": [],
+    "domains": [],
+    "email_addresses": [],
+    "excluded": {
+      "commands": [],
+      "domains": [],
+      "email_addresses": [],
+      "file_paths": [],
+      "hashes": [],
+      "ips": [],
+      "processes": [],
+      "registry_keys": [],
+      "urls": []
+    },
+    "file_paths": [],
+    "hashes": [],
+    "ips": [],
+    "processes": [],
+    "registry_keys": [],
+    "urls": []
+  },
+  "iocs_extraction_attempted": true,
+  "malware": [],
+  "markdown": "Blog\nPalo Alto Networks\nCloud Security\nClosing the Cloud Securit...\nClosing the Cloud Security Gap\nLink copied\nBy\nMargaret Kelley\nOct 09, 2025\n6 minutes\nCloud Security\nReports\nUnit 42\nCloud Security\nGlobal Incident Response Report\nInsights From the 2025 Unit 42 Global Incident Response Report\nThe main tenet of cloud security is simple: Apply the same rigorous cybersecurity best practices you use elsewhere.\nBut that’s easier said than done. Since the emergence of cloud technology, organizations have been working to secure it to varying degrees of success. There are a few factors that make cloud security uniquely challenging:\nHigh level of reuse of cloud resources.\nComplexity of cloud-native technologies, like containers and serverless architectures.\nAn expanding attack surface rife with misconfigurations.\nAttackers are taking advantage. Our\n2025 Global Incident Response Report\n(IR report) highlights this critical challenge. Nearly a third of the incidents Unit 42 investigated in 2024 were cloud-related. In 21% of cases, threat actors adversely impacted cloud environments and assets. Public data exposures and excessive permissions gave attackers, like\nBling Libra\nand\nMuddled Libra\n, greater ability to cause damage.\nEven with an abundance of cloud security tools in the market, organizations still struggle to apply cybersecurity best practices, like least privilege, zero trust and even patch hygiene. However, organizations can work toward closing the cloud security gap:\nUnderstand the cloud’s shared responsibility model.\nAchieve full visibility.\nImprove identity and access management (IAM).\nCreate secure configurations.\nAutomate detection and response processes.\nUnderstanding the Shared Responsibility Model\nEvery major cloud service provider (CSP) follows a shared responsibility model. You secure your data, identities and configurations, while your provider secures the underlying hardware. The exact division of responsibility can depend on the type of service provided. If you create a virtual machine, you’re responsible for the infrastructure but not the physical hardware in the CSP’s data center. If you use the CSP’s managed services, the CSP will take greater responsibility for the digital infrastructure.\nDefenders should ensure clarity on which aspects of cloud security fall to their organization.\nVisibility Is the First Line of Defense\nThe cloud on its own isn’t extraordinarily complex. What is complex is the resource sprawl across multiple environments.\nFrontend services connect to backend services over internal load balancers or service meshes. You may have private link endpoints, transit gateways, VPN tunnels or direct connections to hybrid environments that you do not know about.\nA firewall rule or security group change may open unintended access. A dev team may deploy containers using base images with known vulnerabilities. Old storage buckets with outdated access controls may be left behind long after a project retires.\nOrganizations need the ability to zoom out and map connections to create a holistic, dynamic view.\nPrioritization Creates Efficiency\nJust because you can see it all doesn’t mean you can fix it all.\nContext is everything, and a single alert hardly ever tells the whole story. A login from an unexpected location may come from a traveling executive or from a malicious account takeover. A Critical CVE may exist on a nonexposed test system and therefore doesn’t matter. Meanwhile a Medium alert on a domain controller could pose a more significant business risk.\nAlert correlation and consolidation can unlock real-time, proactive defense.\nOrganizations should use AI and machine learning to assist with quickly gathering context, filtering noise and capturing the scope of a threat.\nIdentity Is the Perimeter\nOur IR Report found that threat actors often used valid cloud accounts. They used them to further particular goals:\nInitial access: 13% of cases\nPrivilege escalation: 8% of cases\nPersistence: 7% of cases\nDefense evasion: 7% of cases\nOverpermissioned identities remain a top risk.\nOrganizations should follow best practices for IAM. These are Unit 42 recommendations:\nStart with the principle of least privilege.\nAudit and rotate credentials regularly.\nUse cloud audit logs to detect lateral movement.\nAvoid long-term IAM access keys\n, as they can easily be exploited by attackers if the credentials are leaked.\nSecure Configurations Are Not Optional\nWhile CSPs provide various default security configurations, they need additional work to meet best practices. Common missteps in configurations include exposed cloud storage, unpatched container images and publicly accessible APIs.\nIf left unchanged, these missteps can turn into massive breaches, costing your business its data, revenue and reputation.\nCSP-specific tools can enforce baseline security standards, but few businesses are dealing with baseline attacks. Regularly scan and benchmark your security across frameworks like the Center for Internet Security (\nCIS\n) / Security Technical Implementation Guide (\nSTIG\n) for a comprehensive picture of the environment.\nAutomate Detection and Response\nPowered by automation, AI, as well as hacker toolkits, the speed of intrusion is now faster. In nearly 20% of Unit 42 investigations, data exfiltration took place within the first hour of compromise. Teams must become capable of responding at machine speed.\nThat’s tough to achieve in the cloud. Organizations operate a plethora of cloud-based SaaS tools, as well as multicloud environments. That presents a wide variety of log formats and APIs, and some third-party logs may be inaccessible. Identity misuse, like privilege escalation and lateral movement through API calls, is harder to spot than malware being deployed on a server. With DevOps teams spinning up and decommissioning resources, an incident may be indistinguishable from a misconfigured deployment without strong baselines.\nCloud Security Is a Continuous Discipline\nSecuring the business means securing the cloud. At Palo Alto Networks, we’ve designed our tools and services to provide exceptional defense that speaks to the highly dynamic realities of cloud environments.\nHere’s how Palo Alto Networks can help you\nstart securing your cloud\n:\nCortex Cloud®\noffers full coverage agentless visibility across every cloud layer – infrastructure, compute, code identity, data, AI. This enables security teams to understand what's actively running in their cloud without disrupting business operations or slowing down application development. Cortex Cloud integrates cloud posture capabilities, like cloud security posture management, AI security posture management, Cloud Infrastructure Entitlement Management (CIEM), data security posture management and vulnerability management, into a single data platform that reduces risk noise and enables swift, scalable remediation.\nWhen integrated with a SOC platform, like Cortex XSIAM, Cortex Cloud brings cloud assets into the same unified visibility, control and response framework that protects everything else in your environment.\nFor a deep dive on the latest threat research and tips on how defenders can turn the table, download the full\n2025 Global Incident Response Report\n.\nFAQs for the Cloud Security Gap\nWhat makes cloud security uniquely challenging?\nCloud security is challenging due to the high level of reuse of cloud resources, the complexity of cloud-native technologies, like containers and serverless architectures, and an expanding attack surface rife with misconfigurations.\nHow are attackers exploiting cloud vulnerabilities?\nAttackers are taking advantage of vulnerabilities, with nearly a third of incidents in 2024 being cloud-related. They use public data exposures and excessive permissions to impact cloud environments and assets, as highlighted in the 2025 Global Incident Response Report. Threat actors often use valid cloud accounts for many reasons: initial access, privilege escalation, persistence, defense evasion.\nWhat steps can organizations take to close the cloud security gap?\nOrganizations can close the cloud security gap by understanding the cloud’s shared responsibility model to achieve full visibility across environments. They can also improve identity and access management (IAM) by following least privilege principles, creating secure configurations, and automating detection and response processes to match the speed of intrusions.\nRelated Blogs\nAI and Cybersecurity\n,\nAI Security\n,\nCybersecurity\n,\nData Security\n,\nIncident Response\n,\nReports\n,\nUnit 42\nThe Case for Multidomain Visibility\nPoints of View\n,\nReports\n,\nUnit 42\nSocial Engineering on the Rise — New Unit 42 Report\nAnnouncement\n,\nReports\n,\nUnit 42\nPalo Alto Networks Named a Leader in WW Incident Response Services\nAnnouncement\n,\nReports\n,\nUnit 42\n​​2025 Unit 42 Incident Response Report — Attacks Shift to Disruption\nCybersecurity\n,\nProducts and Services\n,\nReports\n,\nThreat Prevention\n,\nThreat Research\n,\nUnit 42\nTop Three Ways Organizations Were Unprepared for Cyberattacks in 2023\nAnnouncement\n,\nPoints of View\n,\nReports\n,\nUnit 42\nNavigating the Complex Threat Landscape — Key Takeaways for CISOs\nSubscribe to the Blog!\nSign up to receive must-read articles, Playbooks of the Week, new feature announcements, and more.\nSign up\nPlease enter a valid email.\nBy submitting this form, you agree to our\nTerms of Use\nand acknowledge our\nPrivacy Statement\n. Please look for a confirmation email from us. If you don't receive it in the next 10 minutes, please check your spam folder.\nGet the latest news, invites to events, and threat alerts\nEnter your email now to subscribe!\nSign up\nBy submitting this form, you agree to our\nTerms of Use\nand acknowledge our\nPrivacy Statement\n.\nSign up\nGet the latest news, invites to events, and threat alerts\nEnter your email now to subscribe!\nSign up\nBy submitting this form, you agree to our\nTerms of Use\nand acknowledge our\nPrivacy Statement\n.\nSign up\nProducts and Services\nAI-Powered Network Security Platform\nSecure AI by Design\nPrisma AIRS\nAI Access Security\nCloud Delivered Security Services\nAdvanced Threat Prevention\nAdvanced URL Filtering\nAdvanced WildFire\nAdvanced DNS Security\nEnterprise Data Loss Prevention\nEnterprise IoT Security\nMedical IoT Security\nIndustrial OT Security\nSaaS Security\nNext-Generation Firewalls\nHardware Firewalls\nSoftware Firewalls\nStrata Cloud Manager\nSD-WAN for NGFW\nPAN-OS\nPanorama\nSecure Access Service Edge\nPrisma SASE\nApplication Acceleration\nAutonomous Digital Experience Management\nEnterprise DLP\nPrisma Access\nPrisma Browser\nPrisma SD-WAN\nRemote Browser Isolation\nSaaS Security\nAI-Driven Security Operations Platform\nCloud Security\nCortex Cloud\nApplication Security\nCloud Posture Security\nCloud Runtime Security\nPrisma Cloud\nAI-Driven SOC\nCortex XSIAM\nCortex XDR\nCortex XSOAR\nCortex Xpanse\nUnit 42 Managed Detection & Response\nManaged XSIAM\nThreat Intel and Incident Response Services\nProactive Assessments\nIncident Response\nTransform Your Security Strategy\nDiscover Threat Intelligence\nCompany\nAbout Us\nCareers\nContact Us\nCorporate Responsibility\nCustomers\nInvestor Relations\nLocation\nNewsroom\nPopular Links\nBlog\nCommunities\nContent Library\nCyberpedia\nEvent Center\nManage Email Preferences\nProducts A-Z\nProduct Certifications\nReport a Vulnerability\nSitemap\nTech Docs\nUnit 42\nDo Not Sell or Share My Personal Information\nPrivacy\nTrust Center\nTerms of Use\nDocuments\nCopyright © 2025 Palo Alto Networks. All Rights Reserved\nEN\nSelect your language",
+  "mitre_analysis": {
+    "attack_pattern": "The attack pattern indicates a reliance on valid cloud accounts for various stages of the attack lifecycle, including initial access, privilege escalation, persistence, and evasion. The exploitation of misconfigurations and rapid data exfiltration further highlights the vulnerabilities in cloud security practices.",
+    "confidence": 3,
+    "method": "enhanced_3step",
+    "processing_strategy": "full",
+    "step1_behaviors": 6,
+    "step2_behavioral": 6,
+    "step2_explicit": 0,
+    "step3_final": 3,
+    "validation_summary": {
+      "deduplication_actions": "Merged multiple entries for T1078 into a single entry covering all behaviors.",
+      "false_positives_removed": [],
+      "high_confidence": 2,
+      "low_confidence": 0,
+      "medium_confidence": 1,
+      "total_techniques": 3
+    }
+  },
+  "mitre_ttps": [
+    "T1078",
+    "T1203",
+    "T1041"
+  ],
+  "mitre_ttps_extraction_attempted": true,
+  "patch_availability": false,
+  "possible_motivations": [
+    "financial",
+    "espionage",
+    "sabotage"
+  ],
+  "primary_motivation": "financial",
+  "primary_regions_affected": [
+    "Global"
+  ],
+  "recommendations_and_mitigations": "Organizations can close the cloud security gap by understanding the cloud’s shared responsibility model, improving identity and access management (IAM) by following least privilege principles, creating secure configurations, and automating detection and response processes.",
+  "regional_context": "The global nature of cloud services means that incidents can have ripple effects across regions, impacting international businesses and supply chains.",
+  "secondary_motivations": [
+    "espionage",
+    "sabotage"
+  ],
+  "sectors": [],
+  "source_url": "https://www.paloaltonetworks.com/blog/2025/10/closing-the-cloud-security-gap/",
+  "stakeholder_interests": "Cloud service providers, businesses relying on cloud infrastructure, and governments are all stakeholders with vested interests in improving cloud security and mitigating risks.",
+  "strategic_implications": [
+    "The rise in cloud-related incidents indicates a shift in the cyber threat landscape, necessitating enhanced international cooperation on cybersecurity standards.",
+    "Organizations' reliance on cloud services may lead to increased scrutiny and regulation from governments, impacting the tech industry."
+  ],
+  "summary": "The 2025 Unit 42 Global Incident Response Report reveals that nearly a third of investigated incidents in 2024 were cloud-related, with attackers exploiting public data exposures and excessive permissions. Threat actors, including Bling Libra and Muddled Libra, are leveraging valid cloud accounts for initial access, privilege escalation, and persistence. To mitigate these risks, organizations should understand the shared responsibility model, enhance identity and access management, create secure configurations, and automate detection and response processes.",
+  "tension_level": "medium",
+  "threat_actors": [
+    "Bling Libra",
+    "Muddled Libra"
+  ],
+  "title": "Closing the Cloud Security Gap",
+  "underlying_causes": [
+    "The rapid adoption of cloud technologies has outpaced security measures, leading to vulnerabilities that threat actors exploit for financial gain.",
+    "Increased complexity in cloud environments creates opportunities for both state and non-state actors to engage in cyber operations."
+  ],
+  "url": "https://www.paloaltonetworks.com/blog/2025/10/closing-the-cloud-security-gap/",
+  "victims": [],
+  "zero_day_mention": false
+}

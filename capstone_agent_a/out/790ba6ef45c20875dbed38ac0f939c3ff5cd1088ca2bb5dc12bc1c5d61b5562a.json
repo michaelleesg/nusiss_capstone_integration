@@ -1,0 +1,260 @@
+{
+  "active_exploitation": false,
+  "active_exploitation_mentioned": true,
+  "affected_products": [
+    "Salesforce",
+    "Salesloft Drift"
+  ],
+  "affects_asean": false,
+  "affects_singapore": false,
+  "cve": {
+    "active_exploitation": false,
+    "highest_cvss": 0.0,
+    "highest_severity": "UNKNOWN",
+    "patch_availability": false,
+    "total_count": 0,
+    "vulnerabilities": []
+  },
+  "cve_extraction_attempted": true,
+  "cve_severity": [],
+  "cve_vulns": [],
+  "entities_extraction_attempted": true,
+  "escalation_potential": "While the immediate threat is primarily financial, the potential for escalation exists if state actors become involved or if critical infrastructure is targeted in future attacks.",
+  "geographic_analysis_attempted": true,
+  "geopolitical_analysis": {
+    "analysis_metadata": {
+      "confidence": "high",
+      "method": "llm_enhanced",
+      "reasoning": "The analysis is based on the detailed description of the threat actors' methods, the nature of the attacks, and the implications for organizations and governments. The motivations are clearly outlined through the extortion tactics employed, and the geopolitical context is informed by the current cybersecurity landscape and historical trends."
+    },
+    "escalation_potential": "While the immediate threat is primarily financial, the potential for escalation exists if state actors become involved or if critical infrastructure is targeted in future attacks.",
+    "escalation_risk": "medium",
+    "historical_precedents": "Previous incidents of data breaches and extortion campaigns have shown that cybercriminals often evolve their tactics, leading to increased scrutiny and regulatory responses from governments.",
+    "regional_context": "The current cybersecurity landscape is characterized by a growing number of sophisticated cybercriminal groups, with organizations in various regions facing threats that can disrupt operations and compromise sensitive data.",
+    "stakeholder_interests": "Organizations are primarily focused on protecting their data and maintaining customer trust, while governments are interested in safeguarding national security and economic stability.",
+    "strategic_implications": [
+      "Increased awareness and preparedness among organizations may lead to enhanced cybersecurity measures, impacting the operational capabilities of cybercriminals.",
+      "The incidents highlight the need for international cooperation in cybersecurity, as threats can cross borders and affect multiple nations."
+    ],
+    "underlying_causes": [
+      "The rise of cybercriminal groups exploiting vulnerabilities in widely used platforms like Salesforce reflects the increasing sophistication of cyber threats in a digital economy.",
+      "The competitive landscape of data-driven businesses creates incentives for cybercriminals to target organizations for financial gain."
+    ]
+  },
+  "global_implications": true,
+  "high_tension_event": false,
+  "iocs": {
+    "commands": [],
+    "domains": [],
+    "email_addresses": [],
+    "excluded": {
+      "commands": [],
+      "domains": [
+        {
+          "ioc": "salesforce.com",
+          "reason": "legitimate domain belonging to a reputable service"
+        },
+        {
+          "ioc": "fbi.gov",
+          "reason": "domain belongs to the reporting organization"
+        }
+      ],
+      "email_addresses": [],
+      "file_paths": [],
+      "hashes": [],
+      "ips": [],
+      "processes": [],
+      "registry_keys": [],
+      "urls": [
+        {
+          "ioc": "https://login.salesforce.com/setup/connect",
+          "reason": "legitimate domain used for a legitimate service"
+        }
+      ]
+    },
+    "file_paths": [],
+    "hashes": [],
+    "ips": [
+      "68.235.43.202",
+      "146.70.189.111",
+      "34.86.51.128",
+      "23.94.126.63",
+      "185.141.119.136",
+      "206.217.206.64",
+      "38.22.104.226",
+      "151.242.41.182",
+      "68.235.46.22",
+      "69.246.124.204",
+      "185.209.199.56",
+      "185.141.119.168",
+      "185.220.101.143",
+      "185.220.101.167",
+      "185.220.101.33",
+      "96.44.191.157",
+      "91.199.42.164",
+      "185.220.101.133",
+      "87.120.112.134",
+      "146.70.211.183",
+      "146.70.189.47",
+      "195.54.130.100",
+      "104.223.118.62",
+      "198.54.130.108",
+      "37.19.221.179",
+      "208.131.130.53",
+      "206.217.206.84",
+      "185.141.119.184",
+      "196.251.83.162",
+      "64.95.84.159",
+      "194.15.36.117",
+      "146.70.173.60",
+      "185.141.119.151",
+      "205.234.181.14",
+      "208.131.130.91",
+      "192.198.82.235",
+      "192.42.116.20",
+      "198.44.129.88",
+      "206.217.206.14",
+      "179.43.159.198",
+      "79.127.217.44",
+      "206.217.206.104",
+      "67.217.228.216",
+      "68.63.167.122",
+      "149.22.81.201",
+      "185.141.119.138",
+      "198.44.129.56",
+      "68.235.46.151",
+      "64.94.84.78",
+      "208.131.130.71",
+      "83.147.52.41",
+      "104.193.135.221",
+      "23.145.40.165",
+      "37.19.200.167",
+      "185.220.101.180",
+      "66.63.167.122",
+      "68.235.46.208",
+      "154.41.95.2",
+      "37.19.200.141",
+      "185.220.101.164",
+      "198.244.224.200",
+      "51.89.240.10",
+      "151.242.58.76",
+      "23.234.69.167",
+      "146.70.185.47",
+      "185.141.119.185",
+      "146.70.211.55",
+      "147.161.173.90",
+      "146.70.165.47",
+      "206.217.206.25",
+      "146.70.211.119",
+      "146.70.168.239",
+      "195.47.238.83",
+      "146.70.198.112",
+      "198.54.130.100",
+      "44.215.108.109",
+      "35.186.181.1",
+      "176.65.149.100",
+      "68.235.46.202",
+      "37.19.200.132",
+      "94.156.167.237",
+      "185.130.47.58",
+      "163.5.149.152",
+      "185.141.119.166",
+      "191.96.207.201",
+      "31.58.169.96",
+      "185.207.107.130",
+      "206.217.206.26",
+      "141.98.252.189",
+      "206.217.206.124",
+      "37.19.200.154",
+      "31.58.169.85",
+      "31.58.169.92",
+      "185.141.119.181",
+      "72.5.42.72",
+      "192.42.116.179",
+      "23.162.8.66",
+      "208.68.36.90",
+      "198.54.133.123",
+      "45.83.220.206",
+      "185.220.101.185",
+      "96.44.191.141",
+      "64.95.11.225",
+      "195.47.238.178",
+      "185.220.101.169",
+      "96.44.189.109"
+    ],
+    "processes": [],
+    "registry_keys": [],
+    "urls": [
+      "http://64.95.11.112/hello.php",
+      "https://91.199.42.164/login"
+    ]
+  },
+  "iocs_extraction_attempted": true,
+  "malware": [],
+  "markdown": "",
+  "mitre_analysis": {
+    "attack_pattern": "The attack pattern demonstrates a coherent sequence where UNC6040 utilizes vishing for initial access, followed by credential harvesting through phishing panels, and subsequently exfiltrating data via API queries. The extortion phase indicates a clear impact following the data breach, aligning with the observed behaviors of the threat actors.",
+    "confidence": 4,
+    "method": "enhanced_3step",
+    "processing_strategy": "full",
+    "step1_behaviors": 6,
+    "step2_behavioral": 6,
+    "step2_explicit": 0,
+    "step3_final": 4,
+    "validation_summary": {
+      "deduplication_actions": "Removed duplicate T1071.001 entries, keeping the highest confidence entry.",
+      "false_positives_removed": [],
+      "high_confidence": 3,
+      "low_confidence": 0,
+      "medium_confidence": 1,
+      "total_techniques": 4
+    }
+  },
+  "mitre_ttps": [
+    "T1566.001",
+    "T1071.001",
+    "T1041",
+    "T1486"
+  ],
+  "mitre_ttps_extraction_attempted": true,
+  "patch_availability": false,
+  "possible_motivations": [
+    "extortion",
+    "financial",
+    "espionage"
+  ],
+  "primary_motivation": "extortion",
+  "primary_regions_affected": [
+    "North America",
+    "Europe",
+    "Asia-Pacific"
+  ],
+  "recommendations_and_mitigations": "Train call center employees to recognize and report phishing attempts. Require phishing-resistant multi-factor authentication (MFA) for as many services as possible. Implement authentication, authorization, and accounting (AAA) systems to limit actions users can perform. Apply the Principle of Least Privilege to user accounts and groups. Enforce IP-based access restrictions and monitor API usage for unusual behavior. Monitor network logs for anomalous activity and review third-party integrations.",
+  "regional_context": "The current cybersecurity landscape is characterized by a growing number of sophisticated cybercriminal groups, with organizations in various regions facing threats that can disrupt operations and compromise sensitive data.",
+  "secondary_motivations": [
+    "financial",
+    "espionage"
+  ],
+  "sectors": [],
+  "source_url": "https://www.ic3.gov/CSA/2025/250912.pdf",
+  "stakeholder_interests": "Organizations are primarily focused on protecting their data and maintaining customer trust, while governments are interested in safeguarding national security and economic stability.",
+  "strategic_implications": [
+    "Increased awareness and preparedness among organizations may lead to enhanced cybersecurity measures, impacting the operational capabilities of cybercriminals.",
+    "The incidents highlight the need for international cooperation in cybersecurity, as threats can cross borders and affect multiple nations."
+  ],
+  "summary": "The FBI has issued a warning regarding two cyber criminal groups, UNC6040 and UNC6395, who are actively exploiting Salesforce platforms for data theft and extortion. UNC6040 uses social engineering tactics, particularly voice phishing, to gain access to Salesforce accounts, while UNC6395 exploits compromised OAuth tokens from third-party applications. Both groups have been observed exfiltrating sensitive data and subsequently extorting victims. Organizations are urged to implement robust security measures to mitigate these threats.",
+  "tension_level": "medium",
+  "threat_actors": [
+    "UNC6040",
+    "UNC6395",
+    "ShinyHunters"
+  ],
+  "title": "Cyber Criminal Groups UNC6040 and UNC6395 Targeting Salesforce for Data Theft and Extortion",
+  "underlying_causes": [
+    "The rise of cybercriminal groups exploiting vulnerabilities in widely used platforms like Salesforce reflects the increasing sophistication of cyber threats in a digital economy.",
+    "The competitive landscape of data-driven businesses creates incentives for cybercriminals to target organizations for financial gain."
+  ],
+  "url": "https://www.ic3.gov/CSA/2025/250912.pdf",
+  "victims": [],
+  "zero_day_mention": false
+}

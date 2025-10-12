@@ -1,0 +1,125 @@
+{
+  "active_exploitation": false,
+  "active_exploitation_mentioned": false,
+  "affected_products": [
+    "OpenSSL 3.5.4"
+  ],
+  "affects_asean": false,
+  "affects_singapore": false,
+  "cve": {
+    "active_exploitation": false,
+    "highest_cvss": 0.0,
+    "highest_severity": "UNKNOWN",
+    "patch_availability": false,
+    "total_count": 0,
+    "vulnerabilities": []
+  },
+  "cve_extraction_attempted": true,
+  "cve_severity": [],
+  "cve_vulns": [],
+  "entities_extraction_attempted": true,
+  "escalation_potential": "The risk of conflict escalation is low as this development is primarily technical and regulatory rather than politically charged.",
+  "geographic_analysis_attempted": true,
+  "geopolitical_analysis": {
+    "analysis_metadata": {
+      "confidence": "medium",
+      "method": "llm_enhanced",
+      "reasoning": "The analysis is based on the content's focus on cryptographic validation and its implications for security standards, with a clear emphasis on the U.S. context and global relevance. The motivations are inferred from the nature of the submission and the sectors affected."
+    },
+    "escalation_potential": "The risk of conflict escalation is low as this development is primarily technical and regulatory rather than politically charged.",
+    "escalation_risk": "low",
+    "historical_precedents": "Previous instances of cryptographic standard updates have led to shifts in compliance and security practices without significant geopolitical fallout.",
+    "regional_context": "The U.S. remains a leader in cybersecurity and cryptographic standards, impacting global practices and compliance requirements.",
+    "stakeholder_interests": "Governments and organizations globally are interested in adopting validated cryptographic solutions to enhance security against cyber threats, particularly in light of potential quantum computing vulnerabilities.",
+    "strategic_implications": [
+      "The validation of OpenSSL 3.5.4 under FIPS 140-3 standards enhances the security posture of government and defense sectors, potentially influencing global cybersecurity standards."
+    ],
+    "underlying_causes": [
+      "The increasing need for secure cryptographic solutions in response to evolving cyber threats and the advent of quantum computing."
+    ]
+  },
+  "global_implications": true,
+  "high_tension_event": false,
+  "iocs": {
+    "commands": [],
+    "domains": [],
+    "email_addresses": [],
+    "excluded": {
+      "commands": [],
+      "domains": [],
+      "email_addresses": [],
+      "file_paths": [],
+      "hashes": [],
+      "ips": [],
+      "processes": [],
+      "registry_keys": [],
+      "urls": []
+    },
+    "file_paths": [],
+    "hashes": [],
+    "ips": [],
+    "processes": [],
+    "registry_keys": [],
+    "urls": []
+  },
+  "iocs_extraction_attempted": true,
+  "malware": [],
+  "markdown": "# Lightship Security and OpenSSL Corporation Submit OpenSSL 3.5.4 for FIPS 140-3 Validation\n\n**Date:** October 9, 2025  \n**Location:** Newark, United States\n\nLightship Security, an Applus+ Laboratories company and accredited cryptographic security test laboratory, and the OpenSSL Corporation, the co-maintainer of the OpenSSL Library, announce the submission of OpenSSL version 3.5.4 to the Cryptographic Module Validation Program (CMVP) for FIPS 140-3 validation.\n\nThis submission confirms that the code is complete and that all included algorithms have successfully passed NIST testing and independent laboratory review. The final CMVP review and certificate issuance remain as the last step in the process.\n\nThis submission marks a significant milestone in the ongoing collaboration between Lightship Security and the OpenSSL Corporation to provide validated cryptographic solutions that meet modern security and compliance requirements. The OpenSSL 3.5.4 FIPS Object Module provides an open-source, standards-compliant cryptographic module aligned with the FIPS 140-3 standard, enabling organizations across government and industry to deploy secure and compliant solutions once the validation certification is issued.\n\n## Key Features of OpenSSL 3.5.4\n\n- **Post-Quantum Cryptographic (PQC) Algorithms:** Introduced support for PQC algorithms, including ML-KEM, ML-DSA, and SLH-DSA, consistent with NIST’s PQC standardization.\n- **FIPS-140 Validated Module:** This submission is the first step toward a FIPS-140 validated PQC-ready module, supporting organizations preparing for quantum-resistant cryptographic deployments.\n\n## Statements from Leadership\n\n**Jason Lawlor, President of Lightship Security:**\n> “The submission of OpenSSL 3.5.4 to the CMVP marks an important step in sustaining validated, standards-based cryptography within one of the world’s most widely used open-source libraries—foundational to internet infrastructure, embedded systems, and enterprise applications. Lightship Security is proud to continue supporting OpenSSL’s FIPS 140-3 validation efforts to meet both current and emerging compliance requirements for global users.”\n\n**Tim Hudson, President of the OpenSSL Corporation:**\n> “OpenSSL 3.5.4 is not just a step toward future validation. It represents a completed, tested, and ready module that brings real value today. The final certificate will formalize what is already true: OpenSSL 3.5.4 meets the requirements of FIPS 140-3 while introducing post-quantum readiness for the years ahead.”\n\n## Background\n\nThis effort continues the history of the OpenSSL Library FIPS 140 validated modules that are widely deployed across government, defense, and commercial systems to support secure and compliant operations.\n\n## About The OpenSSL Corporation\n\nThe OpenSSL Corporation is a global leader in cryptographic solutions, specializing in developing and maintaining the OpenSSL Library – an essential tool for secure digital communications. The OpenSSL Corporation provides a range of services tailored to assist businesses of all sizes to ensure the secure and efficient implementation of OpenSSL solutions.",
+  "mitre_analysis": {
+    "attack_pattern": "The original content does not describe any attack scenarios or techniques related to MITRE ATT&CK. It focuses on the submission of OpenSSL 3.5.4 for FIPS 140-3 validation, which is not relevant to attack techniques.",
+    "confidence": 0,
+    "method": "enhanced_3step",
+    "processing_strategy": "full",
+    "step1_behaviors": 0,
+    "step2_behavioral": 0,
+    "step2_explicit": 0,
+    "step3_final": 0,
+    "validation_summary": {
+      "deduplication_actions": "No techniques to deduplicate as none were identified.",
+      "false_positives_removed": [],
+      "high_confidence": 0,
+      "low_confidence": 0,
+      "medium_confidence": 0,
+      "total_techniques": 0
+    }
+  },
+  "mitre_ttps": [],
+  "mitre_ttps_extraction_attempted": true,
+  "patch_availability": false,
+  "possible_motivations": [
+    "financial",
+    "espionage",
+    "sabotage"
+  ],
+  "primary_motivation": "financial",
+  "primary_regions_affected": [
+    "North America",
+    "Global"
+  ],
+  "recommendations_and_mitigations": "",
+  "regional_context": "The U.S. remains a leader in cybersecurity and cryptographic standards, impacting global practices and compliance requirements.",
+  "secondary_motivations": [
+    "espionage",
+    "sabotage"
+  ],
+  "sectors": [
+    "Government",
+    "Defense",
+    "Commercial"
+  ],
+  "source_url": "https://hackread.com/lightship-security-and-the-openssl-corporation-submit-openssl-3-5-4-for-fips-140-3-validation/",
+  "stakeholder_interests": "Governments and organizations globally are interested in adopting validated cryptographic solutions to enhance security against cyber threats, particularly in light of potential quantum computing vulnerabilities.",
+  "strategic_implications": [
+    "The validation of OpenSSL 3.5.4 under FIPS 140-3 standards enhances the security posture of government and defense sectors, potentially influencing global cybersecurity standards."
+  ],
+  "summary": "Lightship Security and the OpenSSL Corporation have submitted OpenSSL version 3.5.4 for FIPS 140-3 validation, marking a significant milestone in providing validated cryptographic solutions. This version introduces support for post-quantum cryptographic algorithms and aims to meet modern security and compliance requirements. The final certification will confirm its compliance with FIPS 140-3, enabling secure deployments across various sectors.",
+  "tension_level": "low",
+  "threat_actors": [],
+  "title": "Lightship Security and the OpenSSL Corporation Submit OpenSSL 3.5.4 for FIPS 140-3 Validation",
+  "underlying_causes": [
+    "The increasing need for secure cryptographic solutions in response to evolving cyber threats and the advent of quantum computing."
+  ],
+  "url": "https://hackread.com/lightship-security-and-the-openssl-corporation-submit-openssl-3-5-4-for-fips-140-3-validation/",
+  "victims": [],
+  "zero_day_mention": false
+}

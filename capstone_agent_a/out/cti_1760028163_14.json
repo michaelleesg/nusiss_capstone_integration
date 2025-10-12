@@ -1,0 +1,131 @@
+{
+  "active_exploitation": false,
+  "active_exploitation_mentioned": false,
+  "affected_products": [
+    "Zendesk"
+  ],
+  "affects_asean": false,
+  "affects_singapore": false,
+  "cve": {
+    "active_exploitation": false,
+    "highest_cvss": 0.0,
+    "highest_severity": "UNKNOWN",
+    "patch_availability": false,
+    "total_count": 0,
+    "vulnerabilities": []
+  },
+  "cve_extraction_attempted": true,
+  "cve_severity": [],
+  "cve_vulns": [],
+  "entities_extraction_attempted": true,
+  "escalation_potential": "The risk of escalation is moderate, as the incident could lead to further attacks on similar platforms or provoke retaliatory actions from affected entities.",
+  "geographic_analysis_attempted": true,
+  "geopolitical_analysis": {
+    "analysis_metadata": {
+      "confidence": "medium",
+      "method": "llm_enhanced",
+      "reasoning": "The analysis is based on the nature of the breach, the motivations of the threat actors, and the implications for user trust and regulatory environments. The assessment considers the global nature of the platforms involved and the potential for similar incidents to affect users worldwide."
+    },
+    "escalation_potential": "The risk of escalation is moderate, as the incident could lead to further attacks on similar platforms or provoke retaliatory actions from affected entities.",
+    "escalation_risk": "medium",
+    "historical_precedents": "Similar incidents have occurred in the past, where third-party breaches have led to significant data exposure and extortion attempts, highlighting systemic vulnerabilities.",
+    "regional_context": "The incident reflects broader trends in cybersecurity threats faced by digital platforms globally, with implications for user privacy and data security.",
+    "stakeholder_interests": "Stakeholders include Discord, affected users, third-party vendors like Zendesk, regulatory bodies, and law enforcement agencies, all of whom have vested interests in data security and user privacy.",
+    "strategic_implications": [
+      "Potential erosion of user trust in digital platforms, impacting user engagement and business operations.",
+      "Increased scrutiny and regulatory pressure on data protection practices across the tech industry."
+    ],
+    "underlying_causes": [
+      "Increased reliance on third-party vendors for customer support and services, leading to vulnerabilities.",
+      "Growing trend of cyber extortion and data breaches targeting organizations with sensitive user data."
+    ]
+  },
+  "global_implications": true,
+  "high_tension_event": false,
+  "iocs": {
+    "commands": [],
+    "domains": [],
+    "email_addresses": [],
+    "excluded": {
+      "commands": [],
+      "domains": [],
+      "email_addresses": [],
+      "file_paths": [],
+      "hashes": [],
+      "ips": [],
+      "processes": [],
+      "registry_keys": [],
+      "urls": []
+    },
+    "file_paths": [],
+    "hashes": [],
+    "ips": [],
+    "processes": [],
+    "registry_keys": [],
+    "urls": []
+  },
+  "iocs_extraction_attempted": true,
+  "malware": [],
+  "markdown": "# Discord Confirms 70,000 Government IDs Exposed in Third-Party Breach\n\n**Posted on:** October 9, 2025  \n**Author:** Dissent\n\nDiscord is facing a significant extortion attempt following a breach of one of its third-party customer service providers, resulting in the exposure of sensitive user data, including government identification photos used for age verification. \n\n## Incident Overview\n\nThreat actors claim to have exfiltrated **1.5 terabytes** of sensitive information, including over **2.1 million** government-issued identification photos. However, Discord disputes these figures, stating that approximately **70,000 users** had their ID photos exposed during the incident on **September 20, 2025**. The breach did not directly target Discord’s infrastructure but compromised customer support systems managed by **Zendesk**, a third-party vendor.\n\n## Discord's Statement (Updated October 8, 2025)\n\n### TL;DR:\nDiscord discovered an incident where an unauthorized party compromised one of its third-party vendors. This was not a breach of Discord itself but rather a third-party service used for customer support. The incident impacted a limited number of users who had communicated with Discord's Customer Support or Trust & Safety teams.\n\n### Key Details:\n- **Impacted Users:** Approximately **70,000** users may have had government-ID photos exposed.\n- **Data Accessed:**\n  - Name, Discord username, email, and other contact details provided to Discord customer support.\n  - Limited billing information (payment type, last four digits of credit card, purchase history).\n  - IP addresses.\n  - Messages with customer service agents.\n  - Limited corporate data (training materials, internal presentations).\n  - A small number of government-ID images.\n\n### Data Not Involved:\n- Full credit card numbers or CCV codes.\n- Messages or activity on Discord beyond discussions with customer support.\n- Passwords or authentication data.\n\n## Response Actions\n\nDiscord has taken the following steps in response to the incident:\n- Revoked the customer support provider’s access to the ticketing system.\n- Launched an internal investigation.\n- Engaged a leading computer forensics firm to support investigation and remediation efforts.\n- Collaborated with law enforcement to investigate the attack.\n- Notified relevant data protection authorities.\n\n### Recommendations for Users\nImpacted users are advised to stay alert for suspicious communications. Discord has service agents available to answer questions and provide additional support.\n\n## Conclusion\nDiscord emphasizes its commitment to user privacy and security, stating that it is taking all appropriate steps to address the situation and prevent future incidents.",
+  "mitre_analysis": {
+    "attack_pattern": "The attack pattern indicates a sophisticated compromise of a third-party vendor leading to significant data exposure and subsequent extortion attempts. The techniques form a coherent chain from initial access through data collection and exfiltration, culminating in an impact phase characterized by extortion.",
+    "confidence": 4,
+    "method": "enhanced_3step",
+    "processing_strategy": "full",
+    "step1_behaviors": 4,
+    "step2_behavioral": 4,
+    "step2_explicit": 0,
+    "step3_final": 4,
+    "validation_summary": {
+      "deduplication_actions": "No duplicates found; all techniques are unique.",
+      "false_positives_removed": [],
+      "high_confidence": 3,
+      "low_confidence": 0,
+      "medium_confidence": 1,
+      "total_techniques": 4
+    }
+  },
+  "mitre_ttps": [
+    "T1071.001",
+    "T1041",
+    "T1005",
+    "T1491"
+  ],
+  "mitre_ttps_extraction_attempted": true,
+  "patch_availability": false,
+  "possible_motivations": [
+    "extortion",
+    "financial"
+  ],
+  "primary_motivation": "extortion",
+  "primary_regions_affected": [
+    "North America",
+    "Europe",
+    "Asia-Pacific"
+  ],
+  "recommendations_and_mitigations": "Impacted users are advised to stay alert for suspicious communications.",
+  "regional_context": "The incident reflects broader trends in cybersecurity threats faced by digital platforms globally, with implications for user privacy and data security.",
+  "secondary_motivations": [
+    "financial"
+  ],
+  "sectors": [],
+  "source_url": "https://databreaches.net/2025/10/09/discord-confirms-70000-government-ids-exposed-in-third-party-breach/?pk_campaign=feed&pk_kwd=discord-confirms-70000-government-ids-exposed-in-third-party-breach",
+  "stakeholder_interests": "Stakeholders include Discord, affected users, third-party vendors like Zendesk, regulatory bodies, and law enforcement agencies, all of whom have vested interests in data security and user privacy.",
+  "strategic_implications": [
+    "Potential erosion of user trust in digital platforms, impacting user engagement and business operations.",
+    "Increased scrutiny and regulatory pressure on data protection practices across the tech industry."
+  ],
+  "summary": "Discord has confirmed that approximately 70,000 users had their government identification photos exposed due to a breach of a third-party customer service provider, Zendesk. The incident, which occurred on September 20, 2025, involved unauthorized access to sensitive user data, including names, emails, and limited billing information. Discord has since revoked the vendor's access, initiated an internal investigation, and is collaborating with law enforcement. Users are advised to remain vigilant for suspicious communications.",
+  "tension_level": "medium",
+  "threat_actors": [],
+  "title": "Discord Confirms 70,000 Government IDs Exposed in Third-Party Breach – DataBreaches.Net",
+  "underlying_causes": [
+    "Increased reliance on third-party vendors for customer support and services, leading to vulnerabilities.",
+    "Growing trend of cyber extortion and data breaches targeting organizations with sensitive user data."
+  ],
+  "url": "https://databreaches.net/2025/10/09/discord-confirms-70000-government-ids-exposed-in-third-party-breach/?pk_campaign=feed&pk_kwd=discord-confirms-70000-government-ids-exposed-in-third-party-breach",
+  "victims": [
+    "Discord"
+  ],
+  "zero_day_mention": false
+}

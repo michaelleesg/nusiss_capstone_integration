@@ -1,0 +1,111 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-cti"
+version = "0.1.0"
+description = "Agentic CTI URL→JSON pipeline with LangGraph + MCP"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # Core orchestration
+    "langgraph>=0.0.69",
+    "langchain>=0.2.0",
+    "langchain-core>=0.2.0",
+    "langchain-openai>=0.1.0",
+
+    # Data models and validation
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+
+    # Database
+    "sqlalchemy>=2.0.0",
+    "sqlite-fts4",
+
+    # HTTP and parsing
+    "httpx>=0.25.0",
+    "requests>=2.31.0",
+    "feedparser>=6.0.10",
+    "readability-lxml>=0.8.1",
+    "trafilatura>=1.6.0",
+    "pymupdf>=1.23.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=4.9.0",
+
+    # Security/CTI specific
+    "stix2>=3.0.0",
+    "stix2-validator>=3.2.0",
+    "iocextract>=1.16.1",
+    "pymisp>=2.4.0",
+    "nvdlib>=0.7.0",
+    "guardrails-ai>=0.4.0",
+    "pathvalidate>=3.0.0",
+
+    # NLP and text processing
+    "spacy>=3.7.0",
+    "transformers>=4.30.0",
+    "torch>=2.0.0",
+
+    # Utilities
+    "click>=8.1.0",
+    "python-dotenv>=1.0.0",
+    "boto3>=1.28.0",
+    "jsonschema>=4.19.0",
+    "python-magic>=0.4.27",
+    "chardet>=5.2.0",
+    "tldextract>=5.0.0",
+    "validators>=0.22.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "mypy>=1.5.0",
+    "ruff>=0.0.290",
+    "black>=23.7.0",
+    "types-requests>=2.31.0",
+    "types-beautifulsoup4>=4.12.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "PT"]
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "mcp: marks tests as requiring MCP server",
+    "integration: marks tests as integration tests",
+    "slow: marks tests as slow running",
+]
