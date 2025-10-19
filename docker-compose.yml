@@ -22,7 +22,7 @@ services:
         for i in $$(seq 1 120); do
           if curl -fsS "$$QURL/readyz" >/dev/null; then
             echo "Qdrant ready";
-            exec /opt/venv/bin/uvicorn 3_search_api_rich:app --host 0.0.0.0 --port 8000;
+            exec /opt/venv/bin/uvicorn search_api_rich:app --host 0.0.0.0 --port 8000;
           fi
           echo "[ $$i ] waiting...";
           sleep 5;
