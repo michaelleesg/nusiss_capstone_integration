@@ -7,7 +7,7 @@ AIDER_MODEL="${AIDER_MODEL:-gpt-4o-mini}"
 AIDER_BIN="${AIDER_BIN:-aider}"
 COMMIT_MSG_PREFIX="${COMMIT_MSG_PREFIX:-heva: auto-iteration}"
 PROMPT_FILE="${PROMPT_FILE:-.aider_iter_prompt.txt}"
-FILES_TO_ADD="${FILES_TO_ADD:-agentB_heva.py 3_search_api_rich.py}"
+FILES_TO_ADD="${FILES_TO_ADD:-agentB_heva.py search_api_rich.py}"
 # ==============
 
 # 1) restart app so tests run against fresh server
