@@ -1,14 +1,13 @@
-from fastapi import FastAPI, Query
-from pydantic import BaseModel
-from typing import List
-from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import SearchRequest
-from fastapi.responses import JSONResponse
 import logging
-import httpx
-import time
 import os
+from typing import List
+
+from fastapi import FastAPI, Query
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from qdrant_client import QdrantClient
+from sentence_transformers import SentenceTransformer
+
 from api.qdrant_client import QdrantWrapper
 
 # === Config ===
@@ -60,9 +59,7 @@ try:
     info = client.get_collection(COLLECTION_NAME)
     qdrant_dim = info.model_dump()["config"]["params"]["vectors"]["size"]
     if qdrant_dim != embedding_size:
-        raise ValueError(
-            f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}"
-        )
+        raise ValueError(f"❌ Dimension mismatch: Qdrant={qdrant_dim} vs Model={embedding_size}")
     logger.info(f"✅ Vector size matches: {qdrant_dim}")
 except Exception as e:
     logger.error(f"❌ Could not verify vector dimensions: {e}")
@@ -84,9 +81,7 @@ class SearchResponse(BaseModel):
 
 # === /search Endpoint ===
 @app.get("/search", response_model=SearchResponse)
-def search(
-    query: str = Query(..., description="Search sentence or phrase"), limit: int = TOP_K
-):
+def search(query: str = Query(..., description="Search sentence or phrase"), limit: int = TOP_K):
     try:
         vector = model.encode(query).tolist()
         search_result = client.search(
