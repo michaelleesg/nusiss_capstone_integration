@@ -25,9 +25,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ----- App files -----
-COPY 3_search_api_rich.py /app/3_search_api_rich.py
+COPY search_api_rich.py /app/search_api_rich.py
 COPY api/qdrant_client.py /app/api/qdrant_client.py
 
 # Default to API server
 EXPOSE 8000
-CMD ["uvicorn", "3_search_api_rich:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "search_api_rich:app", "--host", "0.0.0.0", "--port", "8000"]
