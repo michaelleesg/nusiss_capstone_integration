@@ -91,3 +91,10 @@ lands.csv
 nohup.out
 
 agent_b/.venv/
+
+.aider*
+*.history*
+.env
+*.env
+.env.*
+**/.ipynb_checkpoints/
