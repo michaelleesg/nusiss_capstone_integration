@@ -98,3 +98,4 @@ agent_b/.venv/
 *.env
 .env.*
 **/.ipynb_checkpoints/
+.aider.tags.cache.v4/
