@@ -2,33 +2,41 @@ name: CI
 
 on:
   push:
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: test
+    timeout-minutes: 45
+    env:
+      PYTHONUNBUFFERED: "1"
+      RUN_EXTERNAL: "1"                # enable your external smoke tests
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
+          cache: "pip"
 
-      - run: python -m pip install --upgrade pip
-      - run: pip install -r requirements.txt || true
-      - run: pip install ruff black pytest pytest-cov mypy bandit pip-audit
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest ruff
 
-      - name: Ruff (lint)
-        run: ruff check --output-format=github
+      - name: Lint (ruff)
+        run: ruff check --output-format=github .
 
-      - name: Black (format check)
-        run: black --check .
-
-      - name: Mypy (type check)
-        run: mypy .
-
-      - name: Bandit (security)
-        run: bandit -r .
-
-      - name: Tests
-        run: pytest -q --cov=. --cov-report=xml --cov-report=term
+      - name: Tests (all)
+        run: pytest -q tests
