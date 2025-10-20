@@ -2,7 +2,8 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     container_name: qdrant
-    ports: ["6333:6333"]
+    ports:
+      - "6333:6333"
     volumes:
       - qdrant_storage:/qdrant/storage
 
@@ -12,24 +13,27 @@ services:
       dockerfile: Dockerfile
     container_name: cyberner-api
     environment:
-      - QDRANT_URL=http://qdrant:6333
-      - QDRANT_COLLECTION=heva_docs
-    ports: ["8000:8000"]
-    command: >
-      sh -lc '
-        QURL=$${QDRANT_URL:-http://qdrant:6333};
-        echo "Waiting for $$QURL/readyz";
-        for i in $$(seq 1 120); do
-          if curl -fsS "$$QURL/readyz" >/dev/null; then
-            echo "Qdrant ready";
-            exec /opt/venv/bin/uvicorn api.search_api_rich:app --host 0.0.0.0 --port 8000;
-          fi
-          echo "[ $$i ] waiting...";
-          sleep 5;
-        done;
-        echo "Qdrant not ready in time";
-        exit 1
-      '
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: heva_docs
+    depends_on:
+      - qdrant
+    ports:
+      - "8000:8000"
+    command:
+      - /bin/sh
+      - -lc
+      - |
+          QURL="$${QDRANT_URL:-http://qdrant:6333}"
+          echo "Waiting for $$QURL/readyz"
+          for i in $$(seq 1 120); do
+            if curl -fsS "$$QURL/readyz" >/dev/null; then
+              echo "Qdrant ready"
+              exec /opt/venv/bin/uvicorn api.search_api_rich:app --host 0.0.0.0 --port 8000
+            fi
+            echo "[ $$i ] waiting..."
+            sleep 2
+          done
+          echo "Qdrant not ready in time"; exit 1
     restart: unless-stopped
 
 volumes:
