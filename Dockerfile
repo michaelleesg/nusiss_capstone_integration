@@ -25,7 +25,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ----- App files -----
-COPY search_api_rich.py /app/search_api_rich.py
+COPY api/search_api_rich.py /app/api/search_api_rich.py
 COPY api/qdrant_client.py /app/api/qdrant_client.py
 
 # Default to API server
