@@ -6,3 +6,5 @@ httpx
 pytest
 ruff
 sentence-transformers
+
+uvicorn[standard]>=0.29
