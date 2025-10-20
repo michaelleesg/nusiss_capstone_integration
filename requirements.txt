@@ -5,7 +5,6 @@ pydantic>=2
 httpx
 pytest
 ruff
-<<<<<<< HEAD
 sentence-transformers
-=======
->>>>>>> d62ee72 (feat: refactor and scaffold Agent B (HEVA) with FastAPI and Qdrant integration)
+
+uvicorn[standard]>=0.29

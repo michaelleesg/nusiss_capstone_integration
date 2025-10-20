@@ -35,12 +35,12 @@ logger = logging.getLogger("uvicorn.error")
 
 
 # === Health/Version/Root ===
-@app.get("/health")
+@app.get("/health", summary="Health")
 def health():
     return {"ok": True}
 
 
-@app.get("/version")
+@app.get("/version", summary="Version")
 def version():
     return {
         "name": "agent-b-heva",
@@ -50,7 +50,7 @@ def version():
     }
 
 
-@app.get("/")
+@app.get("/", summary="Root")
 def root():
     return {
         "message": "🧠 CyberNER Semantic Search is up",
@@ -88,7 +88,7 @@ else:
     logger.info("⏭️ HEVA_SKIP_QDRANT=1 -> skipping Qdrant init for tests.")
 
 
-# === Schemas (align with your current OpenAPI) ===
+# === Schemas (align with OpenAPI) ===
 class SearchResult(BaseModel):
     text: str
     tokens: List[str] = []
@@ -176,14 +176,12 @@ def normalize_point_id(raw_id):
     - uuid-like string -> str(UUID)
     - anything else -> str(UUIDv5) derived from the string (stable)
     """
-    # int or digit-string -> int
     if isinstance(raw_id, int) or (isinstance(raw_id, str) and raw_id.isdigit()):
         i = int(raw_id)
         if i < 0:
             raise ValueError("Point ID must be an unsigned integer")
         return i
 
-    # uuid-like string -> str(UUID), else derive stable UUIDv5
     s = str(raw_id)
     try:
         u = UUID(s)
@@ -205,8 +203,7 @@ def ingest(items: List[IngestItem]):
         return {"ingested": 0, "collection": COLLECTION_NAME}
 
     if client is None:
-        # test mode: still encode to mirror workload
-        _ = model.encode([it.text for it in items])
+        _ = model.encode([it.text for it in items])  # warm model in test mode
         return {"ingested": len(items), "collection": COLLECTION_NAME, "skipped": True}
 
     try:
@@ -245,9 +242,9 @@ def search(
     if not term:
         raise HTTPException(status_code=400, detail="Missing search query ('query' or 'q')")
 
-    # In stub mode -> deterministic response
+    # In stub mode -> deterministic empty response
     if client is None:
-        _ = model.encode(term)  # warm model
+        _ = model.encode(term)  # warm model for parity
         return SearchResponse(query=term, results=[])
 
     # Build filter (AND of simple conditions)
@@ -330,7 +327,6 @@ def search(
     def ioc_present(payload: dict) -> bool:
         if not payload:
             return False
-        # Recognize common IOC-bearing fields or a tag that explicitly says IOC/CVE/etc.
         if any(payload.get(k) for k in ("cves", "ips", "domains", "hashes", "indicators")):
             return True
         tags_ = payload.get("tags") or []
