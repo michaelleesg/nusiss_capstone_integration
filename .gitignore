@@ -6,3 +6,26 @@ __pycache__/
 Thumbs.db
 .vscode/
 .idea/
+capstone_report/
+# Local noise / build outputs
+.aider.input.history
+.aider.tags.cache.v4/
+.aiderignore
+.uvicorn.log
+nohup.out
+qdrant_logs.log
+uvicorn_*.log
+
+# Data / models / storage
+qdrant_storage/
+ner_model/
+capstone_aws_data/
+
+# LaTeX build outputs
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+*.zip
