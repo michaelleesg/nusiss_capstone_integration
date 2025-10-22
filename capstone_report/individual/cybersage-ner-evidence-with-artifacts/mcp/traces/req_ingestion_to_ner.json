@@ -1,9 +1,0 @@
-{
-  "from": "IngestionAgent",
-  "to": "NERAgent",
-  "doc_id": "doc001",
-  "timestamp": "2025-10-02T09:00:00Z",
-  "payload": {
-    "text": "CVE-2025-12345 allows remote execution. APT29 targeted finance. The IP 8.8.8.8 was flagged. Domain: foo.example.com"
-  }
-}

@@ -1,2 +1,0 @@
-{"entity": "CVE-2025-12345","etype":"CVE","method":"regex","confidence":1.0}
-{"entity": "user@example.com","action":"mask","stored":"hash:5d4140","reason":"PII redaction"}
