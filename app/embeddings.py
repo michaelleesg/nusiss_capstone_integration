@@ -1,4 +1,3 @@
-
 # Remove the backticks
 from __future__ import annotations
 import math
@@ -10,10 +9,12 @@ DIM = 384  # default embedding size
 
 _TOKEN_RE = re.compile(r"[A-Za-z0-9_\-.:/#]+")
 
+
 def _tokens(text: str) -> Iterable[str]:
     for tok in _TOKEN_RE.findall(text.lower()):
         if tok:
             yield tok
+
 
 def feature_hash_embed(texts: List[str], dim: int = DIM) -> List[List[float]]:
     """
@@ -38,8 +39,10 @@ def feature_hash_embed(texts: List[str], dim: int = DIM) -> List[List[float]]:
         vecs.append(v)
     return vecs
 
+
 def embed_query(text: str, dim: int = DIM) -> List[float]:
     return feature_hash_embed([text], dim=dim)[0]
+
 
 def embed_chunks(chunks: List[str], dim: int = DIM) -> List[List[float]]:
     return feature_hash_embed(chunks, dim=dim)
