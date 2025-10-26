@@ -1,5 +1,15 @@
 
-```python
+# Remove the backticks
+from __future__ import annotations
+import math
+import re
+from typing import Iterable, List
+import hashlib
+
+DIM = 384  # default embedding size
+
+_TOKEN_RE = re.compile(r"[A-Za-z0-9_\-.:/#]+")
+
 def _tokens(text: str) -> Iterable[str]:
     for tok in _TOKEN_RE.findall(text.lower()):
         if tok:
