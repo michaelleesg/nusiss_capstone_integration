@@ -34,3 +34,6 @@ Article_Storage.Article_Collection_2025.json
 Paste-Ready Mega-Prompt for 13-Oct.txt
 dir_listing.txt
 latest_recommendations.txt
+
+# Ignore eval symlink
+eval_external/
