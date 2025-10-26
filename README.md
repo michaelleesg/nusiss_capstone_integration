@@ -345,3 +345,11 @@ lint:       ## lint
 ## License
 
 Insert your license (MIT/Apache‑2.0/Proprietary).
+
+---
+
+## TODO (post-rebase): Eval symlink & export instructions
+This section conflicted during rebase. Re-add the intended guidance here post-rebase.
+
+- Eval symlink: (add exact command/path you want)
+- Export instructions: (add your steps)
