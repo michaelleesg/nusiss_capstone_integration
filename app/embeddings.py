@@ -1,5 +1,5 @@
 
-````python
+```python
 def _tokens(text: str) -> Iterable[str]:
     for tok in _TOKEN_RE.findall(text.lower()):
         if tok:
