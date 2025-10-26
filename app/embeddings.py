@@ -1,4 +1,3 @@
-````
 
 ````python
 def _tokens(text: str) -> Iterable[str]:
