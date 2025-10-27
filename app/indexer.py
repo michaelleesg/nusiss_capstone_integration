@@ -128,7 +128,9 @@ def upsert_artifact(
             "chunk_length": chunk["chunk_metadata"]["length"],
         }
         raw_id = f'{artifact.get("artifact_id", filename or "doc")}:{ix}'
-        metadata["artifact_id"] = artifact.get("artifact_id")  # Include artifact_id for traceability
+        metadata["artifact_id"] = artifact.get(
+            "artifact_id"
+        )  # Include artifact_id for traceability
         pid = str(uuid.uuid5(uuid.NAMESPACE_URL, raw_id))  # Deterministic UUID
         points.append(PointStruct(id=pid, vector=vec, payload=metadata))
 
