@@ -102,6 +102,7 @@ def upsert_artifact(
           'has_structured_data': chunk['chunk_metadata']['has_structured_data'],
           'chunk_length': chunk['chunk_metadata']['length'],
           'artifact_id': artifact.get("artifact_id"),  # Include artifact_id for traceability
+          'artifact_id': artifact.get("artifact_id"),  # Include artifact_id for traceability
       }
     """
     text = artifact.get("text", "") or ""
