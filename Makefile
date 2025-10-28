@@ -13,8 +13,15 @@ security:
 	bandit -r .
 	pip-audit || true
 
+.PHONY: set-payload
 set-payload:
-	python -c "from app.qdrant_utils import set_payload_by_filter; set_payload_by_filter(client, QDRANT_COLLECTION, payload, flt=None, limit=1000, wait=True)"
+	@python -m scripts.qdrant_set_payload \
+		--url "$${URL:-http://localhost:6333}" \
+		--collection "$${COLLECTION:-heva_v1}" \
+		--filter-key "$${FILTER_KEY:-source}" \
+		--filter-val "$(SOURCE)" \
+		--set-key "$(KEY)" \
+		--set-val "$(VAL)"
 	check: lint format test security
 
 all: check export-eval
