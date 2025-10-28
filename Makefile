@@ -1,4 +1,4 @@
-.PHONY: lint format test security check all up down ingest search eval
+.PHONY: lint format test security check all up down ingest search eval set-payload
 
 lint:
 	ruff check --fix $(shell git ls-files "*.py")
@@ -13,7 +13,9 @@ security:
 	bandit -r .
 	pip-audit || true
 
-check: lint format test security
+set-payload:
+	python -c "from app.qdrant_utils import set_payload_by_filter; set_payload_by_filter(client, collection, payload, flt=None, limit=1000, wait=True)"
+	check: lint format test security
 
 all: check export-eval
 
