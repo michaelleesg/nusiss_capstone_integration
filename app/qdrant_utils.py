@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter
 
+
 def set_payload_by_filter(
     client: QdrantClient,
     collection: str,
