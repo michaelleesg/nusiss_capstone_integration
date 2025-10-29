@@ -1,3 +1,7 @@
+raise SystemExit(
+    "DEPRECATED: This script has been retired. Use app.py → chunk_and_ingest.py instead."
+)
+
 import argparse
 import time
 import uuid
@@ -49,26 +53,36 @@ def wait_for_qdrant(url, timeout=60):
 wait_for_qdrant(QDRANT_URL)
 
 
-# === Load BIO sentences ===
+# === Load BIO sentences with full token/tag info ===
 def load_bio_sentences(path):
-    sentences = []
+    full = []
     current = []
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
                 if current:
-                    sentence = " ".join(token for token, _ in current)
-                    sentences.append(sentence)
+                    tokens = [t for t, _ in current]
+                    tags = [l for _, l in current]
+                    full.append(
+                        {
+                            "text": " ".join(tokens),
+                            "tokens": tokens,
+                            "tags": tags,
+                            "length": len(tokens),
+                            "source": "ner_training.txt",
+                        }
+                    )
                     current = []
             else:
                 parts = line.split()
                 if len(parts) == 2:
                     current.append((parts[0], parts[1]))
-    return sentences
+    return full
 
 
-sentences = load_bio_sentences(NER_BIO_SOURCE)
+records = load_bio_sentences(NER_BIO_SOURCE)
+sentences = [r["text"] for r in records]
 print(f"✅ Loaded {len(sentences)} sentences.")
 
 # === Encode with SentenceTransformer ===
@@ -122,24 +136,23 @@ def upload_batch(points, retries=3):
 
 
 print("🚀 Uploading vectors in batches...")
-for i in tqdm(range(0, len(sentences), BATCH_SIZE), desc="Ingesting", unit="batch"):
-    batch_sentences = sentences[i : i + BATCH_SIZE]
+for i in tqdm(range(0, len(records), BATCH_SIZE), desc="Ingesting", unit="batch"):
+    batch_records = records[i : i + BATCH_SIZE]
     batch_vectors = vectors[i : i + BATCH_SIZE]
-    payloads = [{"text": s} for s in batch_sentences]
     points = [
-        PointStruct(id=str(uuid.uuid4()), vector=v.tolist(), payload=p)
-        for v, p in zip(batch_vectors, payloads)
+        PointStruct(id=str(uuid.uuid4()), vector=v.tolist(), payload=r)
+        for v, r in zip(batch_vectors, batch_records)
     ]
     upload_batch(points)
 
-print(f"✅ Ingested {len(sentences)} total vectors into Qdrant.")
+print(f"✅ Ingested {len(records)} total vectors into Qdrant.")
 
 # === Final sanity check ===
 try:
     time.sleep(1)
     count = client.count(COLLECTION_NAME, exact=True).count
     print(f"🔎 Qdrant confirms {count} vectors in collection '{COLLECTION_NAME}'.")
-    if count != len(sentences):
-        print(f"⚠️ Warning: Expected {len(sentences)} vectors, but found {count}!")
+    if count != len(records):
+        print(f"⚠️ Warning: Expected {len(records)} vectors, but found {count}!")
 except Exception as e:
     print(f"❌ Could not verify vector count: {e}")
