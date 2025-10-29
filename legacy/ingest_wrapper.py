@@ -1,3 +1,7 @@
+raise SystemExit(
+    "DEPRECATED: This script has been retired. Use app.py → chunk_and_ingest.py instead."
+)
+
 import os, time, uuid, argparse
 import httpx, numpy as np
 from tqdm import tqdm
