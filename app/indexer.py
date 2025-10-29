@@ -102,6 +102,8 @@ def upsert_artifact(
           'has_structured_data': chunk['chunk_metadata']['has_structured_data'],
           'chunk_length': chunk['chunk_metadata']['length'],
           'artifact_id': artifact.get("artifact_id"),  # Include artifact_id for traceability
+          'published_at': artifact.get("published_at"),  # Include published_at for traceability
+          'tags': artifact.get("tags", []),  # Include tags for additional context
           'artifact_id': artifact.get("artifact_id"),  # Include artifact_id for traceability
       }
     """
