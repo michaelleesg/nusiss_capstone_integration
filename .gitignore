@@ -37,3 +37,8 @@ latest_recommendations.txt
 
 # Ignore eval symlink
 eval_external/
+# HEVA backups & temps
+*.bak
+*.bak*
+*.tmp
+scripts/*.bak*
