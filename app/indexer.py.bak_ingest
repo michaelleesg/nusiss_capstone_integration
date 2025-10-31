@@ -183,21 +183,6 @@ def upsert_artifact(
                 metadata[k] = []
         # <<< END HEVA METADATA PATCH <<<
 
-        # Compute published_at_ts if present; always add ingested_at_ts as fallback
-        try:
-            from datetime import datetime
-            from time import time as _now
-            if metadata.get("published_at") and not metadata.get("published_at_ts"):
-                _s = str(metadata["published_at"]).replace("Z","")
-                metadata["published_at_ts"] = int(datetime.fromisoformat(_s).timestamp())
-        except Exception:
-            pass
-        # Always set ingested_at_ts if missing
-        if not metadata.get("ingested_at_ts"):
-            from time import time as _now
-            metadata["ingested_at_ts"] = int(_now())
-
-
         # Normalize published_at → published_at_ts (unix int) if present
         try:
             if metadata.get("published_at") and not metadata.get("published_at_ts"):

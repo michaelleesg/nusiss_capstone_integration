@@ -138,31 +138,6 @@ def maybe_create_indexes(client: QdrantClient, name: str):
         ("ioc.hashes", PayloadSchemaType.KEYWORD),
     ]:
         try:
-            # >>> BEGIN HEVA INDEX PATCH (idempotent) >>>
-            for field, schema in [
-                ("tags", PayloadSchemaType.KEYWORD),
-                ("doc_id", PayloadSchemaType.KEYWORD),
-                ("source_type", PayloadSchemaType.KEYWORD),
-                ("published_at_ts", PayloadSchemaType.INTEGER),
-                ("ioc.cves", PayloadSchemaType.KEYWORD),
-                ("ioc.ips", PayloadSchemaType.KEYWORD),
-                ("ioc.domains", PayloadSchemaType.KEYWORD),
-                ("ioc.hashes", PayloadSchemaType.KEYWORD),
-                # New pivots
-                ("source", PayloadSchemaType.KEYWORD),
-                ("folder_type", PayloadSchemaType.KEYWORD),
-                ("context_category", PayloadSchemaType.KEYWORD),
-                ("threat_actors", PayloadSchemaType.KEYWORD),
-                ("mitre_ttps", PayloadSchemaType.KEYWORD),
-                ("cve_vulns", PayloadSchemaType.KEYWORD),
-                ("affected_products", PayloadSchemaType.KEYWORD),
-                ("sectors", PayloadSchemaType.KEYWORD),
-            ]:
-                try:
-                    client.create_payload_index(collection_name=name, field_name=field, field_schema=schema)
-                except Exception:
-                    pass
-            # <<< END HEVA INDEX PATCH <<<
             client.create_payload_index(
                 collection_name=name, field_name=field, field_schema=schema
             )
@@ -252,21 +227,6 @@ def build_payload(
         for t in rec["tags"]:
             if t not in payload["tags"]:
                 payload["tags"].append(t)
-    # >>> BEGIN HEVA BUILD_PAYLOAD PATCH (idempotent) >>>
-    for key in [
-        "source", "folder_type", "context_category",
-        "threat_actors", "mitre_ttps", "cve_vulns",
-        "affected_products", "sectors",
-        "affects_singapore", "affects_asean", "active_exploitation", "high_tension_event"
-    ]:
-        val = rec.get(key)
-        if val is not None:
-            payload[key] = val
-
-    for k in ("tags","threat_actors","mitre_ttps","cve_vulns","affected_products","sectors"):
-        if k in payload and not isinstance(payload[k], list):
-            payload[k] = [payload[k]]
-    # <<< END HEVA BUILD_PAYLOAD PATCH <<<
     return payload
 
 
@@ -281,7 +241,7 @@ def upsert_with_retry(client, collection, points, sub_batch=500, max_retries=3):
             try:
                 client.upsert(collection_name=collection, points=part, wait=True)
                 break
-            except Exception as _e:
+            except Exception as e:
                 if attempt == max_retries:
                     raise
                 time.sleep(2**attempt)
