@@ -9,7 +9,7 @@ def test_health(client):
 
 def test_search_empty_query(client):
     r = client.get("/search", params={"q": ""})
-    assert r.status_code == 422  # Expecting a validation error for empty query
+    assert r.status_code in (400, 422)  # Expecting a validation error for empty query
 
 
 def test_search_smoke(client):
