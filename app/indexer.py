@@ -183,6 +183,15 @@ def upsert_artifact(
                 metadata[k] = []
         # <<< END HEVA METADATA PATCH <<<
 
+        # >>> HEVA CLOCK GUARD >>>
+        # preserve existing clocks if caller supplied them
+        if "ingested_at_ts" in metadata and metadata["ingested_at_ts"] is None:
+            metadata.pop("ingested_at_ts", None)
+        if "published_at_ts" in metadata and metadata["published_at_ts"] is None:
+            metadata.pop("published_at_ts", None)
+        # <<< HEVA CLOCK GUARD <<<
+
+
         # Compute published_at_ts if present; always add ingested_at_ts as fallback
         try:
             from datetime import datetime

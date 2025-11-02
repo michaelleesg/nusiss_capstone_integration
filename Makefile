@@ -1,5 +1,9 @@
 SHELL := /bin/bash
 
+QDR ?= http://127.0.0.1:6333
+COL ?= heva_docs
+TAG ?= THREAT_ACTOR
+DAYS ?= 7
 .PHONY: lint format test security check all up down ingest search eval set-payload set-payload
 
 lint:
@@ -25,9 +29,6 @@ set-payload:
 		--set-key "$(KEY)" \
 		--set-val "$(VAL)"
 
-
-
-
 .PHONY: check
 check:
 	@true
@@ -35,16 +36,8 @@ check:
 ## QDRANT QUICK TARGETS (HEVA)
 .PHONY: qdr-count-oct qdr-last7 qdr-ta-since
 
-
-
-
-
-
-
-
 ### >>> HEVA QDRANT TARGETS >>>
 SHELL := /bin/bash
-QDR ?= http://127.0.0.1:6333
 
 qdr-ping:
 	@echo "Pinging $(QDR)/collections ..."
@@ -72,41 +65,8 @@ qdr-ta-since:
 ### <<< HEVA QDRANT TARGETS <<<
 ### >>> HEVA EXTRAS TARGETS >>>
 # Extra convenience targets. Requires curl + jq. QDR can be overriden: make qdr-seed QDR=http://localhost:6333
-QDR ?= http://127.0.0.1:6333
 
-qdr-seed:
-	@NOW=$$(date +%s); \
-	echo "Seeding one demo THREAT_ACTOR doc into heva_docs (ingested_at_ts=$$NOW)"; \
-	# ensure collection exists (idempotent); vectors size is arbitrary since we only scroll/count here
-	curl -sS -X PUT "$(QDR)/collections/heva_docs" \
-	  -H 'Content-Type: application/json' \
-	  -d '{ "vectors": { "size": 4, "distance": "Cosine" } }' >/dev/null || true; \
-	jq -n --argjson now $$NOW '{
-	  points: [{
-	    id: $now,
-	    vector: [0,0,0,0],
-	    payload: {
-	      text: "Seed THREAT_ACTOR doc",
-	      source: "seed",
-	      tags: ["THREAT_ACTOR"],
-	      threat_actors: ["TA505"],
-	      ingested_at_ts: $now
-	    }
-	  }]
-	}' | curl -sS -X PUT "$(QDR)/collections/heva_docs/points" \
-	  -H 'Content-Type: application/json' -d @- | jq -r '.status' || true
-
-qdr-wipe-docs:
-	@echo "Deleting collection heva_docs (DANGER)"; \
-	curl -sS -X DELETE "$(QDR)/collections/heva_docs" | jq -r '.status' || true
-
-qdr-wipe-heva_v1:
-	@echo "Deleting collection heva_v1 (DANGER)"; \
-	curl -sS -X DELETE "$(QDR)/collections/heva_v1" | jq -r '.status' || true
-### <<< HEVA EXTRAS TARGETS <<<
-### >>> HEVA EXTRAS >>>
 SHELL := /bin/bash
-QDR ?= http://127.0.0.1:6333
 
 # Seed a demo THREAT_ACTOR point into heva_docs (id=1, 384-d zero vector)
 qdr-seed:
@@ -145,3 +105,41 @@ qdr-wipe-heva_v1:
 	curl -sS -X POST "$(QDR)/collections/heva_v1/points/delete" \
 	  -H "Content-Type: application/json" -d @- | jq -c .
 ### <<< HEVA EXTRAS <<<
+### >>> HEVA SMOKE START >>>
+.PHONY: qdr-smoke
+qdr-smoke:
+	@echo "— qdr-ping —";     $(MAKE) qdr-ping || true
+	@echo; echo "— count-oct —"; $(MAKE) qdr-count-oct || true
+	@echo; echo "— last7 —";     $(MAKE) qdr-last7 || true
+	@echo; echo "— ta-since —";  $(MAKE) qdr-ta-since || true
+	@echo; read -rp "Done. Press Enter to close..." _
+### <<< HEVA SMOKE END <<<
+### >>> HEVA FIX-CLOCK START >>>
+.PHONY: qdr-fix-clock
+qdr-fix-clock:
+	@bash -c 'shopt -s nullglob; files=(Makefile *.mk); now=$$(date +%s); touched=0; \
+	for f in "$${files[@]}"; do \
+	  [ -e "$$f" ] || continue; \
+	  if stat -c %Y "$$f" >/dev/null 2>&1; then m=$$(stat -c %Y "$$f"); else m=$$(stat -f %m "$$f"); fi; \
+	  if [ -n "$$m" ] && [ "$$m" -gt "$$now" ] 2>/dev/null; then touch "$$f"; touched=$$((touched+1)); fi; \
+	done; \
+	sleep 1; echo "✅ qdr-fix-clock: touched $$touched file(s) & waited 1s."'
+	@echo "Tip: run 'make qdr-smoke' after this."
+### <<< HEVA FIX-CLOCK END <<<
+### >>> HEVA ALL START >>>
+.PHONY: qdr-all
+qdr-all:
+	@echo "→ qdr-fix-clock"
+	@$(MAKE) qdr-fix-clock || true
+	@echo
+	@echo "→ qdr-seed (idempotent)"
+	@$(MAKE) qdr-seed || true
+	@echo
+	@echo "→ qdr-smoke"
+	@$(MAKE) qdr-smoke || true
+### <<< HEVA ALL END <<<
+### >>> HEVA PARAM START >>>
+.PHONY: qdr-since
+qdr-since:
+	@bash scripts/qdr_since.sh "$(QDR)" "$(COL)" "$(TAG)" "$(DAYS)"
+### <<< HEVA PARAM END <<<
