@@ -149,3 +149,11 @@ qdr-since:
 qdr-since-help:
 	@echo "Usage: make qdr-since [QDR=…] [COL=…] [TAG=…] [DAYS=…]"; echo "Defaults via Make: QDR=$(QDR) COL=$(COL) TAG=$(TAG) DAYS=$(DAYS)"
 ### <<< HEVA PARAM END <<<
+### >>> HEVA CLEAN START >>>
+.PHONY: clean-backups heva-clean
+clean-backups:
+	rm -f -- Makefile.bak.* *.tmp *.log 2>/dev/null || true
+heva-clean:
+	find . -maxdepth 1 -type f \( -name 'Makefile.bak.*' -o -name '*.tmp' -o -name '*.log' \) -print -delete 2>/dev/null || true
+	echo "✓ HEVA clean done."
+### <<< HEVA CLEAN END <<<
