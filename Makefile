@@ -4,6 +4,10 @@ QDR ?= http://127.0.0.1:6333
 COL ?= heva_docs
 TAG ?= THREAT_ACTOR
 DAYS ?= 7
+QDR ?= http://127.0.0.1:6333
+COL ?= heva_docs
+TAG ?= THREAT_ACTOR
+DAYS ?= 7
 .PHONY: lint format test security check all up down ingest search eval set-payload set-payload
 
 lint:
@@ -139,7 +143,9 @@ qdr-all:
 	@$(MAKE) qdr-smoke || true
 ### <<< HEVA ALL END <<<
 ### >>> HEVA PARAM START >>>
-.PHONY: qdr-since
+.PHONY: qdr-since qdr-since-help
 qdr-since:
 	@bash scripts/qdr_since.sh "$(QDR)" "$(COL)" "$(TAG)" "$(DAYS)"
+qdr-since-help:
+	@echo "Usage: make qdr-since [QDR=…] [COL=…] [TAG=…] [DAYS=…]"; echo "Defaults via Make: QDR=$(QDR) COL=$(COL) TAG=$(TAG) DAYS=$(DAYS)"
 ### <<< HEVA PARAM END <<<
