@@ -1,3 +1,4 @@
+.DEFAULT_GOAL := help
 SHELL := /bin/bash
 
 QDR ?= http://127.0.0.1:6333
@@ -157,3 +158,11 @@ heva-clean:
 	find . -maxdepth 1 -type f \( -name 'Makefile.bak.*' -o -name '*.tmp' -o -name '*.log' \) -print -delete 2>/dev/null || true
 	echo "✓ HEVA clean done."
 ### <<< HEVA CLEAN END <<<
+### >>> HEVA QUICK HELP START >>>
+.PHONY: help
+help:
+	@echo "Targets:"
+	@echo "  qdr-since [QDR=… COL=… TAG=… DAYS=…]  – list items since N days"
+	@echo "  heva-clean                             – purge Makefile.bak.*, *.tmp, *.log"
+	@echo "Vars (Make defaults): QDR=$(QDR)  COL=$(COL)  TAG=$(TAG)  DAYS=$(DAYS)"
+### <<< HEVA QUICK HELP END <<<
