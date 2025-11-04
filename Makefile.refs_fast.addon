@@ -1,0 +1,3 @@
+.PHONY: refs-fast
+refs-fast:
+	@ROOT="/home/mike/capstone_win" OUT="$$(pwd)/_inventory" bash ./scripts/refs_fast.sh || true

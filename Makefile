@@ -166,3 +166,12 @@ help:
 	@echo "  heva-clean                             – purge Makefile.bak.*, *.tmp, *.log"
 	@echo "Vars (Make defaults): QDR=$(QDR)  COL=$(COL)  TAG=$(TAG)  DAYS=$(DAYS)"
 ### <<< HEVA QUICK HELP END <<<
+.PHONY: inventory inventory-fast
+inventory:
+	@ROOT="/home/mike/capstone_win" INVDIR="$$(pwd)/_inventory" bash ./scripts/list_files_usage.sh
+
+inventory-fast:
+	@NO_PAUSE=1 ROOT="/home/mike/capstone_win" INVDIR="$$(pwd)/_inventory" bash ./scripts/list_files_usage.sh
+.PHONY: refs-fast
+refs-fast:
+	@ROOT="/home/mike/capstone_win" OUT="$$(pwd)/_inventory" bash ./scripts/refs_fast.sh || true
