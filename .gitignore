@@ -98,3 +98,18 @@ tests/*.bak*
 capstone_agent_a/
 agent_a_localremote
 agent_a_localremote/
+# --- repo audit: caches & outputs ---
+.ruff_cache/
+.aider.tags.cache.v4/
+.aider*history*
+.coverage
+.env
+capstone_agent_a/out/
+*_tmp/
+*_temp/
+*.bak
+Makefile.bak.*
+dir_listing.txt
+latest_recommendations.txt
+lands.csv
+cybersage_deploy_bundle.zip
