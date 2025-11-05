@@ -179,13 +179,13 @@ refs-fast:
 # One-button audit: fast refs + build _inventory/to_remove.csv (zero-refs + junk)
 
 # Dry-run prune
-audit-prune:
-	ROOT="/home/mike/capstone_win" DRY_RUN=1 _tools/prune_from_csv.sh _inventory/to_remove.csv || true
+# OLD-DISABLED: audit-prune:
+# OLD-DISABLED: 	ROOT="/home/mike/capstone_win" DRY_RUN=1 _tools/prune_from_csv.sh _inventory/to_remove.csv || true
 
 # Apply prune + publish
-audit-apply:
-	ROOT="/home/mike/capstone_win" DRY_RUN=0 _tools/prune_from_csv.sh _inventory/to_remove.csv || true
-	cd /home/mike/capstone_win && git fetch team && git add -A \
-  && git commit -m "chore: repo audit — prune zero-refs & junk (batch)" --no-verify || true \
-  && git push team HEAD:main || true
+# OLD-DISABLED: audit-apply:
+# OLD-DISABLED: 	ROOT="/home/mike/capstone_win" DRY_RUN=0 _tools/prune_from_csv.sh _inventory/to_remove.csv || true
+# OLD-DISABLED: 	cd /home/mike/capstone_win && git fetch team && git add -A \
+# OLD-DISABLED:   && git commit -m "chore: repo audit — prune zero-refs & junk (batch)" --no-verify || true \
+# OLD-DISABLED:   && git push team HEAD:main || true
 include audits.mk
