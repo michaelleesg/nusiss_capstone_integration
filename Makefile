@@ -175,86 +175,8 @@ inventory-fast:
 .PHONY: refs-fast
 refs-fast:
 	@ROOT="/home/mike/capstone_win" OUT="$$(pwd)/_inventory" bash ./scripts/refs_fast.sh || true
-.PHONY: audit-fast audit-prune audit-apply
-# 1) Fast refs + build to_remove.csv (zero-refs + junk patterns)
-.PHONY: refs-fast inventory-quick audit-fast audit-prune audit-apply
-
-# Fast refs-only pass (tracked files), writes _inventory/refs_summary_fast.csv
-refs-fast:
-	@ROOT="/home/mike/capstone_win" OUT="$$(pwd)/_inventory" bash ./scripts/refs_fast.sh || true
-
-# Quick inventory of tracked files only (immediate; no slow scan)
-inventory-quick:
-	@mkdir -p _inventory; \
-	python3 - <<'PY' || true
-import csv, subprocess, pathlib
-root = pathlib.Path("/home/mike/capstone_win").resolve()
-out  = pathlib.Path("_inventory/files_inventory_quick.csv")
-lfs = set()
-try:
-    for ln in subprocess.check_output(["git","lfs","ls-files"], cwd=root, text=True).splitlines():
-        if ln.strip(): lfs.add(ln.split()[-1])
-except Exception:
-    pass
-rows=[]
-for b in subprocess.check_output(["git","ls-files","-z"], cwd=root).split(b'\\0'):
-    if not b:
-        continue
-    rel = b.decode('utf-8','replace')
-    p = root/rel
-    try:
-        st=p.stat(); size=st.st_size; execf='y' if (st.st_mode & 0o111) else ''
-    except Exception:
-        size,execf=0,''
-    last_dt,last_author="",""
-    try:
-        s=subprocess.check_output(["git","log","-1","--pretty=%cI|%an","--",rel],cwd=root,text=True).strip()
-        if '|' in s: last_dt,last_author=s.split('|',1)
-    except Exception:
-        pass
-    rows.append({"path":rel,"size_bytes":size,"exec":execf,"git_tracked":"y","git_status":"","lfs_pointer":"y" if rel in lfs else "", "last_commit":last_dt,"last_author":last_author})
-with out.open('w',newline='',encoding='utf-8') as f:
-    w=csv.DictWriter(f,fieldnames=["path","size_bytes","exec","git_tracked","git_status","lfs_pointer","last_commit","last_author"])
-    w.writeheader(); w.writerows(rows)
-print("[write]", out)
-PY
 
 # One-button audit: fast refs + build _inventory/to_remove.csv (zero-refs + junk)
-audit-fast:
-	$(MAKE) refs-fast
-	python3 - <<'PY' || true
-import csv, pathlib, fnmatch
-root = pathlib.Path("_inventory")
-refs = {r['path']: int((r['ref_count_approx'] or 0)) for r in csv.DictReader(open(root/"refs_summary_fast.csv", encoding='utf-8'))}
-inv  = list(csv.DictReader(open(root/"files_inventory.csv", encoding='utf-8')))
-
-INCLUDE_PATTERNS = [
-  ".aider*", ".coverage", ".env", ".ruff_cache/**",
-  "dir_listing.txt", "latest_recommendations.txt", "lands.csv",
-  "Makefile.bak.*", "Makefile.addon",
-  "capstone_agent_a/out/*.json", "capstone_agent_a/output.txt",
-  "tests/test_all.py.tmp", "cybersage_deploy_bundle.zip", "IS06_*.pdf",
-  "qdrant_storage/.lock", "qdrant_storage/.qdrant_fs_check",
-]
-def match_any(path):
-    for pat in INCLUDE_PATTERNS:
-        if fnmatch.fnmatch(path, pat) or ("/**" in pat and path.startswith(pat.replace("/**",""))):
-            return True
-    return False
-
-cand=set()
-for r in inv:
-    p=r['path']
-    if p.startswith("_inventory/"):
-        continue
-    if match_any(p) or refs.get(p,0)==0:
-        cand.add(p)
-
-out = root/"to_remove.csv"
-with out.open('w', newline='', encoding='utf-8') as f:
-    w=csv.writer(f); w.writerow(["path"]); [w.writerow([p]) for p in sorted(cand)]
-print("[write]", out, "count=", len(cand))
-PY
 
 # Dry-run prune
 audit-prune:
@@ -266,3 +188,4 @@ audit-apply:
 	cd /home/mike/capstone_win && git fetch team && git add -A \
   && git commit -m "chore: repo audit — prune zero-refs & junk (batch)" --no-verify || true \
   && git push team HEAD:main || true
+include audits.mk

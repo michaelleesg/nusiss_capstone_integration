@@ -5,6 +5,7 @@ path
 .aiderignore
 .coverage
 .env
+.gitignore.bak.2025-10-11-150758
 .ruff_cache/.gitignore
 .ruff_cache/0.14.0/1079401343857846736
 .ruff_cache/0.14.0/10878667968106447924
@@ -113,7 +114,5 @@ qdrant_storage/.lock
 qdrant_storage/.qdrant_fs_check
 qdrant_storage/aliases/data.json
 qdrant_storage/raft_state.json
-scan_usage.py
-scripts/list_files_usage.sh
 scripts/pytest_health.sh
 tests/test_all.py.tmp

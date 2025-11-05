@@ -25,6 +25,9 @@ Dockerfile.processor
 HEVA_QDRANT_HELPERS
 HEVA_QDRANT_HELPERS.md
 Makefile
+Makefile.audit
+Makefile.audit.addon
+Makefile.audit.addon.tab@@
 Makefile.refs_fast
 Makefile.refs_fast.addon
 PROMPT_AGENT_B
@@ -63,6 +66,8 @@ ci
 ci.yml
 cli
 cli.py
+client
+client.py
 combined
 combined.json
 config
@@ -73,6 +78,8 @@ cti
 cti.db
 cve
 cve.py
+cve_agent
+cve_agent.py
 cyber_agent
 cyber_agent.py
 data
@@ -118,6 +125,8 @@ install
 install.cmd
 ioc
 ioc.py
+ioc_agent
+ioc_agent.py
 ip_classifier
 ip_classifier.py
 iterate_heva
