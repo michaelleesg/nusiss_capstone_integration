@@ -10,11 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup SSH for submodules
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: |
-            ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Process SSH key with trailing newline
+        run: |
+          mkdir -p ~/.ssh
+          # Write the SSH key and ensure it ends with a newline
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          # Add blank line after key
+          echo "" >> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Start SSH agent and add key
+        run: |
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
 
       - name: Initialize Git config
         run: |
@@ -71,3 +79,9 @@ jobs:
             --body "Automated update of the agent_b submodule to the latest version from main branch.\n\nThis PR was automatically created by the security-advisor repository's GitHub Action workflow." \
             --base main \
             --head update-agent-b-submodule
+
+      - name: Cleanup SSH key
+        if: always()
+        run: |
+          rm -f ~/.ssh/id_rsa
+          ssh-agent -k
