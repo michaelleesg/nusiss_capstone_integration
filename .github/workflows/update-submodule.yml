@@ -11,10 +11,13 @@ jobs:
 
     steps:
       - name: Process SSH key with trailing newline
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          # Write key with single trailing newline, then append blank line
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          # Handle escaped newlines if present
+          echo "$SSH_KEY" | sed 's/\\n/\n/g' > ~/.ssh/id_rsa
+          # Add blank line after key
           echo "" >> ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
