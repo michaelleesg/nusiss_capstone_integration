@@ -1,0 +1,71 @@
+name: Update Cybersage Primary Submodule
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH for submodules
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Initialize Git config
+        run: |
+          git config --global url."git@github.com:".insteadOf "https://github.com/"
+      - name: Checkout cybersage-primary repository
+        uses: actions/checkout@v4
+        with:
+          repository: kiwiProgrammer/cybersage-primary
+          fetch-depth: 0
+      - name: Update agent_b submodule
+        run: |
+          git submodule update --init --remote agent_b
+      - name: Check for changes
+        id: check-changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+      - name: Create branch and commit changes
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          BRANCH_NAME="update-agent-b-submodule"
+
+          # Check if branch exists on remote
+          if git ls-remote --heads origin $BRANCH_NAME | grep -q $BRANCH_NAME; then
+            # Branch exists, checkout and update
+            git fetch origin $BRANCH_NAME
+            git checkout $BRANCH_NAME
+          else
+            # Branch doesn't exist, create it
+            git checkout -b $BRANCH_NAME
+          fi
+
+          git add agent_b
+          git commit -m "chore: update agent_b submodule to latest version"
+      - name: Push branch
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+          git push origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        if: steps.check-changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "chore: update agent_b submodule" \
+            --body "Automated update of the agent_b submodule to the latest version from main branch.\n\nThis PR was automatically created by the security-advisor repository's GitHub Action workflow." \
+            --base main \
+            --head update-agent-b-submodule
