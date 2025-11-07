@@ -13,8 +13,9 @@ jobs:
       - name: Process SSH key with trailing newline
         run: |
           mkdir -p ~/.ssh
-          # Use printf to handle escaped newlines and add blank line at end
-          printf '%s\n\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          # Write key with single trailing newline, then append blank line
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "" >> ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
       - name: Validate SSH key format
