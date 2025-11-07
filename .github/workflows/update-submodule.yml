@@ -13,11 +13,19 @@ jobs:
       - name: Process SSH key with trailing newline
         run: |
           mkdir -p ~/.ssh
-          # Write the SSH key and ensure it ends with a newline
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          # Add blank line after key
-          echo "" >> ~/.ssh/id_rsa
+          cat > ~/.ssh/id_rsa << 'EOF'
+          ${{ secrets.SSH_PRIVATE_KEY }}
+
+          EOF
           chmod 600 ~/.ssh/id_rsa
+
+      - name: Debug SSH key
+        run: |
+          echo "SSH key file size:"
+          ls -lh ~/.ssh/id_rsa
+          echo "First and last 3 lines of SSH key:"
+          head -3 ~/.ssh/id_rsa
+          tail -3 ~/.ssh/id_rsa
 
       - name: Start SSH agent and add key
         run: |
