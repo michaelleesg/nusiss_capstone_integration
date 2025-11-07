@@ -10,31 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Process SSH key with trailing newline
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          # Handle escaped newlines if present
-          echo "$SSH_KEY" | sed 's/\\n/\n/g' > ~/.ssh/id_rsa
-          # Add blank line after key
-          echo "" >> ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Validate SSH key format
-        run: |
-          echo "Checking key format:"
-          head -1 ~/.ssh/id_rsa
-          tail -1 ~/.ssh/id_rsa
-          echo "Key line count:"
-          wc -l ~/.ssh/id_rsa
-          echo "Checking for Windows line endings (CRLF):"
-          file ~/.ssh/id_rsa
-
-      - name: Start SSH agent and add key
-        run: |
-          eval "$(ssh-agent -s)"
-          ssh-add -v ~/.ssh/id_rsa
+      - name: Setup SSH for submodules
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Initialize Git config
         run: |
