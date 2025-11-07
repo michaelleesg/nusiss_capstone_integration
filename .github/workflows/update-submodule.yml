@@ -13,24 +13,24 @@ jobs:
       - name: Process SSH key with trailing newline
         run: |
           mkdir -p ~/.ssh
-          cat > ~/.ssh/id_rsa << 'EOF'
-          ${{ secrets.SSH_PRIVATE_KEY }}
-
-          EOF
+          # Use printf to handle escaped newlines and add blank line at end
+          printf '%s\n\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Debug SSH key
+      - name: Validate SSH key format
         run: |
-          echo "SSH key file size:"
-          ls -lh ~/.ssh/id_rsa
-          echo "First and last 3 lines of SSH key:"
-          head -3 ~/.ssh/id_rsa
-          tail -3 ~/.ssh/id_rsa
+          echo "Checking key format:"
+          head -1 ~/.ssh/id_rsa
+          tail -1 ~/.ssh/id_rsa
+          echo "Key line count:"
+          wc -l ~/.ssh/id_rsa
+          echo "Checking for Windows line endings (CRLF):"
+          file ~/.ssh/id_rsa
 
       - name: Start SSH agent and add key
         run: |
           eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
+          ssh-add -v ~/.ssh/id_rsa
 
       - name: Initialize Git config
         run: |
