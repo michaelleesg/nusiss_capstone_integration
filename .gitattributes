@@ -1,6 +1,4 @@
 # --- LFS: keep large data as pointers ---
-combined.json filter=lfs diff=lfs merge=lfs -text
-ner_training.txt filter=lfs diff=lfs merge=lfs -text
 
 # --- Prefer our side for ephemeral/auto files during merges ---
 .aider.tags.cache.v4/** merge=ours

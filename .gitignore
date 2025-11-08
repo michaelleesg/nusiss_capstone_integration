@@ -113,3 +113,5 @@ dir_listing.txt
 latest_recommendations.txt
 lands.csv
 cybersage_deploy_bundle.zip
+
+legacy/data_unused/*
