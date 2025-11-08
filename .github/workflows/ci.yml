@@ -26,6 +26,20 @@ jobs:
     timeout-minutes: 15
     continue-on-error: true
 
+    # Qdrant must be defined UNDER the job (your snippet had it at top level)
+    services:
+      qdrant:
+        image: qdrant/qdrant:latest
+        ports:
+          - 6333:6333   # REST
+          - 6334:6334   # gRPC
+        # Optional: wait for readiness to avoid flakiness
+        options: >-
+          --health-cmd="wget -qO- http://localhost:6333/readyz || exit 1"
+          --health-interval=5s
+          --health-timeout=2s
+          --health-retries=40
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,7 +48,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements*.txt
+            pyproject.toml
+            setup.cfg
 
       - name: Install dependencies
         run: |
@@ -54,5 +72,19 @@ jobs:
       - name: Bandit (security)
         run: bandit -r . || true
 
-      - name: Tests
+      # Run tests in "offline" mode so app import doesn't ping Qdrant
+      - name: Tests (offline, coverage)
+        env:
+          HEVA_SKIP_QDRANT: "1"
         run: pytest -q --cov=. --cov-report=xml --cov-report=term || true
+
+      # Optional: external smoke tests that actually hit Qdrant
+      - name: External smokes (hit local Qdrant service)
+        if: ${{ always() }}            # keep non-blocking; remove if you want to gate
+        continue-on-error: true        # make smokes advisory
+        env:
+          RUN_EXTERNAL: "1"
+          RUN_EXTERNAL_INLINE: "1"     # start uvicorn in-thread inside the test
+          HEVA_SKIP_QDRANT: "0"        # override conftest default so we DO use Qdrant
+          QDRANT_URL: "http://localhost:6333"
+        run: pytest -q -k external

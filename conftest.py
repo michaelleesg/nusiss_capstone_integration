@@ -4,6 +4,8 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 
+import os
+os.environ.setdefault("HEVA_SKIP_QDRANT", "1")
 from api.search_api_rich import app
 
 # Ensure tests don’t try to hit real Qdrant unless you want them to
