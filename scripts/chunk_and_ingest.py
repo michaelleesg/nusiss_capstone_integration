@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+"""
+HEVA chunk & ingest tool (Qdrant)
+
+- Fast `--help`: heavy imports happen after argparse, so help is instant.
+- Idempotent payload index creation.
+- Rich payload with IoCs, tags, and HEVA-specific fields.
+"""
+
 import argparse
 import hashlib
 import json
@@ -5,17 +14,11 @@ import os
 import re
 import time
 import uuid
-from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
-import torch
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import Distance, PayloadSchemaType, PointStruct, VectorParams
-from sentence_transformers import SentenceTransformer
-from tqdm import tqdm
-
+# ---- Light globals (stdlib only) ----
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "heva_docs")
 EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
@@ -27,18 +30,9 @@ DOM_RE = re.compile(r"\b[a-z0-9][a-z0-9-]*\.[a-z]{2,}\b", re.I)
 HASH_RE = re.compile(r"\b[a-f0-9]{32,64}\b", re.I)
 
 
-def detect_ioc(q: str) -> tuple[str, str] | None:
-    if m := CVE_RE.search(q):
-        return ("ioc.cves", m.group(0).upper())
-    if m := IP_RE.search(q):
-        return ("ioc.ips", m.group(0))
-    if m := DOM_RE.search(q):
-        return ("ioc.domains", m.group(0).lower())
-    if m := HASH_RE.search(q):
-        return ("ioc.hashes", m.group(0).lower())
-    return None
-
-
+# -----------------------------
+# Helpers (stdlib only, fast)
+# -----------------------------
 def md5_hex(s: str) -> str:
     return hashlib.md5(s.encode("utf-8"), usedforsecurity=False).hexdigest()
 
@@ -55,7 +49,7 @@ def extract_iocs(text: str) -> dict[str, list[str]]:
         flags=re.I,
     )
 
-    def dedup(xs: list[str]) -> list[str]:
+    def dedup(xs):
         return list(dict.fromkeys(xs))
 
     return {
@@ -75,15 +69,15 @@ def generate_queries(text: str, title: str = "") -> list[str]:
     snippet = " ".join((text or "").split()[:40])
     if snippet:
         qs.append(snippet)
-    cves = re.findall(r"CVE-\d{4}-\d{4,7}", text, flags=re.I)
-    ips = re.findall(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", text)
-    domains = re.findall(r"\b[a-z0-9][a-z0-9-]*\.[a-z]{2,}\b", text, flags=re.I)
+    qs += re.findall(r"CVE-\d{4}-\d{4,7}", text, flags=re.I)[:2]
+    qs += re.findall(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", text)[:2]
+    qs += re.findall(r"\b[a-z0-9][a-z0-9-]*\.[a-z]{2,}\b", text, flags=re.I)[:2]
     hashes = re.findall(r"\b[a-f0-9]{32,64}\b", text, flags=re.I)
-    qs += cves[:2] + ips[:2] + domains[:2] + hashes[:1]
+    qs += hashes[:1]
     return list(dict.fromkeys(qs))[:6]
 
 
-def chunk_text(text: str, max_chars: int = 1200, overlap: int = 150) -> list[dict[str, Any]]:
+def chunk_text(text: str, max_chars=1200, overlap=150) -> list[dict[str, Any]]:
     t = re.sub(r"\s+", " ", (text or "")).strip()
     out: list[dict[str, Any]] = []
     i, n = 0, len(t)
@@ -112,53 +106,11 @@ def to_ts(dt_str: str | None) -> int | None:
         return None
 
 
-def ensure_collection(client: QdrantClient, name: str, size: int = EMB_DIM) -> None:
-    if not client.collection_exists(name):
-        client.create_collection(
-            collection_name=name,
-            vectors_config=VectorParams(size=size, distance=Distance.COSINE),
-        )
-
-
-def maybe_create_indexes(client: QdrantClient, name: str) -> None:
-    # >>> BEGIN HEVA INDEX PATCH (idempotent) >>>
-    fields: list[tuple[str, PayloadSchemaType]] = [
-        ("tags", PayloadSchemaType.KEYWORD),
-        ("doc_id", PayloadSchemaType.KEYWORD),
-        ("source_type", PayloadSchemaType.KEYWORD),
-        ("published_at_ts", PayloadSchemaType.INTEGER),
-        ("ioc.cves", PayloadSchemaType.KEYWORD),
-        ("ioc.ips", PayloadSchemaType.KEYWORD),
-        ("ioc.domains", PayloadSchemaType.KEYWORD),
-        ("ioc.hashes", PayloadSchemaType.KEYWORD),
-        # New pivots
-        ("source", PayloadSchemaType.KEYWORD),
-        ("folder_type", PayloadSchemaType.KEYWORD),
-        ("context_category", PayloadSchemaType.KEYWORD),
-        ("threat_actors", PayloadSchemaType.KEYWORD),
-        ("mitre_ttps", PayloadSchemaType.KEYWORD),
-        ("cve_vulns", PayloadSchemaType.KEYWORD),
-        ("affected_products", PayloadSchemaType.KEYWORD),
-        ("sectors", PayloadSchemaType.KEYWORD),
-    ]
-    for field, schema in fields:
-        try:
-            client.create_payload_index(
-                collection_name=name,
-                field_name=field,
-                field_schema=schema,
-            )
-        except Exception:
-            # Ignore if it already exists or the server rejects duplicates.
-            pass
-    # <<< END HEVA INDEX PATCH <<<
-
-
 def load_records(path: str) -> Iterable[dict[str, Any]]:
     txt = Path(path).read_text(encoding="utf-8").strip()
     idx = 0
 
-    def coerce(r: Any, i: int) -> dict[str, Any]:
+    def coerce(r, i):
         if isinstance(r, dict):
             return r
         if isinstance(r, str):
@@ -230,14 +182,12 @@ def build_payload(
         "scoring": {"risk_score": None, "confidence": None},
         "acl": ["public"],
     }
-
-    # Preserve incoming tags (union)
     if isinstance(rec.get("tags"), list):
         for t in rec["tags"]:
             if t not in payload["tags"]:
                 payload["tags"].append(t)
 
-    # >>> BEGIN HEVA BUILD_PAYLOAD PATCH (idempotent) >>>
+    # HEVA-specific passthroughs
     for key in [
         "source",
         "folder_type",
@@ -256,33 +206,19 @@ def build_payload(
         if val is not None:
             payload[key] = val
 
-    for k in (
-        "tags",
-        "threat_actors",
-        "mitre_ttps",
-        "cve_vulns",
-        "affected_products",
-        "sectors",
-    ):
+    for k in ("tags", "threat_actors", "mitre_ttps", "cve_vulns", "affected_products", "sectors"):
         if k in payload and not isinstance(payload[k], list):
             payload[k] = [payload[k]]
-    # <<< END HEVA BUILD_PAYLOAD PATCH <<<
 
     return payload
 
 
-def _chunks(seq: list[Any], n: int):
+def _chunks(seq, n):
     for i in range(0, len(seq), n):
         yield seq[i : i + n]
 
 
-def upsert_with_retry(
-    client: QdrantClient,
-    collection: str,
-    points: list[PointStruct],
-    sub_batch: int = 500,
-    max_retries: int = 3,
-) -> None:
+def upsert_with_retry(client, collection, points, sub_batch=500, max_retries=3):
     for part in _chunks(points, sub_batch):
         for attempt in range(1, max_retries + 1):
             try:
@@ -294,14 +230,17 @@ def upsert_with_retry(
                 time.sleep(2**attempt)
 
 
-def main() -> None:
+# -----------------------------
+# Main (heavy imports happen here)
+# -----------------------------
+def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True, help="JSON array or JSONL file")
     ap.add_argument("--collection", default=QDRANT_COLLECTION)
     ap.add_argument("--qdrant-url", default=QDRANT_URL)
     ap.add_argument("--max-chars", type=int, default=1200)
     ap.add_argument("--overlap", type=int, default=150)
-    ap.add_argument("--create-indexes", action="store_true")
+    ap.add_argument("--create-indexes", "--create-index", "--create-indexs", dest="create_indexes", action="store_true", help="Create payload indexes (idempotent)")
     ap.add_argument("--max-docs", type=int, default=0, help="Stop after N docs (0 = all)")
     ap.add_argument(
         "--batch-chunks",
@@ -318,10 +257,59 @@ def main() -> None:
     ap.add_argument("--normalize", action="store_true", help="L2-normalize embeddings")
     args = ap.parse_args()
 
+    # Heavy stuff only after we know we're not just printing --help:
+    import torch  # noqa: WPS433
+    from qdrant_client import QdrantClient  # noqa: WPS433
+    from qdrant_client.http.models import (  # noqa: WPS433
+        Distance,
+        PayloadSchemaType,
+        PointStruct,
+        VectorParams,
+    )
+    from sentence_transformers import SentenceTransformer  # noqa: WPS433
+    from tqdm import tqdm  # noqa: WPS433
+
+    def ensure_collection(client, name: str, size: int = EMB_DIM):
+        if not client.collection_exists(name):
+            client.create_collection(
+                collection_name=name,
+                vectors_config=VectorParams(size=size, distance=Distance.COSINE),
+            )
+
+    def maybe_create_indexes(client, name: str):
+        fields = [
+            ("tags", PayloadSchemaType.KEYWORD),
+            ("doc_id", PayloadSchemaType.KEYWORD),
+            ("source_type", PayloadSchemaType.KEYWORD),
+            ("published_at_ts", PayloadSchemaType.INTEGER),
+            ("ioc.cves", PayloadSchemaType.KEYWORD),
+            ("ioc.ips", PayloadSchemaType.KEYWORD),
+            ("ioc.domains", PayloadSchemaType.KEYWORD),
+            ("ioc.hashes", PayloadSchemaType.KEYWORD),
+            # HEVA pivots
+            ("source", PayloadSchemaType.KEYWORD),
+            ("folder_type", PayloadSchemaType.KEYWORD),
+            ("context_category", PayloadSchemaType.KEYWORD),
+            ("threat_actors", PayloadSchemaType.KEYWORD),
+            ("mitre_ttps", PayloadSchemaType.KEYWORD),
+            ("cve_vulns", PayloadSchemaType.KEYWORD),
+            ("affected_products", PayloadSchemaType.KEYWORD),
+            ("sectors", PayloadSchemaType.KEYWORD),
+        ]
+        for field, schema in fields:
+            try:
+                client.create_payload_index(
+                    collection_name=name, field_name=field, field_schema=schema
+                )
+            except Exception:
+                # already exists or not supported — ignore
+                pass
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     client = QdrantClient(url=args.qdrant_url, timeout=60.0, prefer_grpc=True)
     ensure_collection(client, args.collection, EMB_DIM)
     if args.create_indexes:
+        maybe_create_indexes(client, args.collection)
         maybe_create_indexes(client, args.collection)
 
     texts: list[str] = []
@@ -331,7 +319,7 @@ def main() -> None:
 
     model = SentenceTransformer(EMB_MODEL, device=device)
 
-    def flush_batch() -> None:
+    def flush_batch():
         nonlocal texts, metas, total_chunks
         if not texts:
             return
@@ -382,11 +370,12 @@ def main() -> None:
             if len(texts) >= args.batch_chunks:
                 flush_batch()
 
-        seen_docs += 1
+        seen_docs += 1  # per document
 
     flush_batch()
     print(
-        f"✅ Ingested {seen_docs} documents with {total_chunks} chunks into "
+        "✅ Ingested "
+        f"{seen_docs} documents with {total_chunks} chunks into "
         f"'{args.collection}' on device={device}."
     )
 
