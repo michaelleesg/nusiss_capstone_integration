@@ -42,8 +42,8 @@ def client() -> TestClient:
 
 def test_health_unit(client: TestClient):
     r = client.get("/health")
-    assert r.status_code == 200
-    assert r.json() == {"ok": True}  # from test_app.py :contentReference[oaicite:3]{index=3}
+    assert resp.status_code == 200
+    assert r.json() == {"ok": True}  # from test_app.py
 
 
 def test_openapi_has_ingest_unit(client: TestClient):
@@ -57,7 +57,7 @@ def test_ingest_stub_and_search_unit(client: TestClient):
         {"id": "t-2", "text": "beaconing to 203.0.113.10", "metadata": {"ips": ["203.0.113.10"]}},
     ]
     r = client.post("/ingest", json=docs)
-    assert r.status_code == 200
+    assert resp.status_code == 200
     out = r.json()
     # In skip mode, endpoint reports success; schema includes "ingested"
     assert "ingested" in out and out["ingested"] == 2
@@ -69,15 +69,15 @@ def test_ingest_stub_and_search_unit(client: TestClient):
 
 
 def test_search_empty_query_validation_unit(client: TestClient):
-    # Mirrors your service test expectation (422 on empty query) :contentReference[oaicite:5]{index=5}
+    # Mirrors your service test expectation (422 on empty query)
     r = client.get("/search", params={"q": ""})
-    assert r.status_code in (400, 422)
+    assert resp.status_code in (400, 422)
 
 
 def test_search_smoke_unit(client: TestClient):
-    # Don’t overfit assertions—just check JSON-ish response (from your tests) :contentReference[oaicite:6]{index=6}
+    # Don’t overfit assertions—just check JSON-ish response (from your tests)
     r = client.get("/search", params={"q": "cve"})
-    assert r.status_code == 200
+    assert resp.status_code == 200
     assert r.text.strip().startswith("{") or r.text.strip().startswith("[")
 
 
@@ -95,8 +95,8 @@ def _wait_for_health(url: str, timeout_s: float = 10.0):
     t0 = time.time()
     while time.time() - t0 < timeout_s:
         try:
-            requests.get(url, timeout=0.5)
-            if r.status_code == 200:
+        resp = requests.get(url, timeout=0.5)
+            if resp.status_code == 200:
                 return True
         except Exception:
             pass
@@ -117,7 +117,7 @@ def test_external_health():
     url = f"http://{host}:{port}/health"
 
     if os.getenv("RUN_EXTERNAL_INLINE") == "1":
-        # Start uvicorn in another thread (pattern adapted from your smoke test) :contentReference[oaicite:7]{index=7}
+        # Start uvicorn in another thread (pattern adapted from your smoke test)
         import uvicorn
 
         def _run_server():
@@ -148,7 +148,7 @@ def test_external_ingest_then_search():
     ]
     requests.post(f"{base}/ingest", json=docs, timeout=5)
 
-    # Basic search smoke (pattern adapted from your external test) :contentReference[oaicite:9]{index=9}
+    # Basic search smoke (pattern adapted from your external test)
     r2 = requests.get(f"{base}/search", params={"q": "CVE-2021-44228", "limit": 3}, timeout=5)
     assert r2.status_code == 200
     assert r2.text.strip().startswith("{") or r2.text.strip().startswith("[")
@@ -156,7 +156,7 @@ def test_external_ingest_then_search():
 
 def test_version_unit(client):
     r = client.get("/version")
-    assert r.status_code == 200
+    assert resp.status_code == 200
     data = r.json()
     assert data.get("name") == "agent-b-heva"
     assert data.get("version") == "0.1.0"
@@ -164,7 +164,7 @@ def test_version_unit(client):
 
 def test_version(client):
     r = client.get("/version")
-    assert r.status_code == 200
+    assert resp.status_code == 200
     data = r.json()
     assert data.get("name") == "agent-b-heva"
     assert data.get("version") == "0.1.0"
