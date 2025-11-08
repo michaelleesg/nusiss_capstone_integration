@@ -1,3 +1,5 @@
+[![Smoke CI](https://github.com/michaelleesg/nus-iss-test/actions/workflows/smoke.yml/badge.svg)](https://github.com/michaelleesg/nus-iss-test/actions/workflows/smoke.yml)
+
 # Agent B — HEVA Search API (FastAPI + Qdrant)
 
 > Historical Evidence Vector Archive (HEVA): semantic search and threat‑intel helpers powering CyberSage Agent B.
