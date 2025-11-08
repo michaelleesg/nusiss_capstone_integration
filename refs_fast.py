@@ -1,16 +1,33 @@
 #!/usr/bin/env python3
-import argparse, csv, os, subprocess, sys, json
+import argparse
+import csv
+import json
+import subprocess
+import sys
 from pathlib import Path
 
-EXCLUDES = ['.git', '.venv', 'venv', 'node_modules', '.aider.tags.cache.v4', '__pycache__', '.pytest_cache', '.mypy_cache']
+EXCLUDES = [
+    ".git",
+    ".venv",
+    "venv",
+    "node_modules",
+    ".aider.tags.cache.v4",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+]
+
 
 def run(cmd, cwd):
-    return subprocess.run(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+    return subprocess.run(
+        cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
+    )
+
 
 def main():
     ap = argparse.ArgumentParser(description="Single-pass ripgrep ref counter (tracked files only)")
-    ap.add_argument('--root', required=True)
-    ap.add_argument('--out', required=True)
+    ap.add_argument("--root", required=True)
+    ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
     root = Path(args.root).resolve()
@@ -18,8 +35,8 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
     out_csv = out_dir / "refs_summary_fast.csv"
 
-    r = run(["git","ls-files","-z"], cwd=root)
-    files = [p for p in r.stdout.split('\0') if p]
+    r = run(["git", "ls-files", "-z"], cwd=root)
+    files = [p for p in r.stdout.split("\0") if p]
     if not files:
         print("[refs_fast] no tracked files?", file=sys.stderr)
         return 1
@@ -36,14 +53,14 @@ def main():
         all_terms.update(ts)
 
     pat_path = out_dir / "refs_fast_patterns.txt"
-    with pat_path.open('w', encoding='utf-8') as f:
+    with pat_path.open("w", encoding="utf-8") as f:
         for term in sorted(all_terms):
             f.write(term + "\n")
 
     globs = []
     for ex in EXCLUDES:
         globs += ["--glob", f"!**/{ex}/**"]
-    cmd = ["rg","-n","-S","--no-ignore-vcs","--json","-f", str(pat_path), str(root)]
+    cmd = ["rg", "-n", "-S", "--no-ignore-vcs", "--json", "-f", str(pat_path), str(root)]
     cmd = cmd[:3] + globs + cmd[3:]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
 
@@ -83,12 +100,14 @@ def main():
                 break
         rows.append({"path": rel, "ref_count_approx": total, "first_hit": first})
 
-    with out_csv.open('w', newline='', encoding='utf-8') as f:
-        w = csv.DictWriter(f, fieldnames=["path","ref_count_approx","first_hit"])
-        w.writeheader(); w.writerows(rows)
+    with out_csv.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["path", "ref_count_approx", "first_hit"])
+        w.writeheader()
+        w.writerows(rows)
 
     print(f"[refs_fast] wrote {out_csv}  files={len(rows)}  terms={len(all_terms)}")
     return 0
+
 
 if __name__ == "__main__":
     try:

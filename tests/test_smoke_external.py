@@ -1,6 +1,7 @@
 import os
-import requests
+
 import pytest
+import requests
 
 
 @pytest.mark.skipif(os.getenv("RUN_EXTERNAL") != "1", reason="Set RUN_EXTERNAL=1 to run this test")
@@ -22,7 +23,6 @@ import threading
 import time
 
 import pytest
-import requests
 import uvicorn
 
 from api.search_api_rich import app

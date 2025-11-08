@@ -16,7 +16,7 @@ Env knobs:
 import os
 import threading
 import time
-from typing import Dict, Any, List
+from typing import Any
 
 import pytest
 import requests
@@ -39,6 +39,7 @@ def client() -> TestClient:
 # (adapted from your existing test files)
 # =========================
 
+
 def test_health_unit(client: TestClient):
     r = client.get("/health")
     assert r.status_code == 200
@@ -51,7 +52,7 @@ def test_openapi_has_ingest_unit(client: TestClient):
 
 
 def test_ingest_stub_and_search_unit(client: TestClient):
-    docs: List[Dict[str, Any]] = [
+    docs: list[dict[str, Any]] = [
         {"id": "t-1", "text": "CVE-2021-44228 issue", "metadata": {"cves": ["CVE-2021-44228"]}},
         {"id": "t-2", "text": "beaconing to 203.0.113.10", "metadata": {"ips": ["203.0.113.10"]}},
     ]
@@ -85,14 +86,16 @@ def test_search_smoke_unit(client: TestClient):
 # =========================
 
 RUN_EXTERNAL = os.getenv("RUN_EXTERNAL") == "1"
-pytestmark_external = pytest.mark.skipif(not RUN_EXTERNAL, reason="Set RUN_EXTERNAL=1 to run external smoke tests.")
+pytestmark_external = pytest.mark.skipif(
+    not RUN_EXTERNAL, reason="Set RUN_EXTERNAL=1 to run external smoke tests."
+)
 
 
 def _wait_for_health(url: str, timeout_s: float = 10.0):
     t0 = time.time()
     while time.time() - t0 < timeout_s:
         try:
-            r = requests.get(url, timeout=0.5)
+            requests.get(url, timeout=0.5)
             if r.status_code == 200:
                 return True
         except Exception:
@@ -128,7 +131,7 @@ def test_external_health():
         t.start()
 
     _wait_for_health(url)
-    r = requests.get(url, timeout=2)
+    requests.get(url, timeout=2)
 
 
 @pytest.mark.skipif(not RUN_EXTERNAL, reason="Set RUN_EXTERNAL=1 to run external smoke tests.")
@@ -140,13 +143,16 @@ def test_external_ingest_then_search():
     _wait_for_health(f"{base}/health")
 
     # Ingest one doc (server accepts string ids; in prod compose this hits real Qdrant)
-    docs = [{"id": "ext-1", "text": "CVE-2021-44228 hello", "metadata": {"cves": ["CVE-2021-44228"]}}]
-    r = requests.post(f"{base}/ingest", json=docs, timeout=5)
+    docs = [
+        {"id": "ext-1", "text": "CVE-2021-44228 hello", "metadata": {"cves": ["CVE-2021-44228"]}}
+    ]
+    requests.post(f"{base}/ingest", json=docs, timeout=5)
 
     # Basic search smoke (pattern adapted from your external test) :contentReference[oaicite:9]{index=9}
     r2 = requests.get(f"{base}/search", params={"q": "CVE-2021-44228", "limit": 3}, timeout=5)
     assert r2.status_code == 200
     assert r2.text.strip().startswith("{") or r2.text.strip().startswith("[")
+
 
 def test_version_unit(client):
     r = client.get("/version")
@@ -154,6 +160,7 @@ def test_version_unit(client):
     data = r.json()
     assert data.get("name") == "agent-b-heva"
     assert data.get("version") == "0.1.0"
+
 
 def test_version(client):
     r = client.get("/version")

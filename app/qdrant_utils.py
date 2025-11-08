@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Dict, Any, Optional
+from typing import Any
+
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter
 
@@ -8,8 +9,8 @@ from qdrant_client.models import Filter
 def set_payload_by_filter(
     client: QdrantClient,
     collection: str,
-    payload: Dict[str, Any],
-    flt: Optional[Filter] = None,
+    payload: dict[str, Any],
+    flt: Filter | None = None,
     limit: int = 1000,
     wait: bool = True,
 ) -> int:

@@ -8,7 +8,6 @@ from __future__ import annotations
 import importlib.util
 import re
 from pathlib import Path
-from typing import List, Tuple
 
 # Locate and import the deep file WITHOUT importing from this package (avoid cycles)
 ROOT = Path(__file__).resolve().parent.parent
@@ -64,13 +63,13 @@ _TRIM_LEFT = "([{'\""
 _TRIM_RIGHT = ")]}',.;:"
 
 
-def _emit(label: str, m: re.Match) -> Tuple[int, int, str]:
+def _emit(label: str, m: re.Match) -> tuple[int, int, str]:
     # All patterns must capture the entity in group 1
     s, e = m.span(1)
     return (s, e, label)
 
 
-def _trim(text: str, s: int, e: int) -> Tuple[int, int]:
+def _trim(text: str, s: int, e: int) -> tuple[int, int]:
     while s < e and text[s] in _TRIM_LEFT:
         s += 1
     while e > s and text[e - 1] in _TRIM_RIGHT:
@@ -78,14 +77,14 @@ def _trim(text: str, s: int, e: int) -> Tuple[int, int]:
     return s, e
 
 
-def _dedupe_keep_longest(spans: List[Tuple[int, int, str]]) -> List[Tuple[int, int, str]]:
+def _dedupe_keep_longest(spans: list[tuple[int, int, str]]) -> list[tuple[int, int, str]]:
     by_label = {}
     for s, e, lbl in spans:
         by_label.setdefault(lbl, []).append((s, e))
-    final: List[Tuple[int, int, str]] = []
+    final: list[tuple[int, int, str]] = []
     for lbl, lst in by_label.items():
         lst.sort(key=lambda t: (t[0], -(t[1] - t[0])))
-        kept: List[Tuple[int, int]] = []
+        kept: list[tuple[int, int]] = []
         for s, e in lst:
             replace_idx = None
             for i, (ks, ke) in enumerate(kept):
@@ -104,14 +103,14 @@ def _dedupe_keep_longest(spans: List[Tuple[int, int, str]]) -> List[Tuple[int, i
     return final
 
 
-def find_all(text: str) -> List[Tuple[int, int, str]]:
+def find_all(text: str) -> list[tuple[int, int, str]]:
     """
     Return a list of (start, end, label) spans for:
       - CVE, IP, DOMAIN (regex)
       - MALWARE, THREAT_ACTOR (dictionary-backed regex)
     Post-process: trim punctuation and dedupe overlaps (keep longest per label).
     """
-    spans: List[Tuple[int, int, str]] = []
+    spans: list[tuple[int, int, str]] = []
     for m in CVE_PATTERN.finditer(text):
         spans.append(_emit("CVE", m))
     for m in IP_PATTERN.finditer(text):

@@ -41,4 +41,3 @@ load_env
 
 echo "🚀 Starting uvicorn on 0.0.0.0:$PORT…"
 exec uvicorn "$APP" --host 0.0.0.0 --port "$PORT" --reload
-

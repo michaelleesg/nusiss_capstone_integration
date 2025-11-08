@@ -126,4 +126,3 @@ if ((${#missing[@]})); then
   read -rp "Press Enter to exit..."
   exit 1
 fi
-

@@ -24,7 +24,8 @@ def repo_snapshot():
             continue
         try:
             txt = path.read_text()
-        except:
+        except Exception:
+
             continue
         if len(txt) > 100_000:  # skip huge files
             continue

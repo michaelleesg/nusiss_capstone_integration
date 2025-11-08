@@ -22,4 +22,3 @@ if [[ -z "$resp" || "$resp" != *"{"* ]]; then
 fi
 
 echo "[healthcheck] OK"
-

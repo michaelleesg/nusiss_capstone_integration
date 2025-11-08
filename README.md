@@ -68,8 +68,8 @@ docker compose up --build
 ```
 
 Endpoints:
-- Swagger UI: <http://localhost:8000/docs>  
-- Health: `GET http://localhost:8000/health`  
+- Swagger UI: <http://localhost:8000/docs>
+- Health: `GET http://localhost:8000/health`
 - Version: `GET http://localhost:8000/version`
 
 Stop/clean:
@@ -292,13 +292,13 @@ Suggested markers:
 
 ## FAQ
 
-**Q: I get port collisions on 8000/6333.**  
+**Q: I get port collisions on 8000/6333.**
 A: Change `APP_PORT`, use `uvicorn … --port 8001`, or map `-p 8001:8000`. For Qdrant, map `-p 6334:6333` and set `QDRANT_URL=http://localhost:6334`.
 
-**Q: Compose can’t reach Qdrant.**  
+**Q: Compose can’t reach Qdrant.**
 A: Inside the compose network the hostname is `qdrant`, not `localhost`. Use `http://qdrant:6333` in the API container.
 
-**Q: How do I paginate?**  
+**Q: How do I paginate?**
 A: Use `offset` + `limit`. Depending on your store, you may also add `next_token` in the future for cursor‑based paging.
 
 ---

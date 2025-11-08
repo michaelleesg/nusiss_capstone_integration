@@ -1,24 +1,25 @@
 import argparse
+import hashlib
 import json
 import os
 import re
-import uuid
-import hashlib
-from pathlib import Path
-from datetime import datetime
-from typing import List, Dict, Any, Iterable, Tuple
-from tqdm import tqdm
 import time
+import uuid
+from collections.abc import Iterable
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 import torch
-from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import (
     Distance,
-    VectorParams,
-    PointStruct,
     PayloadSchemaType,
+    PointStruct,
+    VectorParams,
 )
+from sentence_transformers import SentenceTransformer
+from tqdm import tqdm
 
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "heva_docs")
@@ -47,7 +48,7 @@ def md5_hex(s: str) -> str:
     return hashlib.md5(s.encode("utf-8"), usedforsecurity=False).hexdigest()
 
 
-def extract_iocs(text: str) -> Dict[str, List[str]]:
+def extract_iocs(text: str) -> dict[str, list[str]]:
     cves = re.findall(r"CVE-\d{4}-\d{4,7}", text, flags=re.I)
     ips = re.findall(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", text)
     domains = re.findall(r"\b[a-z0-9][a-z0-9-]*\.[a-z]{2,}\b", text, flags=re.I)
@@ -90,7 +91,7 @@ def generate_queries(text: str, title: str = "") -> list[str]:
     return list(dict.fromkeys(qs))[:6]
 
 
-def chunk_text(text: str, max_chars=1200, overlap=150) -> List[Dict[str, Any]]:
+def chunk_text(text: str, max_chars=1200, overlap=150) -> list[dict[str, Any]]:
     t = re.sub(r"\s+", " ", (text or "")).strip()
     out, i, n = [], 0, len(t)
     while i < n:
@@ -159,18 +160,18 @@ def maybe_create_indexes(client: QdrantClient, name: str):
                 ("sectors", PayloadSchemaType.KEYWORD),
             ]:
                 try:
-                    client.create_payload_index(collection_name=name, field_name=field, field_schema=schema)
+                    client.create_payload_index(
+                        collection_name=name, field_name=field, field_schema=schema
+                    )
                 except Exception:
                     pass
             # <<< END HEVA INDEX PATCH <<<
-            client.create_payload_index(
-                collection_name=name, field_name=field, field_schema=schema
-            )
+            client.create_payload_index(collection_name=name, field_name=field, field_schema=schema)
         except Exception:
             pass
 
 
-def load_records(path: str) -> Iterable[Dict[str, Any]]:
+def load_records(path: str) -> Iterable[dict[str, Any]]:
     txt = Path(path).read_text(encoding="utf-8").strip()
     idx = 0
 
@@ -205,15 +206,15 @@ def load_records(path: str) -> Iterable[Dict[str, Any]]:
 
 
 def build_payload(
-    rec: Dict[str, Any],
-    ch: Dict[str, Any],
+    rec: dict[str, Any],
+    ch: dict[str, Any],
     *,
     doc_id: str,
     idx: int,
     total: int,
     prev_id: str | None,
     chunk_id: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     title = rec.get("caps_title") or rec.get("title") or ""
     source_url = rec.get("_id") or rec.get("url") or ""
     published_at_str = rec.get("published_at") or rec.get("date_time")
@@ -254,16 +255,24 @@ def build_payload(
                 payload["tags"].append(t)
     # >>> BEGIN HEVA BUILD_PAYLOAD PATCH (idempotent) >>>
     for key in [
-        "source", "folder_type", "context_category",
-        "threat_actors", "mitre_ttps", "cve_vulns",
-        "affected_products", "sectors",
-        "affects_singapore", "affects_asean", "active_exploitation", "high_tension_event"
+        "source",
+        "folder_type",
+        "context_category",
+        "threat_actors",
+        "mitre_ttps",
+        "cve_vulns",
+        "affected_products",
+        "sectors",
+        "affects_singapore",
+        "affects_asean",
+        "active_exploitation",
+        "high_tension_event",
     ]:
         val = rec.get(key)
         if val is not None:
             payload[key] = val
 
-    for k in ("tags","threat_actors","mitre_ttps","cve_vulns","affected_products","sectors"):
+    for k in ("tags", "threat_actors", "mitre_ttps", "cve_vulns", "affected_products", "sectors"):
         if k in payload and not isinstance(payload[k], list):
             payload[k] = [payload[k]]
     # <<< END HEVA BUILD_PAYLOAD PATCH <<<
@@ -295,9 +304,7 @@ def main():
     ap.add_argument("--max-chars", type=int, default=1200)
     ap.add_argument("--overlap", type=int, default=150)
     ap.add_argument("--create-indexes", action="store_true")
-    ap.add_argument(
-        "--max-docs", type=int, default=0, help="Stop after N docs (0 = all)"
-    )
+    ap.add_argument("--max-docs", type=int, default=0, help="Stop after N docs (0 = all)")
     ap.add_argument(
         "--batch-chunks",
         type=int,
@@ -319,8 +326,8 @@ def main():
     if args.create_indexes:
         maybe_create_indexes(client, args.collection)
 
-    texts: List[str] = []
-    metas: List[Tuple[str, Dict[str, Any]]] = []  # (point_id, payload)
+    texts: list[str] = []
+    metas: list[tuple[str, dict[str, Any]]] = []  # (point_id, payload)
     total_chunks = 0
     seen_docs = 0
 

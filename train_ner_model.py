@@ -1,13 +1,14 @@
-from transformers import (
-    AutoTokenizer,
-    AutoModelForTokenClassification,
-    DataCollatorForTokenClassification,
-    TrainingArguments,
-    Trainer,
-)
-from datasets import Dataset
 import os
+
+from datasets import Dataset
 from dotenv import load_dotenv
+from transformers import (
+    AutoModelForTokenClassification,
+    AutoTokenizer,
+    DataCollatorForTokenClassification,
+    Trainer,
+    TrainingArguments,
+)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,7 +21,7 @@ if not os.path.exists(data_path):
 tokens, tags = [], []
 sentences = []
 
-with open(data_path, "r", encoding="utf-8") as f:
+with open(data_path, encoding="utf-8") as f:
     for line in f:
         line = line.strip()
         if not line:
@@ -88,7 +89,7 @@ tokenized_dataset = dataset.map(tokenize_and_align_labels)
 tokenized_dataset = tokenized_dataset.remove_columns(["tokens", "ner_tags"])
 
 # Count usable samples
-valid_count = sum(1 for x in tokenized_dataset if any(l != -100 for l in x["labels"]))
+valid_count = sum(1 for x in tokenized_dataset if any(label != -100 for label in x["labels"]))
 print(f"✅ Usable training samples after tokenization: {valid_count}")
 if valid_count == 0:
     raise ValueError("❌ All labels masked after tokenization. Check alignment.")

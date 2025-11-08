@@ -1,6 +1,6 @@
 import hashlib
 import os
-from typing import Any, Dict, List
+from typing import Any
 
 from fastapi import FastAPI, Request
 from qdrant_client import QdrantClient
@@ -31,12 +31,12 @@ def ensure_collection():
         )
 
 
-def make_doc_id(art: Dict[str, Any]) -> str:
+def make_doc_id(art: dict[str, Any]) -> str:
     raw = (art.get("source_url", "") + art.get("content_sha256", "")).encode()
     return hashlib.sha256(raw).hexdigest()
 
 
-def mk_embedding_text(art: Dict[str, Any]) -> str:
+def mk_embedding_text(art: dict[str, Any]) -> str:
     i = art.get("iocs", {})
     ioc_flat = " ".join(
         i.get("urls", []) + i.get("domains", []) + i.get("ips", []) + i.get("hashes", [])
@@ -55,12 +55,12 @@ def mk_embedding_text(art: Dict[str, Any]) -> str:
     )
 
 
-async def embed(_: str) -> List[float]:
+async def embed(_: str) -> list[float]:
     # stub: returns a zero vector; swap with real embeddings later
     return [0.0] * VECTOR_SIZE
 
 
-def mk_payload(art: Dict[str, Any]) -> Dict[str, Any]:
+def mk_payload(art: dict[str, Any]) -> dict[str, Any]:
     cves = [v.get("id", "") for v in art.get("cve", {}).get("vulnerabilities", [])]
     return {
         "tenant": next(
@@ -102,7 +102,7 @@ async def ingest_artifact(req: Request):
 
 
 @app.post("/by-cves")
-async def by_cves(body: Dict[str, Any]):
+async def by_cves(body: dict[str, Any]):
     tenant = body.get("tenant", "default")
     cves = body.get("cves", [])
     flt = Filter(must=[FieldCondition(key="tenant", match=MatchValue(value=tenant))])

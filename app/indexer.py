@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Dict, Any, List, Optional
 import uuid
+from typing import Any
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct
@@ -9,7 +9,7 @@ from qdrant_client.models import PointStruct
 from .embeddings import embed_chunks
 
 
-def derive_context_category(heading: Optional[str], text: str) -> str:
+def derive_context_category(heading: str | None, text: str) -> str:
     """
     Heuristic categorizer so Agent B emits Agent C-style 'context_category' values.
     """
@@ -31,8 +31,8 @@ def chunk_text(
     target_tokens: int = 512,
     overlap: int = 128,
     has_structured_data: bool = False,
-    section: Optional[str] = None,
-) -> List[Dict[str, Any]]:
+    section: str | None = None,
+) -> list[dict[str, Any]]:
     """
     Produce Agent-C-shaped chunks with:
       - type: 'report'
@@ -45,7 +45,7 @@ def chunk_text(
     approx_chars = max(1, target_tokens) * 4
     step = max(1, approx_chars - overlap * 4)
 
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for i in range(0, len(text), step):
         seg = text[i : i + approx_chars].strip()
         if not seg:
@@ -85,10 +85,10 @@ def chunk_text(
 def upsert_artifact(
     client: QdrantClient,
     collection: str,
-    artifact: Dict[str, Any],
+    artifact: dict[str, Any],
     *,
-    filename: Optional[str] = None,
-    folder_type: Optional[str] = None,
+    filename: str | None = None,
+    folder_type: str | None = None,
 ) -> int:
     """
     Chunk, embed, and upsert one artifact into Qdrant.
@@ -117,7 +117,7 @@ def upsert_artifact(
     )
 
     vecs = embed_chunks([c["text"] for c in chunks])
-    points: List[PointStruct] = []
+    points: list[PointStruct] = []
 
     for ix, (chunk, vec) in enumerate(zip(chunks, vecs)):
         metadata = {
@@ -129,7 +129,7 @@ def upsert_artifact(
             "has_structured_data": chunk["chunk_metadata"]["has_structured_data"],
             "chunk_length": chunk["chunk_metadata"]["length"],
         }
-        raw_id = f'{artifact.get("artifact_id", filename or "doc")}:{ix}'
+        raw_id = f"{artifact.get('artifact_id', filename or 'doc')}:{ix}"
         metadata["artifact_id"] = artifact.get(
             "artifact_id"
         )  # Include artifact_id for traceability
@@ -144,40 +144,38 @@ def upsert_artifact(
                 or ""
             ),
             "folder": (
-                folder_type
-                or artifact.get("folder_type")
-                or artifact.get("folder")
-                or "osint"
+                folder_type or artifact.get("folder_type") or artifact.get("folder") or "osint"
             ),
             "doc_type": chunk["type"],
-            "section":  chunk["section"],
+            "section": chunk["section"],
             "context_category": chunk.get("context_category", artifact.get("context_category")),
             "has_structured_data": chunk["chunk_metadata"]["has_structured_data"],
-            "chunk_length":        chunk["chunk_metadata"]["length"],
-
+            "chunk_length": chunk["chunk_metadata"]["length"],
             # Traceability
             "artifact_id": artifact.get("artifact_id"),
-
             # NEW: temporal + enrichment
             "published_at": artifact.get("published_at"),
-            "tags":          artifact.get("tags", []),
-
+            "tags": artifact.get("tags", []),
             # Optional threat-intel pivots
-            "threat_actors":     artifact.get("threat_actors", []),
-            "mitre_ttps":        artifact.get("mitre_ttps", []),
-            "cve_vulns":         artifact.get("cve_vulns", []),
+            "threat_actors": artifact.get("threat_actors", []),
+            "mitre_ttps": artifact.get("mitre_ttps", []),
+            "cve_vulns": artifact.get("cve_vulns", []),
             "affected_products": artifact.get("affected_products", []),
-            "sectors":           artifact.get("sectors", []),
-
+            "sectors": artifact.get("sectors", []),
             # Optional booleans used downstream
-            "affects_singapore":   artifact.get("affects_singapore"),
-            "affects_asean":       artifact.get("affects_asean"),
+            "affects_singapore": artifact.get("affects_singapore"),
+            "affects_asean": artifact.get("affects_asean"),
             "active_exploitation": artifact.get("active_exploitation"),
-            "high_tension_event":  artifact.get("high_tension_event"),
+            "high_tension_event": artifact.get("high_tension_event"),
         }
 
         for k in (
-            "tags","threat_actors","mitre_ttps","cve_vulns","affected_products","sectors"
+            "tags",
+            "threat_actors",
+            "mitre_ttps",
+            "cve_vulns",
+            "affected_products",
+            "sectors",
         ):
             if metadata.get(k) is None:
                 metadata[k] = []
@@ -191,27 +189,28 @@ def upsert_artifact(
             metadata.pop("published_at_ts", None)
         # <<< HEVA CLOCK GUARD <<<
 
-
         # Compute published_at_ts if present; always add ingested_at_ts as fallback
         try:
             from datetime import datetime
             from time import time as _now
+
             if metadata.get("published_at") and not metadata.get("published_at_ts"):
-                _s = str(metadata["published_at"]).replace("Z","")
+                _s = str(metadata["published_at"]).replace("Z", "")
                 metadata["published_at_ts"] = int(datetime.fromisoformat(_s).timestamp())
         except Exception:
             pass
         # Always set ingested_at_ts if missing
         if not metadata.get("ingested_at_ts"):
             from time import time as _now
-            metadata["ingested_at_ts"] = int(_now())
 
+            metadata["ingested_at_ts"] = int(_now())
 
         # Normalize published_at → published_at_ts (unix int) if present
         try:
             if metadata.get("published_at") and not metadata.get("published_at_ts"):
                 from datetime import datetime
-                _dt = datetime.fromisoformat(str(metadata["published_at"]).replace("Z",""))
+
+                _dt = datetime.fromisoformat(str(metadata["published_at"]).replace("Z", ""))
                 metadata["published_at_ts"] = int(_dt.timestamp())
         except Exception:
             pass

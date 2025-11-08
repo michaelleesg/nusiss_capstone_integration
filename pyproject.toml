@@ -5,9 +5,21 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = [".venv", ".aider.tags.cache.v4", "legacy"]
+extend-exclude = [".aider.tags.cache.v4", "legacy", ".qdrant", ".venv", "node_modules", "original_combined.json"]
 
 [tool.ruff.lint]
-# Equivalent to what you wanted from both sides of the conflict
-select = ["E", "F", "I", "UP"]
-ignore = ["E203", "E266", "E501"]
+select = ["E","F","I"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E402","F841"]
+"_tools_*" = ["E701","E702"]
+"scripts/**" = ["E701","E702"]
+"refs_fast.py" = ["E702"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]

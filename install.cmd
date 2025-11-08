@@ -144,13 +144,13 @@ set "IN_PLATFORM_SECTION="
 REM Read the manifest line by line
 for /f "usebackq tokens=*" %%i in ("!MANIFEST_PATH!") do (
     set "LINE=%%i"
-    
+
     REM Check if this line contains our platform
     echo !LINE! | findstr /c:"\"%PLATFORM_NAME%\":" >nul
     if !ERRORLEVEL! equ 0 (
         set "IN_PLATFORM_SECTION=1"
     )
-    
+
     REM If we're in the platform section, look for checksum
     if defined IN_PLATFORM_SECTION (
         echo !LINE! | findstr /c:"\"checksum\":" >nul
@@ -162,7 +162,7 @@ for /f "usebackq tokens=*" %%i in ("!MANIFEST_PATH!") do (
                 set "CHECKSUM_PART=!CHECKSUM_PART: =!"
                 set "CHECKSUM_PART=!CHECKSUM_PART:"=!"
                 set "CHECKSUM_PART=!CHECKSUM_PART:,=!"
-                
+
                 REM Check if it looks like a SHA256 (64 hex chars)
                 if not "!CHECKSUM_PART!"=="" (
                     call :check_length "!CHECKSUM_PART!" 64
@@ -173,7 +173,7 @@ for /f "usebackq tokens=*" %%i in ("!MANIFEST_PATH!") do (
                 )
             )
         )
-        
+
         REM Check if we've left the platform section (closing brace)
         echo !LINE! | findstr /c:"}" >nul
         if !ERRORLEVEL! equ 0 set "IN_PLATFORM_SECTION="

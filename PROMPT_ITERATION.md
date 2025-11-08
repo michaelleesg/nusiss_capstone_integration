@@ -7,4 +7,3 @@
 - Keep ingestion path: POST /ingest and/or background pickup watcher.
 - Update or add tests as needed to keep behavior covered.
 - Never touch .venv, do not reformat notebooks.
-

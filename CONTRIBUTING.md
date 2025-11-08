@@ -1,6 +1,6 @@
 # Contributing Guide
 
-Welcome! This repo uses a **two‑remote** flow and a few guardrails so we keep history clean and CI happy.  
+Welcome! This repo uses a **two‑remote** flow and a few guardrails so we keep history clean and CI happy.
 If you follow the quickstart below you’ll be in great shape.
 
 ---

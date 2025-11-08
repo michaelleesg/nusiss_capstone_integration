@@ -2,7 +2,7 @@ based on the work done for ner and from the perspective of an academically brill
 
 
 
-I need to turn this into a segment on the NER agent I am working on in the technical paper that includes all the agents for this project. the format used should be latex generated using the batch file i am uploading now. please also reference the structure but all fashion related project information should be purged from this exercise because that was a project from the previous semester. 
+I need to turn this into a segment on the NER agent I am working on in the technical paper that includes all the agents for this project. the format used should be latex generated using the batch file i am uploading now. please also reference the structure but all fashion related project information should be purged from this exercise because that was a project from the previous semester.
 yes to this: adapt your existing .bib file (purge fashion references, add only NER/CTI papers like BERT, RoBERTa, SecBERT, MITRE ATT&CK, CVE, KEV, EPSS) so your LaTeX compiles seamlessly
 yes to this: reate a new CyberSage.bib with only CTI/NER references
 embed these three figures with captions into your PR3 final Word document, or keep them as supplementary diagrams for the Capstone Technical Paper
@@ -14,7 +14,7 @@ regenerate the cleaned CyberSage.bib as a file and package them all into a zip f
 Add the full agent content (not just stubs) for A, B, C, D to this package so the final PDF is close to camera-ready.
 Insert a References sanity check (e.g., add a couple of \cite{...} lines in Agent B) to confirm BibTeX is fully wired.
 do the following and regenerate capstone_report.zip for download:
-Rewrote agentB_ner.tex with the full NER section including citations to:	
+Rewrote agentB_ner.tex with the full NER section including citations to:
 devlin2018bert, liu2019roberta, jehangir2023ner, recentner2024, secbert2020, securebert2021, mitre_attack, cve_reference, cisa_kev, epss_reference.
 Added a safety net \nocite{*} in main.tex (right before the bibliography) so the bibliography renders even if citations are optimized away or not yet referenced.
 Ensured all ampersands in section titles are escaped (e.g., \&).
@@ -37,5 +37,3 @@ How this aligns with industry use cases (banking, CTI SaaS).
 Uses a scholarly tone appropriate for academic submission (structured, evidence-backed, and clearly referenced to AIC/Capstone learning outcomes).
 Make the writing concise, impactful, and impressive to an academic examiner — emphasizing depth, clarity, and reflection over marketing fluff."
 *
-
-

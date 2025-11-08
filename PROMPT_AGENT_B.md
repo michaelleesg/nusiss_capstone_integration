@@ -21,4 +21,3 @@
   - coverage,
   - pytest JUnit XML,
   - an HTML/Markdown report in `capstone_report/`.
-

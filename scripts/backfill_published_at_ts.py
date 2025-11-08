@@ -1,10 +1,9 @@
 import os
 from datetime import datetime
-from typing import List, Optional
 
+from pydantic import ValidationError
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as qm
-from pydantic import ValidationError
 
 COLLECTION = os.environ.get("QDRANT_COLLECTION", "cybersage")
 QDRANT_URL = os.environ.get("QDRANT_URL", "http://127.0.0.1:6333")
@@ -13,6 +12,7 @@ BATCH = int(os.environ.get("BACKFILL_BATCH", "256"))
 DRY_RUN = os.environ.get("DRY_RUN", "0") == "1"
 
 cli = QdrantClient(url=QDRANT_URL, api_key=QDRANT_KEY)
+
 
 def build_filter_with_is_null() -> qm.Filter:
     # published_at_ts IS NULL, published_at IS NOT NULL
@@ -31,7 +31,8 @@ def build_filter_with_is_null() -> qm.Filter:
         ],
     )
 
-def to_ts(val) -> Optional[int]:
+
+def to_ts(val) -> int | None:
     try:
         s = str(val).strip()
         if not s:
@@ -42,12 +43,14 @@ def to_ts(val) -> Optional[int]:
     except Exception:
         return None
 
+
 # Try to construct the filter; fall back to None if unsupported
 flt = None
 try:
     flt = build_filter_with_is_null()
 except (TypeError, ValidationError, AttributeError):
     flt = None
+
 
 def scroll_page(offset, flt):
     """
@@ -69,6 +72,7 @@ def scroll_page(offset, flt):
         # Try new kw
         return cli.scroll(**kwargs_base, filter=flt)
 
+
 updated = 0
 scanned = 0
 offset = None
@@ -78,8 +82,8 @@ while True:
     if not points:
         break
 
-    to_update_ids: List = []
-    to_update_payloads: List[dict] = []
+    to_update_ids: list = []
+    to_update_payloads: list[dict] = []
 
     for p in points:
         pl = dict(p.payload or {})

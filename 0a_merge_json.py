@@ -1,6 +1,6 @@
 import json
-import uuid
 import os
+import uuid
 
 # ✅ Define paths
 base_dir = "C:/Users/mike/Downloads/capstone"
@@ -9,11 +9,11 @@ file2 = os.path.join(base_dir, "Raw_Crawled_Fixed.json")
 output_path = os.path.join(base_dir, "combined.json")
 
 # ✅ Load first file
-with open(file1, "r", encoding="utf-8") as f1:
+with open(file1, encoding="utf-8") as f1:
     data1 = json.load(f1)
 
 # ✅ Load second file
-with open(file2, "r", encoding="utf-8") as f2:
+with open(file2, encoding="utf-8") as f2:
     data2 = json.load(f2)
 
 # 🧹 Flatten nested lists if present

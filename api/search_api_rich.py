@@ -4,7 +4,7 @@ import os
 import re
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -66,7 +66,7 @@ embedding_size = model.get_sentence_embedding_dimension()
 logger.info(f"✅ Loaded model '{MODEL_NAME}' (dim={embedding_size})")
 
 # === Qdrant (optional in tests) ===
-client: Optional[QdrantClient] = None
+client: QdrantClient | None = None
 if not SKIP_QDRANT:
     try:
         client = QdrantClient(url=QDRANT_URL)
@@ -91,19 +91,19 @@ else:
 # === Schemas (align with OpenAPI) ===
 class SearchResult(BaseModel):
     text: str
-    tokens: List[str] = []
-    labels: List[str] = []
-    tags: List[str] = []
+    tokens: list[str] = []
+    labels: list[str] = []
+    tags: list[str] = []
     score: float
 
 
 class SearchResponse(BaseModel):
     query: str
-    results: List[SearchResult]
+    results: list[SearchResult]
 
 
 # === IOC detection (CVE/IP/domain/SHA256) ===
-IOC_RE: Dict[str, re.Pattern] = {
+IOC_RE: dict[str, re.Pattern] = {
     "cve": re.compile(r"\bCVE-\d{4}-\d{4,7}\b", re.IGNORECASE),
     "ip": re.compile(
         r"\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b"
@@ -113,9 +113,9 @@ IOC_RE: Dict[str, re.Pattern] = {
 }
 
 
-def detect_iocs(text: str) -> Dict[str, List[str]]:
+def detect_iocs(text: str) -> dict[str, list[str]]:
     text = text or ""
-    found: Dict[str, List[str]] = {}
+    found: dict[str, list[str]] = {}
     for key, rx in IOC_RE.items():
         hits = rx.findall(text)
         if hits:
@@ -123,22 +123,22 @@ def detect_iocs(text: str) -> Dict[str, List[str]]:
     return found
 
 
-def _ioc_filter_for_value(key: str, values: List[str]) -> Filter:
+def _ioc_filter_for_value(key: str, values: list[str]) -> Filter:
     return Filter(must=[FieldCondition(key=key, match=MatchAny(any=values))])
 
 
 def exact_hits_for_iocs(
     qdrant: QdrantClient,
     collection: str,
-    iocs: Dict[str, List[str]],
+    iocs: dict[str, list[str]],
     limit: int = 10,
 ):
     """
     Fetch exact matches for detected IOCs using payload filters. Tries common keys.
     """
-    gathered: List[Any] = []
+    gathered: list[Any] = []
     seen = set()
-    key_map: Dict[str, List[str]] = {
+    key_map: dict[str, list[str]] = {
         "cve": ["cves", "CVE", "cve", "indicators", "tags"],
         "ip": ["ips", "ip", "indicators", "tags"],
         "domain": ["domains", "domain", "indicators", "tags"],
@@ -194,11 +194,11 @@ def normalize_point_id(raw_id):
 class IngestItem(BaseModel):
     id: str
     text: str
-    metadata: Dict[str, Any] = {}
+    metadata: dict[str, Any] = {}
 
 
 @app.post("/ingest", summary="Ingest texts into the vector collection")
-def ingest(items: List[IngestItem]):
+def ingest(items: list[IngestItem]):
     if not items:
         return {"ingested": 0, "collection": COLLECTION_NAME}
 
@@ -226,17 +226,17 @@ def ingest(items: List[IngestItem]):
 @app.get("/search", response_model=SearchResponse, summary="Search")
 def search(
     request: Request,
-    query: Optional[str] = Query(None, description="Search sentence or phrase"),
-    q: Optional[str] = Query(None, description="Alias for query"),
+    query: str | None = Query(None, description="Search sentence or phrase"),
+    q: str | None = Query(None, description="Alias for query"),
     limit: int = Query(TOP_K, ge=1, le=50),
     # light filters
-    min_score: Optional[float] = Query(0.0, ge=0.0, description="Minimum score for results"),
-    tags: Optional[str] = Query(None, description="Comma-separated tags to filter"),
-    source_type: Optional[str] = Query(None, description="Filter by source type"),
-    doc_id: Optional[str] = Query(None, description="Filter by document ID"),
-    after: Optional[str] = Query(None, description="Filter by published date after (ISO8601)"),
-    before: Optional[str] = Query(None, description="Filter by published date before (ISO8601)"),
-    has_ioc: Optional[bool] = Query(None, description="Filter by presence of IOCs"),
+    min_score: float | None = Query(0.0, ge=0.0, description="Minimum score for results"),
+    tags: str | None = Query(None, description="Comma-separated tags to filter"),
+    source_type: str | None = Query(None, description="Filter by source type"),
+    doc_id: str | None = Query(None, description="Filter by document ID"),
+    after: str | None = Query(None, description="Filter by published date after (ISO8601)"),
+    before: str | None = Query(None, description="Filter by published date before (ISO8601)"),
+    has_ioc: bool | None = Query(None, description="Filter by presence of IOCs"),
 ):
     term = query or q or request.query_params.get("q") or request.query_params.get("query")
     if not term:
@@ -257,7 +257,7 @@ def search(
     if doc_id:
         must.append(FieldCondition(key="doc_id", match=MatchValue(value=doc_id)))
 
-    def to_ts(s: Optional[str]) -> Optional[int]:
+    def to_ts(s: str | None) -> int | None:
         if not s:
             return None
         try:
@@ -295,7 +295,7 @@ def search(
         )
 
     # IOC-boosted merge: exact matches first, then vector hits (dedupe by id)
-    merged: List[SearchResult] = []
+    merged: list[SearchResult] = []
     seen = set()
 
     iocs = detect_iocs(term)

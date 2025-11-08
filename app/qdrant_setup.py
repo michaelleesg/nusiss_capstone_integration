@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, HnswConfigDiff
+from qdrant_client.models import Distance, HnswConfigDiff, VectorParams
 
 # Keep this in sync with app/embeddings.DIM (we default to 384 there).
 DIM = 384
+
 
 def ensure_collection(url: str = "http://localhost:6333", name: str = "heva_v1") -> bool:
     """

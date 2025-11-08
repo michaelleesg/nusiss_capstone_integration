@@ -1,11 +1,30 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.14.4
     hooks:
       - id: ruff
-        args: [--fix]
+        args: ["--fix"]
+        exclude: |
+          ^legacy/|^\.qdrant/|^original_combined\.json
       - id: ruff-format
+        exclude: |
+          ^legacy/|^\.qdrant/|^original_combined\.json
+
   - repo: https://github.com/psf/black
     rev: 25.9.0
     hooks:
       - id: black
+        exclude: |
+          ^legacy/|^\.qdrant/|^original_combined\.json
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+        files: '\.(py|md|sh|yml|yaml|toml|txt)$'
+        exclude: |
+          ^legacy/|^\.qdrant/|^original_combined\.json
+      - id: trailing-whitespace
+        files: '\.(py|md|sh|yml|yaml|toml|txt)$'
+        exclude: |
+          ^legacy/|^\.qdrant/|^original_combined\.json

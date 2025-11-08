@@ -1,9 +1,10 @@
 # Remove the backticks
 from __future__ import annotations
+
+import hashlib
 import math
 import re
-from typing import Iterable, List
-import hashlib
+from collections.abc import Iterable
 
 DIM = 384  # default embedding size
 
@@ -16,12 +17,12 @@ def _tokens(text: str) -> Iterable[str]:
             yield tok
 
 
-def feature_hash_embed(texts: List[str], dim: int = DIM) -> List[List[float]]:
+def feature_hash_embed(texts: list[str], dim: int = DIM) -> list[list[float]]:
     """
     Deterministic, dependency-free "embedding" using feature hashing.
     Not SOTA, but good enough for wiring + tests. Returns L2-normalized vectors.
     """
-    vecs: List[List[float]] = []
+    vecs: list[list[float]] = []
     for t in texts:
         v = [0.0] * dim
         for tok in _tokens(t):
@@ -40,9 +41,9 @@ def feature_hash_embed(texts: List[str], dim: int = DIM) -> List[List[float]]:
     return vecs
 
 
-def embed_query(text: str, dim: int = DIM) -> List[float]:
+def embed_query(text: str, dim: int = DIM) -> list[float]:
     return feature_hash_embed([text], dim=dim)[0]
 
 
-def embed_chunks(chunks: List[str], dim: int = DIM) -> List[List[float]]:
+def embed_chunks(chunks: list[str], dim: int = DIM) -> list[list[float]]:
     return feature_hash_embed(chunks, dim=dim)
