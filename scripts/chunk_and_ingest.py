@@ -236,7 +236,7 @@ def build_payload(
         "title": title,
         "published_at": published_at_str,
         "published_at_ts": to_ts(published_at_str),
-        "tags": ["source:combined.json"],
+        "tags": ["source:ingest"],
         "ioc": ioc_chunk,
         "queries": queries,
         "has_ioc": has_ioc,

@@ -1,0 +1,104 @@
+curl -s --get "$BASE/search" \
+  --data-urlencode "query=phishing attacks,  intercepting session tokens, proxy login flow" \
+  --data-urlencode "limit=200" | jq .
+
+
+curl -s --get "$BASE/search" \
+  --data-urlencode "query=CVE-2024-29849 exploit chain proof-of-concept" \
+  --data-urlencode "limit=200" | jq .
+
+
+Key knobs you’ll see (and what they mean)
+
+M (a.k.a. hnsw_m) – Max edges per node (graph connectivity).
+Higher → better recall & smoother search, but more memory and slower builds.
+
+ef_construction – Build-time breadth (how widely you search when inserting).
+Higher → better index quality/recall, slower builds.
+
+search_ef – Query-time breadth (how many candidates you explore).
+Higher → higher recall, more latency (your main runtime recall knob).
+
+
+HNSW (Hierarchical Navigable Small World) is a graph-based index for Approximate Nearest Neighbor (ANN) search. It organizes all vectors into multiple layers of small-world graphs: the top layers are sparse “express lanes” that let a query jump quickly across the dataset; lower layers are denser and refine to the true neighbors. Insertion links a new vector to nearby nodes while descending layers; search starts at the top, walks greedily toward closer nodes, and descends until the bottom layer, where it explores a candidate list to return top-k neighbors—much faster than brute force with high recall.
+Key knobs
+
+M (a.k.a. hnsw_m): max edges per node → higher = better recall/smoother navigation, but more memory & slower builds (we use 16).
+
+ef_construction: build-time breadth → higher = better index quality/recall, but slower indexing (we use 128).
+search_ef: query-time breadth → higher = higher recall, but more latency (we use an adaptive 64–128, ~96 default).
+
+Why it’s good for HEVA
+Scales to large CTI corpora, gives sub-linear query time, and lets us tune recall vs latency at runtime via search_ef without rebuilding the index.
+
+Chunk each doc into ~1200-char, sentence-aware windows with 150-char overlap.
+
+Extract IOCs & build a rich payload (provenance + hints).
+
+Embed each chunk with MiniLM-L6-v2 (384-dim).
+
+Upsert into Qdrant (cosine), with payload indexes on ioc.* for deterministic lookups.
+
+Here’s how your actual ingest pipeline does chunking + embeddings (MiniLM-L6-v2) into Qdrant, based on chunk_and_ingest.py.
+
+What the script ingests
+
+Each record becomes many “evidence chunks” with:
+
+text + offsets (offset_start, offset_end), chunk_index, chunk_total, chunk_id
+extracted IOCs → ioc.{cves, ips, domains, hashes}, optional mitre_techniques, etc.
+provenance: doc_id, title, source_url, tags, published_at, published_at_ts
+embedding metadata: emb_model="sentence-transformers/all-MiniLM-L6-v2", emb_dim=384
+
+neighborhood links: neighborhood.prev_chunk_id / next_chunk_id
+light heuristics: queries (title + first ~40 words + obvious IOCs), fingerprint (MD5)
+
+ Indicators of Compromise (IOCs ...
+Tactics, Techniques, and Procedures (TTP)
+
+Chunking (sentence-aware, with overlap)
+Function: chunk_text(text, max_chars=1200, overlap=150)
+Normalizes whitespace.
+Takes windows of up to max_chars (default 1200).
+Preferentially cuts at the last “. ” found before the window end; if the cut would be too short (< ~50% of max_chars), it just cuts at the window end.
+Emits { "text", "start", "end" } per chunk.
+Moves the cursor forward by max_chars - overlap (default overlap 150), so adjacent chunks overlap for recall.
+
+IOC extraction & helper fields
+
+Regex-based IOC pull from the chunk text → ioc.cves, ioc.ips, ioc.domains, ioc.hashes.
+
+Builds a small queries array (title, first ~40 words, plus top IOCs) to help later retrieval.
+
+Timestamps: parses published_at / date_time → published_at_ts (if present).
+
+Embeddings (MiniLM-L6-v2, 384-dim)
+
+Model: SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+Device: CUDA if available, else CPU.
+
+Batching:
+
+Collects up to --batch-chunks chunks (default 1500) before encoding/upserting.
+
+Inside model.encode, uses --encode-batch-size (default 64) micro-batches.
+
+Optional --normalize to L2-normalize vectors before upsert.
+
+Produces a 384-dim cosine embedding per chunk.
+
+Qdrant collection & payload indexes
+
+Ensures collection exists with cosine metric and vector size 384.
+
+Optionally creates payload indexes (if --create-indexes):
+tags, doc_id, source_type, published_at_ts, and ioc.cves / ioc.ips / ioc.domains / ioc.hashes.
+
+Upsert strategy (reliable + scalable)
+
+Builds PointStruct(id=chunk_id, vector=embedding, payload=…).
+
+Uses a retrying upsert_with_retry that slices the batch into sub-batches (default 500) and backs off on transient errors.
+
+Sets neighborhood.prev_chunk_id during ingest (you can fill next_chunk_id later if you need forward links).

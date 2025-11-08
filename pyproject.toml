@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 [tool.black]
 line-length = 100
 target-version = ["py311"]
@@ -6,13 +5,9 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-
+extend-exclude = [".venv", ".aider.tags.cache.v4", "legacy"]
 
 [tool.ruff.lint]
-extend-select = ["I"]  # import sorting
-=======
-[tool.ruff]
-line-length = 100
+# Equivalent to what you wanted from both sides of the conflict
 select = ["E", "F", "I", "UP"]
->>>>>>> d62ee72 (feat: refactor and scaffold Agent B (HEVA) with FastAPI and Qdrant integration)
 ignore = ["E203", "E266", "E501"]

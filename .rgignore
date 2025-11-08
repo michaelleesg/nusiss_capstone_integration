@@ -1,0 +1,15 @@
+**/.git/
+**/.venv/
+node_modules/
+dist/
+build/
+__pycache__/
+
+# ignore backups
+*.bak
+**/*.bak
+
+legacy/**
+legacy/data_unused/**
+
+legacy/**
