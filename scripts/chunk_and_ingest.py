@@ -383,16 +383,13 @@ def main():
             if len(texts) >= args.batch_chunks:
                 flush_batch()
 
+    print(
+        f"✅ Ingested {seen_docs} documents with {total_chunks} chunks into "
+        f"\'{args.collection}\' on device={device}."
+    )
+
         seen_docs += 1
 
     flush_batch()
-
-
-print(
-    f"✅ Ingested {seen_docs} documents with {total_chunks} chunks into "
-    f"'{args.collection}' on device={device}."
-)
-
-
 if __name__ == "__main__":
     main()
