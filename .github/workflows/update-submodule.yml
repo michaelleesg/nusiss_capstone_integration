@@ -65,6 +65,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
+          # Check if PR already exists
+          if gh pr list --head update-agent-b-submodule --base main --state open | grep -q update-agent-b-submodule; then
+            echo "PR already exists, skipping creation"
+            exit 0
+          fi
+
           gh pr create \
             --title "chore: update agent_b submodule" \
             --body "Automated update of the agent_b submodule to the latest version from main branch.\n\nThis PR was automatically created by the security-advisor repository's GitHub Action workflow." \
