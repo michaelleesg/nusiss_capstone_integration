@@ -115,3 +115,8 @@ lands.csv
 cybersage_deploy_bundle.zip
 
 legacy/data_unused/*
+
+**/.venv/
+**/__pycache__/
+.pytest_cache/
+.qdrant/
